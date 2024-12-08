@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>making a virtual machine from scratch (in rust)</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<img src="/public/img/logo.svg" class="logo">
+	<b>dogeystamp</b>
+	<a href="/index.html">home</a>
+	<a href="/about">about</a>
+	<a href="/projects">projects</a>
+	<a href="https://git.dogeystamp.com">gitea</a>
+</div>
+
+<article>
+<h1 id="making-a-virtual-machine-from-scratch-in-rust">making a virtual machine from scratch (in rust)</h1>
+<p>2024-01-20</p>
+<p>Computers are wonderful machines that can do many things.
+However, even though they are very complex, at their core they are surprisingly simple.
+In fact, with only basic programming knowledge,
+it is possible to simulate a fully-functioning computer akin to modern ones.</p>
+<p>In this post, I document how I built a virtual machine for Little Computer 3 (LC-3),
+an educational computer model.
+LC-3 may be simple, but it works the same way any modern computer does:
+through implementing it, you get a glimpse of how real architectures like x86 or ARM work.
+Besides that, once you&#8217;re finished, you can play 2048 in the VM you created from scratch.
+Is there anything more gratifying?</p>
+<p>Writing a virtual machine is also a great test of your programming ability.
+I decided to do this project in Rust, in order to learn how the language works hands-on.
+I&#8217;ve mostly had experience with C and Python before this, and this was my first Rust project.
+However, this article will focus more on the virtual machine aspect, rather than the Rust.</p>
+<p>If you&#8217;re just looking for the source code, check it out on GitHub: <a href="https://github.com/dogeystamp/lc3-vm">dogeystamp&#47;lc3-vm</a>.</p>
+<h2 id="prerequisite-reading">prerequisite reading</h2>
+<p>I assume you have a certain amount of fundamental knowledge before reading this article:</p>
+<ul>
+<li><strong>Programming knowledge</strong> (preferably in Rust or C).
+I assume you know programming decently well, but are not familiar with virtual machines.
+I&#8217;ll give code analogies in C, and I assume you can figure out what the Rust means with prior knowledge in other languages.</li>
+<li><strong>Binary arithmetic</strong>.
+Computers, at their fundamental level, deal with exclusively binary.
+You should know <a href="https://www.hackerearth.com/practice/basic-programming/bit-manipulation/basics-of-bit-manipulation/tutorial/">bitwise operations</a>,
+like left&#47;right shift, AND, NOT, OR, etc. to see how binary is manipulated.
+You should also be familiar with hexadecimal and binary number representation.</li>
+</ul>
+<p>Besides that, I aim for this article to be shorter and more of an overview of topics that were interesting to me.
+For all the context and implementation details, see Justin Meiners&#8217; and Ryan Pendleton&#8217;s <a href="https://www.jmeiners.com/lc3-vm/">blog post</a>
+which meticulously explains LC-3,
+as well as the <a href="https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf">LC-3 ISA specification</a>.</p>
+<h2 id="whats-inside-a-vm">what&#8217;s inside a VM?</h2>
+<p>Starting off, here is some theory to get you in context.
+Skim this if you are familiar with how everything works.</p>
+<p>LC-3 can be modeled with three simple components: the processor and registers (CPU), and memory (RAM).</p>
+<pre><code>
+    registers
+    [ ][ ][ ][ ][ ]
+    [ ][ ][ ][ ][ ]
+    +-------------+     +------------------------+
+    |             |     |                        |
+    |  processor  |-----|         memory         |
+    |             |     |                        |
+    +-------------+     |                        |
+                        +------------------------+
+    
+</code></pre>
+<h3 id="memory">memory</h3>
+<p>First, <em>memory</em> is where most temporary data lives in the computer.
+The easiest way for me to visualize it is a huge C-style array:</p>
+<pre><code>uint16_t mem[65536];
+</code></pre>
+<p>Instead of an index, we use an &#8220;address&#8221; for each element.
+Just like an array, we can read and write (get or set) the data at each address.
+When the computer shuts down, all data in memory is lost.
+(For data to persist, we use storage like hard drives, but LC-3 doesn&#8217;t have this.)</p>
+<p>In LC-3, each element in memory is 16 bits, or 2 bytes.
+At this level, memory does not have any types as they do in languages like C:
+it&#8217;s all raw binary.
+Typed variables, malloc and the stack are all abstractions on top of memory.</p>
+<h3 id="registers">registers</h3>
+<p>Second, <em>registers</em> are where data that is immediately useful is stored.
+They are also 16-bit just like memory elements.
+Think of it as having fixed variables.
+LC-3 has 10 registers:</p>
+<ul>
+<li>the general purpose R0 to R7,</li>
+<li>Program Counter (PC),</li>
+<li>and the Processor Status Register (PSR).</li>
+</ul>
+<p>I&#8217;ll explain the last two later.
+Just like variables, you can assign values to the general purpose registers, and read from them:</p>
+<pre><code>uint16_t r0 = 0;
+...
+uint16_t r7 = 0;
+
+r6 = r0 + r7;
+r3 -= 3;
+</code></pre>
+<p>The reason registers exist when we already have memory is that it&#8217;s way more convenient to use.
+Physically, registers are closer to the processor than memory is,
+and are therefore much faster.
+Besides that, reading&#47;writing from memory usually takes more instructions than just using registers.
+However, in exchange for convenience and speed, you have to deal with a limited amount of registers.</p>
+<h3 id="processor">processor</h3>
+<p>Finally, the <em>processor</em> is where the real computing happens.
+The processor reads <em>instructions</em> one by one, and executes them.
+Instructions are like statements in higher level code, but much simpler.</p>
+<p>LC-3 only has 15 different types of instructions,
+that do things like &#8220;read memory at this address and load the value into R4&#8221;.
+Instructions are just 16-bit binary data.
+Again, read the <a href="https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf">ISA specification</a>
+for detailled information about this.
+For example, the spec says this is how to ADD two registers and store the result in a third register:</p>
+<pre><code>ADD
+| 0 0 0 1 | DR | SR1 | 0 0 0 | SR2 |
+</code></pre>
+<p>DR (Destination Register), SR1 (Source Register) and SR2 are all placeholders for general registers.
+For example, if we wanted to do <code>r1 = r2 + r3</code>:</p>
+<pre><code>ADD         r1      r2      (...)   r3
+| 0 0 0 1 | 0 0 1 | 0 1 0 | 0 0 0 | 0 1 1 |
+
+or in hex:
+0x1283
+</code></pre>
+<p>As you can see, this is pure binary data,
+and as such can be read by the processor.
+When you compile a C program, machine code like this is what comes out.</p>
+<p>There exists <em>assembly</em> which is a human-readable version of this binary.
+Unlike regular code, it is a 1-to-1 correspondence to the binary.
+For example, the above ADD instruction would be</p>
+<pre><code>ADD R1, R2, R3     ; you can put comments using semicolon
+</code></pre>
+<p>Using an assembler, a programmer can convert the assembly code into the pure binary program that LC-3 can read.</p>
+<h3 id="fetch-execute-loop">fetch-execute loop</h3>
+<p>Now that the individual parts are explained, we move on to how it all works together.
+So far, I haven&#8217;t explained where the instructions actually come from.
+Since instructions are just binary data, we actually just place a series of them (a program) in memory:</p>
+<pre><code>address  value (hex)  equivalent assembly code
+0x3000:  [e002]       (LEA R0, HELLO_WORLD)
+0x3001:  [f022]       (PUTS)
+0x3002:  [f025]       (HALT)
+...
+</code></pre>
+<p>The Program Counter (PC) register we talked about earlier is a pointer to the instructions inside a program in memory.
+In LC-3, as seen above, PC starts at the address <code>0x3000</code>.
+The processor will perform a <em>fetch-execute</em> loop:</p>
+<ul>
+<li>Fetch the instruction in memory using the PC (<code>instr = mem[PC]</code>)</li>
+<li>Increment PC (<code>PC += 1</code>)</li>
+<li>Execute the instruction</li>
+<li>Repeat on the next instruction</li>
+</ul>
+<p>Until it reaches an instruction to stop (HALT), the processor will continue this loop.
+Remember that <strong>PC points to the next instruction</strong>, not the current one!
+This often tripped me up implementing the virtual machine.
+The reason it doesn&#8217;t point to the current instruction is that it makes the mechanisms in the next section easier to understand.</p>
+<h3 id="control-flow">control flow</h3>
+<p>If statements, switches, and loops are all implemented using two instructions, <code>JMP</code> and <code>BR</code>,
+which alter PC.</p>
+<p><code>JMP</code> (jump) directly sets the value of PC,
+which means on the next fetch-execute loop, the processor will not execute the next instruction,
+but rather the instruction at the new PC.
+This is what <code>goto</code> in C does under the hood.</p>
+<p>Meanwhile, <code>BR</code> (branch) conditionally sets the value of PC.
+Remember the PSR register mentioned earlier?
+The bottom few bits in PSR contain <em>condition flags</em>.
+Condition flags essentially represent the sign of the result of an operation like AND or ADD.
+Respectively, they&#8217;re P (Positive), Z, (Zero), N (Negative).
+<code>BR</code> works with these flags:
+for example <code>BRnz</code> is &#8220;jump if result is negative or zero&#8221;.</p>
+<p>Let&#8217;s see how a for loop would be implemented this way:</p>
+<pre><code>AND R1, R1, #0    ; set R1 to 0 (anything bitwise and 0 is 0)
+ADD R1, #5        ; set R1 = R1 + 5
+
+LOOP_START        ; this is a label
+
+... (for loop body)
+
+ADD R1, #-1       ; R1 = R1 + (-1) (decrement)
+BRp LOOP_START    ; loop back. once assembled, the label becomes a numerical address offset
+
+HALT              ; we&#39;re done
+</code></pre>
+<p>The equivalent in C:</p>
+<pre><code>for (int i = 5; i &#62; 0; i--) {
+    &#47;&#47; for loop body
+}
+</code></pre>
+<p>It&#8217;s also common practice to AND a register with itself to check if it is positive&#47;negative&#47;zero.
+The the register AND itself is the same value, which allows testing without altering the register&#8217;s contents.</p>
+<h3 id="subroutine-calls">subroutine calls</h3>
+<p>LC-3 has support for &#8220;subroutines&#8221;, which are like functions but less convenient.
+Practically, LC-3 can jump into a subroutine, then at the end of the subroutine, jump back to the place where the subroutine was called.
+This works using instructions like JSR, and RET.</p>
+<p>JSR means &#8220;jump subroutine&#8221;, and it is essentially the same as JMP, however it also saves the current PC into the register R7.
+At the end of the subroutine, we put the instruction RET, which is actually a disguised JMP.
+RET means &#8220;JMP to the address given in R7&#8221;, which means return to the place where we originally used JSR.</p>
+<p>An example usage:</p>
+<pre><code>    AND R1, R1, #0      ; random code
+    JSR   SOME_ROUTINE  ; call subroutine
+    HALT
+
+SOME_ROUTINE
+    ADD, R1, #1         ; random subroutine code
+    RET                 ; return
+</code></pre>
+<p>This code will first set R1 to 0, jump into the subroutine, increment R1, then return to the main part and stop the program.</p>
+<h3 id="memory-mapped-io">memory mapped i&#47;o</h3>
+<p>Earlier, when I described how the LC-3 virtual machine works, I omitted a pretty significant component:
+input and output.
+I&#47;O is the sole method that the virtual machine can communicate with the outside world, whether it&#8217;s receiving user input,
+or sending output.</p>
+<p>LC-3 uses a terminal for I&#47;O, which means it can work with standard input (stdin) and standard output (stdout).
+Input is done via keyboard, and output via display.
+The way this works is <em>memory-mapped I&#47;O</em>.
+In LC-3&#8217;s memory, there are specific addresses that connect to external I&#47;O devices.</p>
+<pre><code>             +----------------+     +----------+
+    ··· -----|     memory     |-----| terminal |
+             +----------------+     +----------+
+</code></pre>
+<p>This is useful because LC-3 can reuse the existing instructions for loading&#47;storing from memory to talk to the terminal.
+When it manipulates the special memory-mapped locations (device registers), it doesn&#8217;t actually store or load data from memory,
+but it communicates with the peripherals like the display or keyboard.</p>
+<p>Here is a full list of memory-mapped addresses in LC-3:</p>
+<pre><code>addr      name                              short description
+
+0xFE00    keyboard status register (KBSR)   has a key been pressed?
+0xFE02    keyboard data register   (KBDR)   what key was pressed?
+0xFE04    display status register  (DSR)    can the display receive a character?
+0xFE06    display data register    (DDR)    character to send to the display
+0xFFFE    machine control register (MCR)    power button
+</code></pre>
+<p>For example, to read keyboard input, a program would first poll bit 15 (the ready bit) of KBSR to wait for the user to press a key.
+If the bit is <code>0</code>, then the program keeps waiting.
+Otherwise, the bit is <code>1</code>, and that means the user pressed a key.
+Then, the program reads bits [7:0] from KBDR into its registers.
+This contains the key that was pressed, encoded as ASCII.
+To read more characters, it would continue this loop.</p>
+<p>As an aside, remember that by convention, the least significant bit (the right-most units bit) is bit 0,
+and the other bits are numbered right-to-left as 1, 2, 3, and so on.
+Not realizing this has caused me issues while implementing this VM,
+as the program was reading from bit 15, while my VM was providing information on bit 0 (which if numbered left to right, is bit 15).</p>
+<p>Displaying data is similar: the program first polls bit 15 of DSR (the ready bit) until the display is ready to receive a character.
+Then, the program stores a character in DDR encoded as ASCII.
+This character is finally sent to the display.</p>
+<p>The program can also halt the computer (shut it down) by setting MCR to all zeroes.</p>
+<p>For detailled information, again, consult the <a href="https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf">LC-3 ISA specification</a>,
+specifically the Device Register Assigments.</p>
+<h2 id="assorted-implementation-details">assorted implementation details</h2>
+<p>Now that we&#8217;ve gone through the basics of how LC-3 works, I&#8217;ll go through some interesting details that I encountered during implementation.
+If you came here to follow along implementing yourself, I recommend you read <a href="https://www.jmeiners.com/lc3-vm/">Meiners&#8217; and Pendleton&#8217;s</a> LC-3 blog post,
+which is actually a tutorial.
+For a Rust version, see <a href="https://www.rodrigoaraujo.me/posts/lets-build-an-lc-3-virtual-machine/">Rodrigo Araujo&#8217;s implementation</a>.</p>
+<h3 id="endianness">endianness</h3>
+<p>Endianness is the order bytes are stored in memory within a word (a single piece of data).
+There&#8217;s big endian, and little endian.
+By definition, big endian starts with the most significant byte,
+and little endian starts with the least significant byte.
+By &#8220;most significant&#8221;, it means in numbers like decimal 123, the hundreds position is &#8220;more significant&#8221; than the units position.</p>
+<p>However, I find it more comprehensible to think that big endian is the &#8220;natural&#8221; order,
+while little endian is the &#8220;reversed&#8221; order. 
+For example, take the number <code>0x12345678</code>.
+On a big endian system, it would be stored in memory like this:</p>
+<pre><code>address  value (hex)
+0x0001:  12
+0x0002:  34
+0x0003:  56
+0x0004:  78
+</code></pre>
+<p>However, on a little endian system, it would be like this:</p>
+<pre><code>address  value (hex)
+0x0001:  78
+0x0002:  56
+0x0003:  34
+0x0004:  12
+</code></pre>
+<p><a href="https://softwareengineering.stackexchange.com/questions/95556">Supposedly, </a>
+it is easier to deal with little endian on processors,
+which is why it is used in many popular CPU architectures.
+However, LC-3 uses big endian.
+This is an issue to consider during implementation.</p>
+<p>For example, if you use <code>hexdump</code> on a program file, you may see this:</p>
+<pre><code>0000000 0030 02e0 22f0 25f0 7900 6f00 7500 2000
+0000010 6c00 6900 6b00 6500 2000 7600 6900 7200
+0000020 7400 7500 6100 6c00 6900 7a00 6900 6e00
+0000030 6700 2000 6200 6f00 7900 7300 2000 6400
+0000040 6f00 6e00 7400 2000 7900 6f00 7500 0000
+</code></pre>
+<p>This is actually incorrect output!
+<code>hexdump</code> assumes groups of two bytes are a single little-endian word,
+so it flips it to make it the proper order.
+However, LC-3 data is in big endian order.</p>
+<p><code>hexdump -C</code> prints bytes as they are on disk, which produces the proper ordering:</p>
+<pre><code>00000000  30 00 e0 02 f0 22 f0 25  00 79 00 6f 00 75 00 20
+00000010  00 6c 00 69 00 6b 00 65  00 20 00 76 00 69 00 72
+00000020  00 74 00 75 00 61 00 6c  00 69 00 7a 00 69 00 6e
+00000030  00 67 00 20 00 62 00 6f  00 79 00 73 00 20 00 64
+00000040  00 6f 00 6e 00 74 00 20  00 79 00 6f 00 75 00 00
+</code></pre>
+<p>It is important to flip bytes or specify that the data is big-endian when reading programs into memory from a file.</p>
+<h3 id="integer-overflow">integer overflow</h3>
+<p>You may know that because integers are represented by a finite amount of bits,
+it is possible for them to overflow when they get too big.
+For LC-3, we usually implement registers and memory using unsigned 16-bit integers,
+which gives us a range of 0-65535.
+This is also the limit of our memory&#8217;s size, since we can not represent an address bigger than that.
+The same issue makes 32-bit computers unable to have more than around 4GB of memory (<code>(1 &#60;&#60; 32) - 1</code>).</p>
+<p>When integers overflow, they often wrap around back to 0 or the lowest number possible.
+This is necessary behaviour on the LC-3, as it makes it possible to use signed numbers in 2&#8217;s complement.
+There is no subtract operation, we just add negative numbers, and it magically wraps around to the correct value.
+However, we usually do not want integer overflow, so Rust complains when it happens:</p>
+<pre><code>error: this arithmetic operation will overflow
+ --&#62; test.rs:2:20
+  |
+2 |     println!("{}", 65535u16+1u16)
+  |                    ^^^^^^^^^^^^^ attempt to compute `u16::MAX + 1_u16`, which would overflow
+  |
+</code></pre>
+<p>Earlier, I mentioned <a href="https://www.rodrigoaraujo.me/posts/lets-build-an-lc-3-virtual-machine/">Rodrigo Araujo&#8217;s VM</a>,
+which was also written in Rust.
+This implementation served as a Rust reference for me.
+In his instruction implementations, he uses casts to perform wrapping arithmetic:</p>
+<pre><code>let addr = (vm.registers.get_reg(base_r) as u32 + offset as u32) as u16;
+</code></pre>
+<p>First, he adds parameters as 32-bit unsigned ints, then casts it back to 16-bit unsigned.
+I personally thought that this would result in truncating the extra bits,
+however upon further experimentation it turned out that it does a modulo operation in the cast.
+This means that if the value exceeds the u16 limit, it wraps back to 0.</p>
+<p>Personally, I found this to be a very janky, implicit way to perform wrapping arithmetic.
+After all, it took me multiple Google searches and a bit of testing to be sure of what the code was doing.
+In my own code, I use explicit syntax for a wrapping addition:</p>
+<pre><code>let addr = vm.registers.get_reg(base_r).wrapping_add(offset);
+</code></pre>
+<p>This code is much clearer, and, quoting the Zen of Python, <code>Explicit is better than implicit.</code></p>
+<h3 id="traps">traps</h3>
+<p>Earlier, in the memory-mapped I&#47;O section, we saw how LC-3 can use memory-mapped I&#47;O to talk to external peripherals.
+You may have noticed that all of this is a very tedious process just to get some user input.
+To simplify things, LC-3 implements <em>traps</em>.
+Traps are essentially utility subroutines that make life easier.
+These can be accessed with the TRAP instruction, along with a code to specify which subroutine the program wants (the trap vector).</p>
+<p>However, instead of the programmer writing these subroutines, traps are part of an operating system on the LC-3.
+The operating system is also a program (it is also comprised of a bunch of instructions in memory), however it runs with higher privileges than the user program.
+The OS is stored in a special location in memory, earlier than the user program memory.</p>
+<p>When a TRAP instruction is called, LC-3 takes the trap vector, looks up a corresponding address in the trap vector table (a section in memory before the operating system),
+then calls that address as if using the JSR instruction on a subroutine.
+These addresses all lead to subroutines within the OS.
+For a C analogy, it&#8217;s like the trap vector table is an array of function pointers,
+where the functions are part of the operating system.</p>
+<p>Here is a list of trap subroutines in LC-3.
+Consult the <a href="https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf">LC-3 ISA specification</a> for a detailled explanation.</p>
+<pre><code>trap vector    name    description
+
+0x20           GETC    get a single character from keyboard (like C&#39;s getchar())
+0x21           OUT     put a single character to terminal
+0x22           PUTS    put a string to terminal
+0x23           IN      get a single character with echo (show the character typed)
+0x24           PUTSP   put a string to terminal (two characters packed per memory address)
+0x25           HALT    shut down the computer
+</code></pre>
+<p>As you can see, these are high level wrappers for the memory-mapped I&#47;O seen in the last section,
+and are also much friendlier to work with in general.
+Importantly, these routines can all be implemented in LC-3 code.</p>
+<p>For my own virtual machine though, and Justin Meiner&#8217;s VM that inspired it, we do not actually write assembly code for trap routines.
+Instead, in the VM itself, we intercept these trap calls, and perform the tasks in high-level C or Rust code, instead of LC-3 assembly.
+This is generally simpler, although less faithful to the specification.
+Because of this, it is also not necessary to implement some of the memory-mapped registers, like the display registers, and the machine control register.</p>
+<p>For example, here is my code that performs GETC:</p>
+<pre><code>fn trap_getc(vm: &#38;mut VM) {
+    while vm.mem.get_mem(0xFE00) &#38; (1 &#60;&#60; 15) == 0 {}
+    vm.registers.r0 = vm.mem.get_mem(0xFE02) &#38; 0xFF;
+}
+</code></pre>
+<p>First, we poll the Keyboard Ready bit, then we load the keypress into the VM&#8217;s registers.
+This type of implementation is much more convenient than writing raw assembly.
+My own GETC is not really efficient, but using standard library <code>getchar()</code> or an alternative would avoid polling the ready bit constantly.
+Right now, with the polling loop, we use up a lot of CPU on the host machine running the VM,
+when we are doing nothing but waiting.
+However, this is the only choice if you actually implement the trap routines in assembly.</p>
+<h3 id="terminal-inputoutput">terminal input&#47;output</h3>
+<p>We&#8217;ve seen in the last section the interface LC-3 provides for I&#47;O, but in this section, I&#8217;ll explain concretely <em>how</em> the terminal interface works in my own implementation.</p>
+<p>In my LC-3 VM, only the keyboard device registers and the output-related trap routines are directly implemented.
+The input-related trap routines are based on the keyboard device registers.</p>
+<h4 id="output">output</h4>
+<p>First, output is relatively simple : we just use the built-in print functions.</p>
+<pre><code>fn trap_puts(vm: &#38;mut VM) {
+    let mut idx = vm.registers.r0;
+    loop {
+        let c = vm.mem.get_mem(idx) as u8 as char;
+        if c == &#39;\0&#39; {
+            break;
+        }
+
+        print!("{}", c);
+        idx += 1;
+    }
+    let _ = io::stdout().flush();
+}
+</code></pre>
+<p>For example, to output a null-terminated string, we loop through it and print each character, breaking when we see a null.
+Importantly, <em>remember to flush stdout</em>.
+This makes sure the output actually appears when needed, and fixes some visual glitches.</p>
+<h4 id="input">input</h4>
+<p>Input is more difficult.
+There are a few problems we need to fix:</p>
+<ul>
+<li><strong>Blocking input</strong>: Normal standard library input functions block,
+which means that your code will stop and wait until the user types their input.
+LC-3 requires that the CPU be able to keep running and periodically check if input comes in,
+instead of pausing everything to wait for input.</li>
+<li><strong>Buffered input</strong>: In a terminal, input is buffered, which means that input is only sent to the program when you press Enter.
+This behaviour is called &#8220;canonical mode&#8221;.
+This is not what we want: we want to get raw keypresses.
+It would not be fun to have to press Enter after each keypress for it to register.</li>
+<li><strong>Echo</strong>: In a terminal, when you type, the letters you type show up.
+This behaviour is called echo.
+We do not want this: we want the program to silently read user input to avoid visual clutter.</li>
+</ul>
+<p>We&#8217;ll first get rid of canonical mode and echo.
+This can be done on Linux using termios:</p>
+<pre><code>fn setup_termios() {
+    let mut term: Termios = Termios::from_fd(STDIN_FILENO).unwrap();
+    term.c_lflag &#38;= !(ICANON | ECHO);
+    &#47;&#47; TCSANOW: "the change occurs immediately"
+    tcsetattr(STDIN_FILENO, TCSANOW, &#38;term).unwrap();
+
+    &#47;&#47; when leaving the program we want to be polite and undo the above changes
+    ctrlc::set_handler(|| {
+        restore_terminal();
+        &#47;&#47; typical CTRL-C exit code
+        std::process::exit(130);
+    })
+    .expect("Failed to set CTRL-C handler");
+}
+</code></pre>
+<p>Here, we disable the <code>ICANON</code> and <code>ECHO</code> bit-flags.
+We also set a Ctrl-C handler:
+if we exit the LC-3 VM unexpectedly,
+we don&#8217;t want to be stuck with weird terminal settings.
+All <code>restore_terminal</code> does is flip on the flags we disabled.</p>
+<p>Now, we have instant, silent input.
+However, we still block on input.
+This means that with code that deals with user input,
+the program freezes up between keypresses.</p>
+<p>To fix this, we need <em>non-blocking input</em>.
+There are libraries to do this, however I decided to use standard Rust features to do it instead.</p>
+<p>We first create a thread dedicated to managing stdin.
+This thread will block until the user presses a key, however it does not block the main thread.
+There is a &#8220;channel&#8221; between this thread and the main thread that allows one-way communication.
+This channel is like a queue data structure : the input thread can send information about key-presses,
+and when the main thread is ready, it can receive this information when it wants to.</p>
+<p>In Rust, I use a <code>TerminalIO</code> struct to implement this:</p>
+<pre><code>    impl TerminalIO {
+    pub fn new() -&#62; TerminalIO {
+        setup_termios();
+        TerminalIO {
+            stdin_channel: Self::spawn_stdin_channel(),
+            char: None,
+        }
+    }
+
+    fn spawn_stdin_channel() -&#62; Receiver&#60;u8&#62; {
+        &#47;&#47; https:&#47;&#47;stackoverflow.com&#47;questions&#47;30012995
+        let (tx, rx) = mpsc::channel::&#60;u8&#62;();
+        let mut buffer: [u8; 1] = [0];
+        thread::spawn(move || loop {
+            let _ = io::stdin().lock().read_exact(&#38;mut buffer);
+            let _ = tx.send(buffer[0]);
+        });
+        rx
+    }
+}
+</code></pre>
+<p>Here, we use a closure (the <code>move</code> here means that the function acquires the variables in the outside scope)
+that runs in a new thread.
+It is an infinite loop that waits for a single byte of input from the user,
+then transmits it over the channel back to the main thread.</p>
+<p>Back in the main thread, I then implement the KBSR and KBDR registers:</p>
+<pre><code>impl KeyboardIO for TerminalIO {
+    fn get_key(&#38;mut self) -&#62; Option&#60;u8&#62; {
+        let c = self.char;
+        self.char = None;
+        c
+    }
+
+    fn check_key(&#38;mut self) -&#62; bool {
+        match self.char {
+            Some(c) =&#62; true,
+            None =&#62; match self.stdin_channel.try_recv() {
+                Ok(key) =&#62; {
+                    self.char = Some(key);
+                    true
+                }
+                Err(mpsc::TryRecvError::Empty) =&#62; false,
+                Err(mpsc::TryRecvError::Disconnected) =&#62; panic!("terminal keyboard stream broke"),
+            },
+        }
+    }
+}
+</code></pre>
+<p>In the main thread, when the VM checks if there is a keypress ready through the Keyboard Ready bit,
+we attempt to receive a keystroke over the channel from the input thread.
+If the channel is empty, return that there is no keypress ready.
+Otherwise, store the character we received.
+Then, when the VM gets a key through the Keyboard Data register, we give it this character.</p>
+<p>I personally find that this solution is elegant:
+it allows for the VM to keep working while waiting on user input,
+and it also doesn&#8217;t take a bunch of boilerplate and working with obscure options like file descriptors.
+The input thread just uses normal input functions, and passes it over to the main thread to be read later.</p>
+<h2 id="debugging">debugging</h2>
+<p>Implementing a virtual machine can often introduce hard-to-find bugs.
+Indeed, there&#8217;s no such thing as a syntax error or a type error when you&#8217;re dealing with assembly.
+When something goes wrong, you&#8217;ll have absolutely no indication of where the issue stems from:
+you&#8217;ll just see weird behaviour.
+With LC-3, though, you can be reasonably sure that the programs you&#8217;re running (like 2048, Rogue),
+can be trusted to be bug-free, given that they&#8217;ve existed for years.
+Therefore, any bug most certainly stems from you, the virtual machine author.</p>
+<p>To find the source of these bugs in your virtual machine implementation,
+I recommend that you read over the code implementing all the instructions,
+and compare it to the ISA specification.
+I find that this is in general great advice for programming anything that involves logic.
+It may not seem like reading will do much,
+but you will be able to catch many, many, dumb mistakes with this method.</p>
+<p>Let&#8217;s talk about my own experience debugging LC-3.
+Rogue worked perfectly,
+but when running the 2048 program, the game started to an empty grid.
+(Usually, 2048 has tiles in the grid.)
+Pressing keys would not do anything either.
+To fix this, I tried applying my earlier advice about re-reading your code.
+I read 70% of the instructions implementation file,
+then decided that it was probably not worth the effort to continue.
+(We will see later this was a bad decision.)</p>
+<p>I then did run-time debugging of what was happening in the VM.
+First, I wrote some debug print statements (these are still available with the <code>--debug</code> flag of the VM.)
+These had the following format:</p>
+<pre><code>PC: 0x3312, op: ADD, params: 0x261
+R0: 0x0
+R1: 0x29a
+R2: 0x0
+R3: 0x0
+R4: 0x0
+R5: 0x3017
+R6: 0x3ffc
+R7: 0x32db
+COND: 0x2 (Z)
+</code></pre>
+<p>All the registers&#8217; contents are displayed, as well as information about the current instruction.
+Every cycle, this information is printed to stderr, which allows the debug stream to be piped into a log file separate from regular output.
+The log is useful, but is too fast to be read while the VM is running, and doesn&#8217;t show any information about memory.
+Most importantly though, it doesn&#8217;t have one of the best creature comforts that you&#8217;d expect from a debugger: breakpoints.</p>
+<p>At this point, I figured it was probably best to use a real debugger.
+For those who have used C or C++ on Linux before, you probably have experience with using GDB to debug.
+GDB is a venerable debugger with a command-line interface.
+The user experience is quite unfriendly, but it&#8217;s efficient, and fast.
+It turns out that GDB also works in Rust, with some slight modifications.
+This debugger, <code>rust-gdb</code>, comes packaged with the Rust compiler.</p>
+<p>We can&#8217;t just directly use <code>rust-gdb</code> to debug our virtual machine software though.
+The debugger doesn&#8217;t understand LC-3 assembly;
+we can&#8217;t just tell it to, for example, break on a given line in the LC-3 code.
+First, I set up a breakpoint in the fetch-execute loop.
+This means that entering <code>c</code> (continue) in GDB will step through a single LC-3 instruction.
+With the assembly source code in a separate window,
+it is possible to step through the execution of the program
+and examine the instructions and how they affect the registers.</p>
+<p>However, stepping through instructions individually gets tedious eventually.
+Monitoring the PC register, I wrote down all the addresses of a few instructions as comments in the assembly source.
+It&#8217;s also possible to get addresses by counting how many instructions there are in the source code.
+I then used GDB&#8217;s conditional breakpoints to break in the VM only when PC reaches that address.
+In essence, this is a breakpoint within the LC-3 code.
+To make this process faster, I made a GDB macro to automate it:</p>
+<pre><code>define vmb
+    # set a breakpoint at VM addr $0
+    break lc3::vm::instruction::execute_instruction if vm.registers.pc == $arg0 + 1
+    set $vmb_break = $bpnum
+end
+</code></pre>
+<p>This creates a new command that can be used to set breakpoints within LC-3.</p>
+<p>Using this, I narrowed down the source of the bug in 2048 to the <code>RAND_MOD</code> subroutine,
+which is supposed to provide a random number within a given range.
+This is used to determine where a new tile is placed in the grid.
+When tested, it was giving a garbage number entirely outside the range argument.
+Then, I further narrowed the issue down to the division&#47;modulo subroutine, <code>MOD_DIV</code>,
+giving the wrong answer.
+Stepping through this function,
+I finally found a single instruction that was behaving oddly: <code>NOT</code>.</p>
+<p>As it turns out, I had made a very subtle typo in the implementation of this instruction:</p>
+<pre><code>     let res = !vm.registers.get_reg(sr);
+-    vm.registers.set_reg_with_cond(sr, res);
++    vm.registers.set_reg_with_cond(dr, res);
+</code></pre>
+<p>Instead of performing the operation on the source register (<code>sr</code>) and storing the result in the destination register (<code>dr</code>),
+I had stored the result back in the source.
+In Rogue, this had not caused any issues, since that program only uses this instruction &#8220;in-place&#8221; (<code>NOT R0, R0</code>).
+However, this behaviour is obviously incorrect when the source and destination are different (<code>NOT R2, R1</code>), like in 2048.
+This spread corrupted data everywhere, and was hard to diagnose.</p>
+<p>In the end, had I followed my earlier advice about re-reading the code, and I hadn&#8217;t given up midway,
+I would&#8217;ve noticed this much quicker.
+Indeed, this will serve as a lesson for me to properly check over code I write in the future,
+and make sure that it is not sloppy.</p>
+<h1 id="conclusion">conclusion</h1>
+<p>While LC-3 is still a relatively simple program,
+implementing it as a virtual machine is still quite educational.
+I learned about the core functionality of computers,
+as well as how assembly works.
+Through LC-3, I also learned the basics of Rust
+and got more experience finding subtle bugs too.
+If you&#8217;re looking to sharpen your skills in a language,
+consider the idea of writing a simple virtual machine.
+Or, maybe, a disassembler or assembler for LC-3.</p>
+<p>Either way, the fact that just this small, contrived system can be so interesting is surprising.
+This is just a microcosm of computing,
+and there is so, so much more to discover.</p>
+<p>Again, if you&#8217;re interested in further reading about LC-3,
+read the <a href="https://www.jmeiners.com/lc3-vm/">original blog post</a> that inspired this one.</p>
+<p>Also, thank you for bearing with me this far.
+This post is longer than any that I&#8217;ve written up to now.
+I hope you enjoyed my journey with LC-3 as much as I did.</p>
+<footer role="contentinfo">
+    <span><a href="#">↑ back to top</a></span><br><br>
+    <small>
+        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

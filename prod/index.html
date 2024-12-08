@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>how to not abandon side projects</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<img src="/public/img/logo.svg" class="logo">
+	<b>dogeystamp</b>
+	<a href="/index.html">home</a>
+	<a href="/about">about</a>
+	<a href="/projects">projects</a>
+	<a href="https://git.dogeystamp.com">gitea</a>
+</div>
+
+<article>
+<h1 id="how-to-not-abandon-side-projects">how to not abandon side projects</h1>
+<p>2023-05-15</p>
+<p>I don&#8217;t personally have any position of authority to back up the following tips.
+However I can attest that at least for me, they were useful.</p>
+<h2 id="the-to-do-list">the to-do list</h2>
+<p>I found that while writing larger personal projects,
+motivation was one of the issues that plagued me the most.
+Oftentimes, I&#8217;d take a break from the project for a week or so, then lose the will to continue.</p>
+<p>I would find that either I had no idea what to do next,
+or that tasks were too daunting to accomplish.
+And after that, I would let the project collect dust in an abandoned repo.</p>
+<p>One day, while browsing <a href="https://telodendria.io">Telodondria</a>&#8217;s code, I found a curious TODO file.</p>
+<p>It looked like this:</p>
+<pre><code>Telodendria To-Do List
+======================
+
+Key:
+
+[ ] Not Started
+[x] Done
+[~] In Progress
+[!] Won&#39;t Fix
+
+Milestone: v0.3.0
+-----------------
+
+[~] Stream API
+    [x] Implementation
+    [x] Convert all code that deals with I&#47;O
+    [!] Multi-output (proof of concept)
+    [!] Memory streams (proof of concept)
+    [ ] TLS
+</code></pre>
+<p>I did the obvious thing to do in this situation, and stole the idea to use it in my own project.
+As it turns out, having a to-do list fixed both problems described above for me.</p>
+<p>When creating one, you&#8217;re essentially assigning future you tasks to do.
+The great thing about always having tasks laid out in front of you is that you
+never have to figure what to do next: you already did that job.
+Instead of having to plan out everything, you can focus on actually implementing things.</p>
+<p>The to-do list also forces you to divide your project into manageable pieces.
+For me, my top-level tasks were components of a system like <code>Implement authentication</code>.
+Every time I&#8217;d get to implementing one of these components, I&#8217;d then divide it into smaller, more concrete pieces, like <code>Implement &#47;users&#47;&#60;id&#62; PATCH</code>.
+Usually, these small tasks were items I could reasonably complete in an evening.
+So basically, there never was this feeling of being overwhelmed, as I always knew that I&#8217;d make decent progress on the project in one session.</p>
+<h2 id="docstrings">docstrings</h2>
+<p>In the spirit of planning things out, I also wrote docstrings before writing important classes and functions.
+Most importantly, it&#8217;s good to have a solid definition of what you&#8217;re about to implement.
+It just so happens the Python docstring is a good way to do that:
+you have parameters, a description, and a return value in a function docstring.
+With Neovim, I&#8217;d have the docstring open in a split, and actually code the function in another.
+This way, there&#8217;s no confusion about what you&#8217;re supposed to write.</p>
+<p>Planning everything out ahead of time is really useful for me.
+When I come back to work-in-progress code from a week back,
+I&#8217;m not in the same state of mind.
+Often, I&#8217;ll have forgotten what I was trying to do in a given place:
+that&#8217;s why leaving good comments and docstrings is helpful.</p>
+<p>Of course, this &#8220;standard&#8221; specified by the docstring isn&#8217;t formal or inflexible.
+It&#8217;s not a real specification; it&#8217;s a short-term plan.
+Sometimes, midway during implementation, I&#8217;ll realize that the docstring describes a function that can&#8217;t work.
+However, that&#8217;s a good thing: if I didn&#8217;t have the plan, I might not have realized my code wasn&#8217;t coherent.</p>
+<h2 id="conclusion">conclusion</h2>
+<p>To be honest, using a divide-and-conquer strategy to complete projects has been working for me.
+Thanks to planning tasks out in a high-level to-do list, and more fine-grained docstrings,
+I have been avoiding lack of motivation, and forgetting what I&#8217;m supposed to be doing.</p>
+<footer role="contentinfo">
+    <span><a href="#">↑ back to top</a></span><br><br>
+    <small>
+        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

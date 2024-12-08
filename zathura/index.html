@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>contributing to zathura as a novice</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<img src="/public/img/logo.svg" class="logo">
+	<b>dogeystamp</b>
+	<a href="/index.html">home</a>
+	<a href="/about">about</a>
+	<a href="/projects">projects</a>
+	<a href="https://git.dogeystamp.com">gitea</a>
+</div>
+
+<article>
+<h1 id="contributing-to-zathura-as-a-novice">contributing to zathura as a novice</h1>
+<p>2023-10-24</p>
+<p>Earlier this year I made a <a href="https://git.pwmt.org/pwmt/zathura/-/merge_requests/80">patch</a>
+for Zathura, the open-source PDF reader.
+In this post, I&#8217;ll document the journey of how I diagnosed the root cause of a bug in Zathura,
+then wrote a bugfix for it.
+As this is my first &#8220;real&#8221; patch that got accepted, the
+most important take-away for me is that it&#8217;s actually not that hard to contribute to open-source.</p>
+<h1 id="the-bug">the bug</h1>
+<p>First of all, as seen in <a href="../typst-notes/">my last blog post</a>, I make use of Zathura extensively in my note-taking setup.
+On one half of my window, I write markup in Neovim, and in the other half Zathura displays the rendered result.
+Every time I save the markup, it is automatically re-compiled, then Zathura reloads the document.
+Normally, this works really well, but if you&#8217;re reloading documents often, you&#8217;ll notice that there&#8217;s flicker every time:</p>
+<p><a href="/public/img/zathura/flicker.mp4"> <img src="/public/img/zathura/flicker-thumb.gif" alt="" /> </a></p>
+<p>Of course, this is not a deal-breaking issue.
+However, it is definitely annoying if you save often, and even more so if your editor automatically saves on change.</p>
+<p>Upon finding this bug, I did what any normal person does and searched online to see if there was any fixes for it.
+I stumbled upon this GitLab issue: <a href="https://git.pwmt.org/pwmt/zathura/-/issues/268"><em>Prevent flickering when reloading document</em></a>.
+Unfortunately for me, the thread was nearly empty, and the last comment was from another user seeking a solution.</p>
+<p><a href="https://superuser.com/questions/1459927/zathura-flicker-when-updating-pdf">Another thread</a>
+on Stack Exchange was also a dead end, with no real answer to the problem.</p>
+<p>At this point, there was clearly no easy solution to remove flicker from Zathura.
+Since this software is open source, I decided to take a look at the source code in an attempt to diagnose the issue.</p>
+<h1 id="investigating-source-code">investigating source code</h1>
+<p>Zathura&#8217;s source code is available at their git repository.
+I cloned it to my projects folder:</p>
+<pre><code>git clone https:&#47;&#47;git.pwmt.org&#47;pwmt&#47;zathura
+</code></pre>
+<p>At the time, the latest commit was <code>c7baa2f6</code> (&#8220;Make icon visible on dark backgrounds&#8221;).
+If you want to follow along with the exact same code as I saw, run this command:</p>
+<pre><code>git checkout c7baa2f6
+</code></pre>
+<p>At first glance, it definitely can seem daunting to navigate an unfamiliar codebase.
+However, these days, we have language servers, which makes it much faster.
+Essentially, language servers are plugins for text editors that give language &#8220;intelligence&#8221;.
+With them, you can, for example, jump to the definition of a variable, or get completions when writing code.
+I find that language servers are useful especially in situations like these, where you might have no idea where a symbol comes from.
+For C, which Zathura is written in, I use <a href="https://github.com/clangd/clangd">clangd</a>, which integrates easily with Neovim.</p>
+<p>A necessary step to use clangd is to have a <code>compile_commands.json</code> file.
+Thankfully, with Zathura&#8217;s build system, Meson, this is automatically generated during the build.
+I followed the build instructions at the bottom of the README:</p>
+<pre><code>meson build
+cd build
+ninja
+</code></pre>
+<p>Then, I copied the resulting file back into the root directory.</p>
+<pre><code>cp compile_commands.json ..&#47;
+</code></pre>
+<p>Now, Neovim will automatically have language intelligence.</p>
+<p>Still, we have no idea where the code responsible for the bug lies.
+Considering the bug happens upon reload, it would make sense to search for code related to reloading documents.
+To do this, I searched for the term &#8220;reload&#8221; using ripgrep (you could use <code>git grep</code> too):</p>
+<pre><code>rg "reload"
+</code></pre>
+<p>From here, I saw an interesting function signature in <code>zathura&#47;shortcuts.c</code>:</p>
+<pre><code>sc_reload(girara_session_t* session, girara_argument_t* UNUSED(argument)
+</code></pre>
+<p>This looks like it could be the code responsible for reloading.
+Looking at it, this is the function body (heavily abridged):</p>
+<pre><code>bool
+sc_reload()
+{
+  &#47;* close current document *&#47;
+  document_close(zathura, true);
+
+  &#47;* reopen document *&#47;
+  document_open();
+}
+</code></pre>
+<p>Surprisingly, reloading a document is implemented by closing and reopening the document,
+rather than a separate in-place refresh feature.
+This would explain why the screen flickers during reloads:
+the document disappears entirely before the new one is loaded in its place.
+It seems like there might be a moment between closing and reopening where there is nothing on screen,
+which is what causes jarring flicker.</p>
+<h1 id="fixing-the-bug">fixing the bug</h1>
+<p>So now, we&#8217;ve successfully diagnosed the root cause of the flickering.
+However, this provides no clear path towards solving it.</p>
+<p>At this point, I decided to check out the <code>document_close</code> and <code>document_open</code> functions mentioned above.
+After studying these two functions, something caught my eye:
+during opening, we create <code>zathura-&#62;pages</code>, and during closing, we free it.
+Looking at the definition, <code>zathura-&#62;pages</code> is an array of pointers to GtkWidgets.</p>
+<p>As an experiment, I commented out a bunch of code from <code>document_close</code> to see what happens if the pages are not freed.
+In my head, I thought it might leave the old pages on screen and let the new ones replace it.
+Obviously, that didn&#8217;t happen, and I got multiple segmentation faults, crashes and memory leaks (womp womp).</p>
+<p>Now, I was practically at a dead end again.
+However, I remembered something the author of the Stack Exchange thread tried regarding this issue:
+they attempted to set <code>render-loading</code> to false to fix the flicker.
+On default settings, when the document is reloaded, a &#8220;Loading&#8230;&#8221; prompt flickers on screen:</p>
+<p><img src="/public/img/zathura/loading.jpg" alt="Zathura loading prompt" /></p>
+<p>Turning it off just makes the flickering a blank screen.
+I decided to look for code related to this prompt with <code>rg "loading"</code>.
+Doing that, I found an interesting function in <code>zathura&#47;page-widget.c</code> called <code>zathura_page_widget_draw</code>.
+Skimming the code, it looks like it handles drawing pages to screen.
+This was a promising new direction to look into.</p>
+<p>Near the end, there is a section that takes care of drawing the loading screen.
+Reading above, we see that the loading screen only renders if the page has no Cairo surface.
+Essentially, if the page hasn&#8217;t fully loaded, put up a loading screen.</p>
+<p>Here, I had an idea: what if we replace the loading screen with the original page from before the reload?
+That way, it would be a seamless transition from the original document to the new document.</p>
+<p>To implement this, I added two extra pointers to the <code>zathura</code> struct:
+the <code>predecessor_document</code>, and the <code>predecessor_pages</code>.
+When Zathura closes the document for a reload, it preserves the current document and pages as &#8220;predecessors&#8221;.
+Zathura will not free the predecessor document and pages immediately.
+Then, in <code>zathura_page_widget_draw</code>, instead of drawing a loading screen, it will draw the predecessor pages.
+Since having an extra buffer also uses more memory, I added a toggle option <code>smooth-reload</code> that switches this feature on and off.</p>
+<p>Of course, I&#8217;m skimming over many specific details here.
+To see the exact code of my patch, you can look at the <a href="https://git.pwmt.org/pwmt/zathura/-/commit/257a2c968bcf67cf814aeab325800d4889d8df21">commit</a> on Zathura&#8217;s git repository.</p>
+<p>Anyways, here is the end result of the bug-fix, where the bottom window is patched and the top one isn&#8217;t:</p>
+<p><a href="/public/img/zathura/before-after.mp4"> <img src="/public/img/zathura/before-after-thumb.gif" alt="Before and after the bugfix" /> </a></p>
+<p>I was really ecstatic when Zathura first smoothly reloaded a document.
+It finally worked!
+After this initial success, I collected all these changes into a <a href="https://git.pwmt.org/pwmt/zathura/-/merge_requests/80">merge request</a> on GitLab.
+Finally, after a month of waiting, I got the maintainer to merge my patch.
+All in all, it took a weekend in total to get familiar with the codebase and create this patch.</p>
+<h1 id="conclusion">conclusion</h1>
+<p><del>At the time of writing, this patch is still only available in the bleeding-edge&#47;git build of Zathura.
+To check that my code has made it into your version of Zathura, you can check in the man page <code>zathurarc(5)</code> for the option <code>smooth-reload</code>.</del>
+(Since 0.5.5, <code>smooth-reload</code> <a href="https://github.com/pwmt/zathura/commit/ef6e7e295c9c046368a3202e8c82efd8b9d24a92">is no longer an option,</a>
+and it is the default behaviour.)</p>
+<p>As of version 0.5.3, my code for flicker-free reload is enabled by default for all users of Zathura.
+Hopefully, this small contribution will improve the experience of future users of Zathura.
+Again, what I want to show in this blog post is that contributing to open-source is actually not <em>that</em> daunting.
+When you encounter odd behaviour in your favourite software, or you want improve a feature, do not be afraid to just open it up and start tinkering.</p>
+<footer role="contentinfo">
+    <span><a href="#">↑ back to top</a></span><br><br>
+    <small>
+        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

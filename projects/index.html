@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>personal projects</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<img src="/public/img/logo.svg" class="logo">
+	<b>dogeystamp</b>
+	<a href="/index.html">home</a>
+	<a href="/about">about</a>
+	<a href="/projects">projects</a>
+	<a href="https://git.dogeystamp.com">gitea</a>
+</div>
+
+<article>
+<h1 id="personal-projects">personal projects</h1>
+<p>This is an assorted list of projects and experiments I&#8217;ve done,
+along with links to either relevant blog posts or Git repositories where you can find more information.
+If there are any broken links here, please inform me.</p>
+<hr/>
+<h2 id="geode-piano"><a href="/piano">geode-piano</a></h2>
+<p>Electronics project to revive a broken digital piano.
+I designed and built a new circuit from scratch to replace the original board.
+geode-piano is based on the Raspberry Pi Pico, using firmware made with the <a href="https://embassy.dev/">embassy-rs</a> framework in Rust.
+It runs on MIDI over USB, and also includes note velocity detection.</p>
+<h2 id="minrss"><a href="/minrss">minrss</a></h2>
+<p>A minimal RSS&#47;Atom feed reader I wrote in C,
+inspired by <a href="http://tools.suckless.org/ii/">suckless</a> <a href="http://tools.suckless.org/sic/">programs</a>.
+The main feature is that it represents feeds as folders,
+with articles as files within them:</p>
+<pre><code>rss
+|--news
+|  |--article1
+|  `--article2
+`--blog
+  |--post
+  `--other_post
+
+</code></pre>
+<p>As such, minrss has very good compatibility with shell scripting.
+You could even use basic shell commands to read your RSS feeds.</p>
+<h2 id="sachet"><a href="https://github.com/dogeystamp/sachet-ui">sachet</a></h2>
+<p>Toy full-stack web service for file-sharing. Includes user management and
+authentication, as well as support for granular permissions on each user.
+The backend is written in Python using the Flask framework,
+while the frontend is written in TypeScript with Mithril.js.
+There are neat features like dark mode and responsive, mobile-friendly design.</p>
+<h2 id="lc-3-vm"><a href="/lc3">lc-3 vm</a></h2>
+<p>Rust implementation of the Little Computer-3 educational architecture as a virtual machine.
+LC-3 is a simplified 16-bit computer that can run programs and games like 2048.
+Concepts found in LC-3, like the fetch-execute loop, and assembly, are foundations of modern computing.</p>
+<h2 id="bitmask"><a href="https://github.com/dogeystamp/bitmask">bitmask</a></h2>
+<p>A Python library that helps with manipulating bit flags. It provides
+meaningful, object-oriented syntax which makes code clearer in this language
+compared to the equivalent C syntax.</p>
+<h2 id="homeserver-automation"><a href="https://github.com/dogeystamp/homeserver-iac">homeserver automation</a></h2>
+<p>Ansible playbook that automates configuration and deployment of my Raspberry Pi server network.
+Starting from entirely blank machines,
+it automatically sets up all the software and configurations,
+including a music server, Matrix chat server, git hosting service, and this website.</p>
+<h2 id="encryptme"><a href="https://github.com/dogeystamp/encryptme">encryptme</a></h2>
+<p>Small web app for encryption&#47;decryption.
+This is mostly an experiment in writing a &#8220;framework&#8221; in vanilla JavaScript.
+The website aims to be simple and clutter-free, while still being featureful.</p>
+<h2 id="pyinstantref"><a href="https://github.com/dogeystamp/pyinstantref">pyinstantref</a></h2>
+<p>Python utility to conveniently and rapidly add cross-references between notes
+written in Typst (a type-setting system similar to LaTeX).
+For more context, see <a href="/typst-notes">this post</a> about my note-taking setup.</p>
+<h2 id="dotfiles"><a href="https://github.com/dogeystamp/dots">dotfiles</a></h2>
+<p>Collection of configurations for my Linux desktop.
+I sink too much time into this,
+but customizing things feels great
+(as many other *nix users can probably confirm).</p>
+<footer role="contentinfo">
+    <span><a href="#">↑ back to top</a></span><br><br>
+    <small>
+        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

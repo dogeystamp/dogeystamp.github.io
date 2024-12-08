@@ -1,0 +1,256 @@
+/*
+MIT License
+
+Copyright (c) 2023 Bradley Taunt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+
+I stole a decent amount of code from the stylesheet of https://barf.bt.ht/
+so here's the license
+*/
+
+@import "/public/fonts/inter/inter.css";
+
+@font-face
+{
+	font-family: JetBrainsMono;
+	src: url(/public/fonts/JetBrainsMono-Regular.ttf);
+}
+
+@font-face
+{
+	font-family: JetBrainsMono;
+	src: url(/public/fonts/JetBrainsMono-Bold.ttf);
+	font-weight: bold;
+}
+
+body {
+	font-family: Inter, sans-serif;
+	max-width: 55em;
+	margin: auto;
+	background: #000000;
+	color: #e3e3e3;
+	font-size: 105%;
+}
+
+.header {
+	margin-top: 2%;
+	display: flex;
+	align-items: center;
+}
+
+.header b {
+	font-size: 175%;
+	position: relative;
+	margin-right: 0.7em;
+	bottom: .09em;
+	color: #ffffff;
+}
+
+.header a {
+	margin-right: 0.7em;
+	font-weight: 600;
+	font-size: 125%;
+	text-decoration: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+hr {
+	background-color: grey;
+	border: 0;
+	height: 1px;
+	margin: 2rem 0;
+}
+nav {
+	margin: 2rem 0 0;
+}
+article {
+	hyphens: auto;
+	padding: 1em;
+}
+article p {
+	margin: 1rem 1em;
+	line-height: 1.5;
+}
+h1,h2,h3,h4 {
+	margin: 2rem 0 0;
+	font-weight: 700;
+	color: #eeeeee;
+}
+h1 {
+	margin-bottom: 0.5rem;
+	font-size: 175%;
+}
+h2 {
+	margin-left: 0.25rem;
+}
+h3 {
+	margin-left: 0.6rem;
+}
+h4 {
+	margin-left: 0.75rem;
+}
+span.created {
+	display: block;
+	margin: 4px 15px;
+	font-family: JetBrainsMono, monospace;
+	color: #aaaaaa;
+}
+span.created a {
+	font-family: Inter, sans-serif;
+}
+
+img {
+	border-radius: 0.5vmin;
+	height: auto;
+	max-width: 100%;
+	width: auto;
+	padding: .25em;
+}
+
+video {
+	border-radius: 0.5vmin;
+	height: auto;
+	max-width: 100%;
+	width: auto;
+	padding: .25em;
+}
+
+.logo {
+	border: none;
+	max-width: 3em;
+	margin-right: 0.45em;
+}
+
+blockquote {
+	border: 1px solid #ffffff55;
+	border-left: 0.5em solid;
+	margin: 2rem 0;
+	padding: 10px;
+}
+blockquote p {
+	margin: 0;
+	font-style: italic;
+	font-size: 90%;
+	display: inline;
+}
+blockquote ul {
+	font-style: italic;
+	font-size: 90%;
+}
+
+figure {
+	margin: 2rem 0;
+}
+figcaption {
+	color: slategrey;
+}
+code {
+	border: 1px solid #444444;
+	padding: 0.05rem 0.15rem;
+	tab-size: 4;
+	font-family: JetBrainsMono;
+	font-size: 80%;
+}
+pre {
+	border: 1px solid #444444;
+}
+pre code {
+	border: 0;
+	display: block;
+	overflow-x: auto;
+	padding: 0.3rem 0.6rem;
+	color: #aaaaaa;
+}
+table {
+	border-collapse: collapse;
+	margin: 2rem 0;
+	text-align: left;
+	width: 100%;
+}
+tr {
+	border-bottom: 1px solid lightgrey;
+}
+tr:nth-of-type(odd) td {
+	background-color: #151515;
+}
+th,td {
+	padding: 6px;
+}
+footer {
+	border-top: 1px dashed grey;
+	margin: 2rem 0;
+	padding: 1rem 15px;
+}
+a {
+	display: inline-flex;
+	color: #99aabb;
+	border-radius: 0.1em;
+	font-weight: 500;
+}
+a:hover {
+	background-color: #222222;
+	color: #99aabb;
+}
+p, pre, table, blockquote {
+	margin-left: 1rem;
+	text-align: justify;
+}
+
+ul li {
+	list-style: square;
+	margin: 0.5em;
+}
+
+@media only screen and (max-device-width: 60em) {
+	h1,h2,h3,h4 {
+		margin: 1rem;
+		font-weight: 700;
+	}
+	.header {
+		flex-flow: column nowrap;
+		margin-bottom: 0em;
+	}
+	.logo {
+		display: none;
+	}
+	.header b {
+		margin-right: 0;
+		margin-bottom: 0.5em;
+		margin-top: 0.5em;
+		font-size: 125%;
+	}
+	.header a {
+		margin-right: 0;
+		margin-bottom: 0.5em;
+	}
+	span.created {
+		font-size: 1em;
+	}
+	span.created a {
+		font-size: 1.25em;
+		display: block;
+		margin-bottom: 1em;
+	}
+}

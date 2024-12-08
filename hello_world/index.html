@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>hello world (from barf.sh)</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<img src="/public/img/logo.svg" class="logo">
+	<b>dogeystamp</b>
+	<a href="/index.html">home</a>
+	<a href="/about">about</a>
+	<a href="/projects">projects</a>
+	<a href="https://git.dogeystamp.com">gitea</a>
+</div>
+
+<article>
+<h1 id="hello-world-from-barf.sh">hello world (from barf.sh)</h1>
+<p>2023-05-14</p>
+<p>Another year, another static site generator.</p>
+<p>This time, for the <a href="https://git.dogeystamp.com/dogeystamp/wb5">5th iteration</a> of the website,
+I&#8217;m using <a href="https://barf.bt.ht">barf</a> to generate it.</p>
+<p>Personally, I think the old script I was using, <a href="https://romanzolotarev.com/ssg.html">ssg</a>,
+was really hacky in comparison to barf.
+One of my biggest grudges is how there was no post list on the front page by default.
+Most of the people using ssg (including me) had to write their own messy <code>sed</code> contraptions to implement it.</p>
+<p>Thankfully, barf implements not only the post list, but also Atom feed generation, which is very convenient.</p>
+<p>Other than that, barf excels by being tiny.
+Unlike ssg, the barf script fits in 3 screenfuls of text for me.
+In my opinion, it&#8217;s much more readable.</p>
+<p>The great thing about these two scripts is that migrating my website from one to the other is really simple.
+They both work similarly, so I just needed minor changes to port over my (admittedly few) pages.</p>
+<p>Anyways, I&#8217;ll hopefully write some blog posts soon and fix the remaining dead links on the website.</p>
+<footer role="contentinfo">
+    <span><a href="#">↑ back to top</a></span><br><br>
+    <small>
+        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

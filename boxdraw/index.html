@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>box-drawing test</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<img src="/public/img/logo.svg" class="logo">
+	<b>dogeystamp</b>
+	<a href="/index.html">home</a>
+	<a href="/about">about</a>
+	<a href="/projects">projects</a>
+	<a href="https://git.dogeystamp.com">gitea</a>
+</div>
+
+<article>
+<h1 id="box-drawing-test">box-drawing test</h1>
+<p>2024-02-03</p>
+<p>In my <a href="/lc3">last blog post</a> about the LC-3 virtual machine, I made a few diagrams with ASCII art.
+I found out recently that I didn&#8217;t have to use <code>+</code> and <code>-</code> and <code>|</code> symbols to make boxes; Unicode has symbols specifically for that.
+So I&#8217;m going to use this blog post as a playground for box-drawing.</p>
+<p>The symbols used here are all copied directly from <a href="https://en.m.wikipedia.org/wiki/Box-drawing_character">this Wikipedia article</a>.</p>
+<pre><code>boxdraw kit
+
+smooth box
+╭─╮││╰─╯
+
+jagged box
+┌─┐││└─┘
+
+heavy box
+┏━┓┃┃┗━┛
+
+wires
+┌─┐│└┘┬┴┤├┼
+
+arrows
+←→↓↑↔↕
+
+dotted
+⋯⋮┄┈┊
+</code></pre>
+<p>To make boxes using the kit, copy-paste one of the &#8220;box&#8221; symbol sets,
+put newlines, and then expand the box to fit the text:</p>
+<pre><code>╭─╮││╰─╯
+
+╭─╮
+││
+╰─╯
+╭────────────╮
+│ hello guys │
+╰────────────╯
+</code></pre>
+<p>Put spacing around the text, too.</p>
+<pre><code>the diagram from last time but smoother ooOOOooo
+
+    registers
+    ┌─┐┌─┐┌─┐┌─┐┌─┐
+    └─┘└─┘└─┘└─┘└─┘
+    ┌─┐┌─┐┌─┐┌─┐┌─┐
+    └─┘└─┘└─┘└─┘└─┘
+    ╭─────────────╮     ╭────────────────────────╮
+    │             │     │                        │
+    │  processor  ├─────┤         memory         │
+    │             │     │                        │
+    ╰─────────────╯     │                        │
+                        ╰────────────────────────╯
+</code></pre>
+<p>Note how the place the wire connects to each box is a different character (<code>┤</code>) that makes it attached.</p>
+<pre><code>╭───────────────────────────────────────────────────╮
+│                                                   │
+│                                                   │
+│                                                   │
+│             a big funny box (smooth)              │
+│                                                   │
+│                                                   │
+│                                                   │
+╰───────────────────────┬───────────────────────────╯
+                        │
+              ╭─────────┴─────────╮
+              │ boxes interlinked │
+              ╰───────────────────╯
+                 ┌────────────┐
+                 │ not smooth │
+                 └────────────┘
+
+               ┏━━━━━━━━━━━━━━━┓
+               ┃ a weighty box ┃
+               ┗━━━━━━━━━━━━━━━┛
+</code></pre>
+<pre><code>╭─────────────────────╮
+│ wires (plus arrows) │
+╰──┬──────────────────╯
+   ├────────┬────┐
+ ←─┼──────┐ │    └─→         
+   │      │ │                
+   └──────┴─┤              
+            │ ↑               
+            │ │              
+            ├─┘
+            ↓
+</code></pre>
+<p>(The vertical arrows are slightly janky.)</p>
+<pre><code>          ╭────────────────────────────╮
+⋯ ┄┄┄┄┄┄┄┄│ this goes off somewhere... │
+          ╰────────────────────────────╯
+                       ┊
+                       ┊
+                       ⋮
+</code></pre>
+<footer role="contentinfo">
+    <span><a href="#">↑ back to top</a></span><br><br>
+    <small>
+        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>
