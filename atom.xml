@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title>welcome to my website</title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2024-12-08T15:23:39Z</updated>
+	<updated>2025-03-02T16:20:59Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -453,8 +453,8 @@ The topology is&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Client -&amp;#62; VPN Server -&amp;#62; public internet -&amp;#62; website
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;which makes it look to the website that the traffic originates from the VPN server.
-This is actually very similar to our internal network set from before, which boils down to&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Client -&amp;#62; VPN Server -&amp;#62; public internet -&amp;#62; internal network
+This is actually very similar to our internal network setup from before, which boils down to&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Client -&amp;#62; VPN Server -&amp;#62; internal network -&amp;#62; machine
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;To achieve the Internet tunnel topology, we just need to modify the client configuration:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;[Peer]
@@ -484,7 +484,9 @@ Here are some resources that were useful to me:&lt;/p&gt;
 &lt;li&gt;&lt;a href=&quot;https://docs.procustodibus.com/guide/wireguard/&quot;&gt;Pro Custodibus: WireGuard&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.wireguard.com/&quot;&gt;WireGuard website&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Thank you for reading this article!&lt;/p&gt;</content>
+&lt;p&gt;Thank you for reading this article!&lt;/p&gt;
+&lt;hr/&gt;
+&lt;p&gt;Edit: the &amp;#8220;our internal setup&amp;#8221; diagram has been corrected (2025-03-02)&lt;/p&gt;</content>
 		<link href="https://www.dogeystamp.com/wireguard"/>
 		<id>https://www.dogeystamp.com/wireguard</id>
 		<updated>2024-06-17T10:00:00Z</updated>

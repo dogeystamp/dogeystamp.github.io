@@ -336,8 +336,8 @@ The topology is</p>
 <pre><code>Client -&#62; VPN Server -&#62; public internet -&#62; website
 </code></pre>
 <p>which makes it look to the website that the traffic originates from the VPN server.
-This is actually very similar to our internal network set from before, which boils down to</p>
-<pre><code>Client -&#62; VPN Server -&#62; public internet -&#62; internal network
+This is actually very similar to our internal network setup from before, which boils down to</p>
+<pre><code>Client -&#62; VPN Server -&#62; internal network -&#62; machine
 </code></pre>
 <p>To achieve the Internet tunnel topology, we just need to modify the client configuration:</p>
 <pre><code>[Peer]
@@ -368,6 +368,8 @@ Here are some resources that were useful to me:</p>
 <li><a href="https://www.wireguard.com/">WireGuard website</a></li>
 </ul>
 <p>Thank you for reading this article!</p>
+<hr/>
+<p>Edit: the &#8220;our internal setup&#8221; diagram has been corrected (2025-03-02)</p>
 <footer role="contentinfo">
     <span><a href="#">↑ back to top</a></span><br><br>
     <small>
