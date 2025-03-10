@@ -216,8 +216,10 @@ ul li {
 }
 
 @media only screen and (max-device-width: 60em) {
+	body {
+		font-size: 100%;
+	}
 	h1,h2,h3,h4 {
-		margin: 1rem;
 		font-weight: 700;
 	}
 	.header {
@@ -244,5 +246,8 @@ ul li {
 		font-size: 1.25em;
 		display: block;
 		margin-bottom: 1em;
+	}
+	p, pre, table, blockquote {
+		text-align: left;
 	}
 }
