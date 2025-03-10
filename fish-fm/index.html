@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>using the shell as a file picker for qutebrowser</title>
+	<title>Using the shell as a file picker for Qutebrowser</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="using-the-shell-as-a-file-picker-for-qutebrowser">using the shell as a file picker for qutebrowser</h1>
+<h1 id="using-the-shell-as-a-file-picker-for-qutebrowser">Using the shell as a file picker for Qutebrowser</h1>
 <p>2023-06-28</p>
 <p><a href="https://github.com/qutebrowser/qutebrowser">Qutebrowser</a> is pretty great (thanks The-Compiler &#60;3).
 For those who don&#8217;t know about it, it&#8217;s essentially a Vim-like browser:
@@ -33,12 +33,12 @@ is the ability to do everything without taking your hands off the keyboard.</p>
 <p>Anyways, an issue I had was that when uploading a file in Qutebrowser is that it calls on a normal GUI file picker.
 This is probably a sane default, but the default file picker does not have Vim shortcuts (absolutely unusable!).
 Now, you <em>could</em> use <a href="https://github.com/ranger/ranger">ranger</a>, or <a href="https://github.com/vifm/vifm">vifm</a>
-in the way described <a href="https://reddit.baby/r/qutebrowser/comments/r9igqe/need_help_using_ranger_as_file_chooser/">here</a>,
+in the way described <a href="https://old.reddit.com/r/qutebrowser/comments/r9igqe/need_help_using_ranger_as_file_chooser/">here</a>,
 but that&#8217;s boring.
 Instead, as a masochist power user, I manage all my files exclusively in the shell,
 and I wanted to have that experience in Qutebrowser.
 So, I made a 25-line script <code>fish-fm</code> that does just that.</p>
-<h2 id="demonstration">demonstration</h2>
+<h2 id="demonstration">Demonstration</h2>
 <p>Here&#8217;s an example usage of fish-fm.</p>
 <p>First, when a website asks you to upload a file, qutebrowser opens a terminal window with fish-fm.
 Then, you have a full fish shell in which
@@ -54,7 +54,7 @@ As a demo:</p>
 which uses sxiv to view your images.
 Then, you can mark the images (see sxiv&#8217;s man page), and those will be uploaded.</p>
 <p><img src="../public/img/fish-fm/sxiv.jpg" alt="" /></p>
-<h2 id="installation">installation</h2>
+<h2 id="installation">Installation</h2>
 <ul>
 <li>Install the dependencies: qutebrowser, fish</li>
 <li>Copy <a href="https://github.com/dogeystamp/dots/blob/main/src/.local/bin/fish-fm">fish-fm</a> somewhere in your PATH.</li>
@@ -74,8 +74,8 @@ so fish-fm can&#8217;t just print the files selected.</p>
 <li>Your file picker is now a fish shell.</li>
 </ul>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

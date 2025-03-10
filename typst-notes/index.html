@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>note-taking with typst and neovim</title>
+	<title>Note-taking with Typst and Neovim</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="note-taking-with-typst-and-neovim">note-taking with typst and neovim</h1>
+<h1 id="note-taking-with-typst-and-neovim">Note-taking with Typst and Neovim</h1>
 <p>2023-08-14</p>
 <p>A while back, I saw Gilles Castel&#8217;s <a href="https://castel.dev/post/lecture-notes-1/">series</a>
 of blog posts about his note-taking setup with LaTeX and Vim.
@@ -59,7 +59,7 @@ Compare these two snippets:</p>
 </code></pre>
 <p>Because of the above advantages, I decided to start writing things down in Typst.
 In this blog post, I&#8217;ll be documenting my process and tools for Typst note-taking at the time of writing.</p>
-<h2 id="neovim-setup">neovim setup</h2>
+<h2 id="neovim-setup">Neovim setup</h2>
 <p>Currently, I&#8217;m using the <a href="https://github.com/kaarmu/typst.vim">typst.vim</a> plugin to integrate Typst with Neovim.
 It provides basic syntax highlighting, and recognizes <code>.typ</code> files as Typst files.
 The plugin also has a &#8220;watch&#8221; command that compiles your Typst file on change to a PDF.
@@ -78,7 +78,7 @@ with another bind to open the PDF in Zathura.
 Every time I save the content in my text editor, it updates the PDF seamlessly.
 It looks like this on screen:</p>
 <p><a href="/public/img/typst-notes/nvim.jpg"> <img src="/public/img/typst-notes/nvim-thumb.jpg" alt="" /> </a></p>
-<h3 id="templates">templates</h3>
+<h3 id="templates">Templates</h3>
 <p>Users of LaTeX or Typst often use templates in order to configure things like document size, layout, fonts, style, and so on.
 Instead of redefining these settings every time, we can just import them from a file.
 I won&#8217;t go into detail here; read the relvant Typst <a href="https://typst.app/docs/tutorial/making-a-template/">documentation</a> for information.
@@ -98,7 +98,7 @@ Here, you can see my snippet for new documents in action:</p>
 <p>With this setup for Neovim, I have achieved the goal of being able to start writing new notes rapidly.
 It only takes around twenty seconds to open a new file in the editor, then fill out the template information,
 after which I can start writing.</p>
-<h3 id="version-control">version control</h3>
+<h3 id="version-control">Version control</h3>
 <p>When dealing with any textual content, a good practice is to put it under version control like Git.
 This is the norm for code, but it&#8217;s also viable for LaTeX&#47;Typst content.
 The main advantages of this are:</p>
@@ -110,7 +110,7 @@ The main advantages of this are:</p>
 <p>For that reason, I set up a private GitHub repo for storing all my notes in a single folder.
 Besides that, I also set up the templates as a submodule.
 Like this, I can clone the notes repository and also get my templates set up at the same time.</p>
-<h2 id="math-code">math &#38; code</h2>
+<h2 id="math-code">Math &#38; code</h2>
 <p>In the notes I&#8217;m writing, I often have to deal with mathematical expressions and code.
 You can see <a href="https://castel.dev/post/lecture-notes-1/#latex-snippets">here</a>
 that Castel gets a lot of use out of UltiSnips for rapidly typing math in LaTeX.
@@ -136,7 +136,7 @@ while multi-line code is introduced by triple backticks.
 This is <em>exactly</em> the same syntax as in Markdown, which is much more familiar than <code>\begin{verbatim}</code>.
 It also provides syntax highlighting out of the box, without needing to import lstlisting:</p>
 <p><a href="/public/img/typst-notes/code.mp4"> <img src="/public/img/typst-notes/code-thumb.gif" alt="" /> </a></p>
-<h2 id="figures">figures</h2>
+<h2 id="figures">Figures</h2>
 <p>Being able to draw diagrams in the notes is also a necessary feature.
 This part of my setup is mostly unaltered from Castel&#8217;s own method of drawing figures.
 Read his own <a href="https://castel.dev/post/lecture-notes-2/">blog post</a> regarding drawing figures for the best explanation of how it works.
@@ -164,7 +164,7 @@ Here&#8217;s a full demo of drawing a figure (click for a non-gif version):</p>
 <p><a href="/public/img/typst-notes/figure.mp4"> <img src="/public/img/typst-notes/figure-thumb.gif" alt="" /> </a></p>
 <p>For now, there&#8217;s the limitation that there is no equivalent of PDF+LaTeX for Typst.
 This means that the font for the document is not synced to the font in the figures themselves.</p>
-<h2 id="linkingreferences">linking&#47;references</h2>
+<h2 id="linkingreferences">Linking&#47;references</h2>
 <p>Often, when I&#8217;m writing notes for a certain topic, I might want to reference another.
 Now, it is possible to use a relative path link to another PDF,
 but that doesn&#8217;t allow for referencing specific pages or sections.
@@ -180,7 +180,7 @@ For example, here I link to my algorithm notes in a document:</p>
 This is helpful when you modify notes afterwards and a page number points to different content.
 A key bind in my PDF reader triggers a rofi menu where you select one of the sections visible on the current page,
 after which you can paste the link to that section seamlessly in your notes.</p>
-<h1 id="conclusion">conclusion</h1>
+<h1 id="conclusion">Conclusion</h1>
 <p>I&#8217;ve been using the above system for taking notes on competitive programming problems
 and computer science for a few months.
 I think that my goals of having a system for notes that was convenient, easy, and featureful has been accomplished.
@@ -192,8 +192,8 @@ The important files are <code>src&#47;.local&#47;bin&#47;typst-figure</code>, an
 But if it hasn&#8217;t, look at the example on their <a href="https://github.com/typst/typst">GitHub page</a>.
 Hopefully, one day Typst will get wider usage, because it&#8217;s a great typesetting system.</p>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

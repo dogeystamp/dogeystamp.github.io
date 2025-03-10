@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>making a virtual machine from scratch (in rust)</title>
+	<title>Making a virtual machine from scratch (in Rust)</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="making-a-virtual-machine-from-scratch-in-rust">making a virtual machine from scratch (in rust)</h1>
+<h1 id="making-a-virtual-machine-from-scratch-in-rust">Making a virtual machine from scratch (in Rust)</h1>
 <p>2024-01-20</p>
 <p>Computers are wonderful machines that can do many things.
 However, even though they are very complex, at their core they are surprisingly simple.
@@ -40,7 +40,7 @@ I decided to do this project in Rust, in order to learn how the language works h
 I&#8217;ve mostly had experience with C and Python before this, and this was my first Rust project.
 However, this article will focus more on the virtual machine aspect, rather than the Rust.</p>
 <p>If you&#8217;re just looking for the source code, check it out on GitHub: <a href="https://github.com/dogeystamp/lc3-vm">dogeystamp&#47;lc3-vm</a>.</p>
-<h2 id="prerequisite-reading">prerequisite reading</h2>
+<h2 id="prerequisite-reading">Prerequisite reading</h2>
 <p>I assume you have a certain amount of fundamental knowledge before reading this article:</p>
 <ul>
 <li><strong>Programming knowledge</strong> (preferably in Rust or C).
@@ -56,7 +56,7 @@ You should also be familiar with hexadecimal and binary number representation.</
 For all the context and implementation details, see Justin Meiners&#8217; and Ryan Pendleton&#8217;s <a href="https://www.jmeiners.com/lc3-vm/">blog post</a>
 which meticulously explains LC-3,
 as well as the <a href="https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf">LC-3 ISA specification</a>.</p>
-<h2 id="whats-inside-a-vm">what&#8217;s inside a VM?</h2>
+<h2 id="whats-inside-a-vm">What&#8217;s inside a VM?</h2>
 <p>Starting off, here is some theory to get you in context.
 Skim this if you are familiar with how everything works.</p>
 <p>LC-3 can be modeled with three simple components: the processor and registers (CPU), and memory (RAM).</p>
@@ -72,7 +72,7 @@ Skim this if you are familiar with how everything works.</p>
                         +------------------------+
     
 </code></pre>
-<h3 id="memory">memory</h3>
+<h3 id="memory">Memory</h3>
 <p>First, <em>memory</em> is where most temporary data lives in the computer.
 The easiest way for me to visualize it is a huge C-style array:</p>
 <pre><code>uint16_t mem[65536];
@@ -85,7 +85,7 @@ When the computer shuts down, all data in memory is lost.
 At this level, memory does not have any types as they do in languages like C:
 it&#8217;s all raw binary.
 Typed variables, malloc and the stack are all abstractions on top of memory.</p>
-<h3 id="registers">registers</h3>
+<h3 id="registers">Registers</h3>
 <p>Second, <em>registers</em> are where data that is immediately useful is stored.
 They are also 16-bit just like memory elements.
 Think of it as having fixed variables.
@@ -109,7 +109,7 @@ Physically, registers are closer to the processor than memory is,
 and are therefore much faster.
 Besides that, reading&#47;writing from memory usually takes more instructions than just using registers.
 However, in exchange for convenience and speed, you have to deal with a limited amount of registers.</p>
-<h3 id="processor">processor</h3>
+<h3 id="processor">Processor</h3>
 <p>Finally, the <em>processor</em> is where the real computing happens.
 The processor reads <em>instructions</em> one by one, and executes them.
 Instructions are like statements in higher level code, but much simpler.</p>
@@ -139,7 +139,7 @@ For example, the above ADD instruction would be</p>
 <pre><code>ADD R1, R2, R3     ; you can put comments using semicolon
 </code></pre>
 <p>Using an assembler, a programmer can convert the assembly code into the pure binary program that LC-3 can read.</p>
-<h3 id="fetch-execute-loop">fetch-execute loop</h3>
+<h3 id="fetch-execute-loop">Fetch-execute loop</h3>
 <p>Now that the individual parts are explained, we move on to how it all works together.
 So far, I haven&#8217;t explained where the instructions actually come from.
 Since instructions are just binary data, we actually just place a series of them (a program) in memory:</p>
@@ -162,7 +162,7 @@ The processor will perform a <em>fetch-execute</em> loop:</p>
 Remember that <strong>PC points to the next instruction</strong>, not the current one!
 This often tripped me up implementing the virtual machine.
 The reason it doesn&#8217;t point to the current instruction is that it makes the mechanisms in the next section easier to understand.</p>
-<h3 id="control-flow">control flow</h3>
+<h3 id="control-flow">Control flow</h3>
 <p>If statements, switches, and loops are all implemented using two instructions, <code>JMP</code> and <code>BR</code>,
 which alter PC.</p>
 <p><code>JMP</code> (jump) directly sets the value of PC,
@@ -196,7 +196,7 @@ HALT              ; we&#39;re done
 </code></pre>
 <p>It&#8217;s also common practice to AND a register with itself to check if it is positive&#47;negative&#47;zero.
 The the register AND itself is the same value, which allows testing without altering the register&#8217;s contents.</p>
-<h3 id="subroutine-calls">subroutine calls</h3>
+<h3 id="subroutine-calls">Subroutine calls</h3>
 <p>LC-3 has support for &#8220;subroutines&#8221;, which are like functions but less convenient.
 Practically, LC-3 can jump into a subroutine, then at the end of the subroutine, jump back to the place where the subroutine was called.
 This works using instructions like JSR, and RET.</p>
@@ -213,7 +213,7 @@ SOME_ROUTINE
     RET                 ; return
 </code></pre>
 <p>This code will first set R1 to 0, jump into the subroutine, increment R1, then return to the main part and stop the program.</p>
-<h3 id="memory-mapped-io">memory mapped i&#47;o</h3>
+<h3 id="memory-mapped-io">Memory mapped I&#47;O</h3>
 <p>Earlier, when I described how the LC-3 virtual machine works, I omitted a pretty significant component:
 input and output.
 I&#47;O is the sole method that the virtual machine can communicate with the outside world, whether it&#8217;s receiving user input,
@@ -254,12 +254,12 @@ This character is finally sent to the display.</p>
 <p>The program can also halt the computer (shut it down) by setting MCR to all zeroes.</p>
 <p>For detailled information, again, consult the <a href="https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf">LC-3 ISA specification</a>,
 specifically the Device Register Assigments.</p>
-<h2 id="assorted-implementation-details">assorted implementation details</h2>
+<h2 id="assorted-implementation-details">Assorted implementation details</h2>
 <p>Now that we&#8217;ve gone through the basics of how LC-3 works, I&#8217;ll go through some interesting details that I encountered during implementation.
 If you came here to follow along implementing yourself, I recommend you read <a href="https://www.jmeiners.com/lc3-vm/">Meiners&#8217; and Pendleton&#8217;s</a> LC-3 blog post,
 which is actually a tutorial.
 For a Rust version, see <a href="https://www.rodrigoaraujo.me/posts/lets-build-an-lc-3-virtual-machine/">Rodrigo Araujo&#8217;s implementation</a>.</p>
-<h3 id="endianness">endianness</h3>
+<h3 id="endianness">Endianness</h3>
 <p>Endianness is the order bytes are stored in memory within a word (a single piece of data).
 There&#8217;s big endian, and little endian.
 By definition, big endian starts with the most significant byte,
@@ -306,7 +306,7 @@ However, LC-3 data is in big endian order.</p>
 00000040  00 6f 00 6e 00 74 00 20  00 79 00 6f 00 75 00 00
 </code></pre>
 <p>It is important to flip bytes or specify that the data is big-endian when reading programs into memory from a file.</p>
-<h3 id="integer-overflow">integer overflow</h3>
+<h3 id="integer-overflow">Integer overflow</h3>
 <p>You may know that because integers are represented by a finite amount of bits,
 it is possible for them to overflow when they get too big.
 For LC-3, we usually implement registers and memory using unsigned 16-bit integers,
@@ -340,7 +340,7 @@ In my own code, I use explicit syntax for a wrapping addition:</p>
 <pre><code>let addr = vm.registers.get_reg(base_r).wrapping_add(offset);
 </code></pre>
 <p>This code is much clearer, and, quoting the Zen of Python, <code>Explicit is better than implicit.</code></p>
-<h3 id="traps">traps</h3>
+<h3 id="traps">Traps</h3>
 <p>Earlier, in the memory-mapped I&#47;O section, we saw how LC-3 can use memory-mapped I&#47;O to talk to external peripherals.
 You may have noticed that all of this is a very tedious process just to get some user input.
 To simplify things, LC-3 implements <em>traps</em>.
@@ -384,11 +384,11 @@ My own GETC is not really efficient, but using standard library <code>getchar()<
 Right now, with the polling loop, we use up a lot of CPU on the host machine running the VM,
 when we are doing nothing but waiting.
 However, this is the only choice if you actually implement the trap routines in assembly.</p>
-<h3 id="terminal-inputoutput">terminal input&#47;output</h3>
+<h3 id="terminal-inputoutput">Terminal input&#47;output</h3>
 <p>We&#8217;ve seen in the last section the interface LC-3 provides for I&#47;O, but in this section, I&#8217;ll explain concretely <em>how</em> the terminal interface works in my own implementation.</p>
 <p>In my LC-3 VM, only the keyboard device registers and the output-related trap routines are directly implemented.
 The input-related trap routines are based on the keyboard device registers.</p>
-<h4 id="output">output</h4>
+<h4 id="output">Output</h4>
 <p>First, output is relatively simple : we just use the built-in print functions.</p>
 <pre><code>fn trap_puts(vm: &#38;mut VM) {
     let mut idx = vm.registers.r0;
@@ -407,7 +407,7 @@ The input-related trap routines are based on the keyboard device registers.</p>
 <p>For example, to output a null-terminated string, we loop through it and print each character, breaking when we see a null.
 Importantly, <em>remember to flush stdout</em>.
 This makes sure the output actually appears when needed, and fixes some visual glitches.</p>
-<h4 id="input">input</h4>
+<h4 id="input">Input</h4>
 <p>Input is more difficult.
 There are a few problems we need to fix:</p>
 <ul>
@@ -514,7 +514,7 @@ Then, when the VM gets a key through the Keyboard Data register, we give it this
 it allows for the VM to keep working while waiting on user input,
 and it also doesn&#8217;t take a bunch of boilerplate and working with obscure options like file descriptors.
 The input thread just uses normal input functions, and passes it over to the main thread to be read later.</p>
-<h2 id="debugging">debugging</h2>
+<h2 id="debugging">Debugging</h2>
 <p>Implementing a virtual machine can often introduce hard-to-find bugs.
 Indeed, there&#8217;s no such thing as a syntax error or a type error when you&#8217;re dealing with assembly.
 When something goes wrong, you&#8217;ll have absolutely no indication of where the issue stems from:
@@ -604,7 +604,7 @@ This spread corrupted data everywhere, and was hard to diagnose.</p>
 I would&#8217;ve noticed this much quicker.
 Indeed, this will serve as a lesson for me to properly check over code I write in the future,
 and make sure that it is not sloppy.</p>
-<h1 id="conclusion">conclusion</h1>
+<h1 id="conclusion">Conclusion</h1>
 <p>While LC-3 is still a relatively simple program,
 implementing it as a virtual machine is still quite educational.
 I learned about the core functionality of computers,
@@ -623,8 +623,8 @@ read the <a href="https://www.jmeiners.com/lc3-vm/">original blog post</a> that 
 This post is longer than any that I&#8217;ve written up to now.
 I hope you enjoyed my journey with LC-3 as much as I did.</p>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

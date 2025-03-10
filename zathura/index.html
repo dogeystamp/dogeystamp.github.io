@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>contributing to zathura as a novice</title>
+	<title>Contributing to Zathura as a novice</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="contributing-to-zathura-as-a-novice">contributing to zathura as a novice</h1>
+<h1 id="contributing-to-zathura-as-a-novice">Contributing to Zathura as a novice</h1>
 <p>2023-10-24</p>
 <p>Earlier this year I made a <a href="https://git.pwmt.org/pwmt/zathura/-/merge_requests/80">patch</a>
 for Zathura, the open-source PDF reader.
@@ -31,7 +31,7 @@ In this post, I&#8217;ll document the journey of how I diagnosed the root cause 
 then wrote a bugfix for it.
 As this is my first &#8220;real&#8221; patch that got accepted, the
 most important take-away for me is that it&#8217;s actually not that hard to contribute to open-source.</p>
-<h1 id="the-bug">the bug</h1>
+<h1 id="the-bug">The bug</h1>
 <p>First of all, as seen in <a href="../typst-notes/">my last blog post</a>, I make use of Zathura extensively in my note-taking setup.
 On one half of my window, I write markup in Neovim, and in the other half Zathura displays the rendered result.
 Every time I save the markup, it is automatically re-compiled, then Zathura reloads the document.
@@ -46,7 +46,7 @@ Unfortunately for me, the thread was nearly empty, and the last comment was from
 on Stack Exchange was also a dead end, with no real answer to the problem.</p>
 <p>At this point, there was clearly no easy solution to remove flicker from Zathura.
 Since this software is open source, I decided to take a look at the source code in an attempt to diagnose the issue.</p>
-<h1 id="investigating-source-code">investigating source code</h1>
+<h1 id="investigating-source-code">Investigating source code</h1>
 <p>Zathura&#8217;s source code is available at their git repository.
 I cloned it to my projects folder:</p>
 <pre><code>git clone https:&#47;&#47;git.pwmt.org&#47;pwmt&#47;zathura
@@ -98,7 +98,7 @@ This would explain why the screen flickers during reloads:
 the document disappears entirely before the new one is loaded in its place.
 It seems like there might be a moment between closing and reopening where there is nothing on screen,
 which is what causes jarring flicker.</p>
-<h1 id="fixing-the-bug">fixing the bug</h1>
+<h1 id="fixing-the-bug">Fixing the bug</h1>
 <p>So now, we&#8217;ve successfully diagnosed the root cause of the flickering.
 However, this provides no clear path towards solving it.</p>
 <p>At this point, I decided to check out the <code>document_close</code> and <code>document_open</code> functions mentioned above.
@@ -138,7 +138,7 @@ It finally worked!
 After this initial success, I collected all these changes into a <a href="https://git.pwmt.org/pwmt/zathura/-/merge_requests/80">merge request</a> on GitLab.
 Finally, after a month of waiting, I got the maintainer to merge my patch.
 All in all, it took a weekend in total to get familiar with the codebase and create this patch.</p>
-<h1 id="conclusion">conclusion</h1>
+<h1 id="conclusion">Conclusion</h1>
 <p><del>At the time of writing, this patch is still only available in the bleeding-edge&#47;git build of Zathura.
 To check that my code has made it into your version of Zathura, you can check in the man page <code>zathurarc(5)</code> for the option <code>smooth-reload</code>.</del>
 (Since 0.5.5, <code>smooth-reload</code> <a href="https://github.com/pwmt/zathura/commit/ef6e7e295c9c046368a3202e8c82efd8b9d24a92">is no longer an option,</a>
@@ -148,8 +148,8 @@ Hopefully, this small contribution will improve the experience of future users o
 Again, what I want to show in this blog post is that contributing to open-source is actually not <em>that</em> daunting.
 When you encounter odd behaviour in your favourite software, or you want improve a feature, do not be afraid to just open it up and start tinkering.</p>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

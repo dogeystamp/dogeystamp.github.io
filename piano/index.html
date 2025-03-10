@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>reviving a digital piano with new brains</title>
+	<title>Reviving a digital piano with new brains</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="reviving-a-digital-piano-with-new-brains">reviving a digital piano with new brains</h1>
+<h1 id="reviving-a-digital-piano-with-new-brains">Reviving a digital piano with new brains</h1>
 <p>2024-05-17</p>
 <p>One day, I was playing my Roland HP-1500 digital piano,
 which is an incredibly old model.
@@ -44,7 +44,7 @@ Your browser does not support the video tag.
 <p>This project is powered by a single <a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi Pico</a>, which runs firmware written in Rust.
 Source code and build instructions are available on the <a href="https://github.com/dogeystamp/geode-piano">project repository</a>.</p>
 <p>It took quite a while to get to this point, and so this blog post will document the process of designing and implementing geode-piano.</p>
-<h2 id="how-a-digital-piano-works">how a digital piano works</h2>
+<h2 id="how-a-digital-piano-works">How a digital piano works</h2>
 <p>First, before even designing anything, I did a bit of research on what was going on inside a digital piano.
 This helps understand how feasible the project is and how complicated it will be.</p>
 <p>As it turns out, digital pianos are, electrically, pretty simple.
@@ -101,7 +101,7 @@ As it turns out, the matrix is accessible through ribbon cables (or <a href="htt
 <p>The metallic contacts on these cables correspond to the columns and rows of the key matrix.
 Usually, you&#8217;ll find one or multiple ribbon cables with one end plugged into the main board of the digital piano,
 and the other ends leading inside the piano key mechanism.</p>
-<h2 id="project-architecture">project architecture</h2>
+<h2 id="project-architecture">Project architecture</h2>
 <p>geode-piano works by disconnecting the ribbon cables from the original circuit board,
 then reconnecting them into my own circuit.
 Effectively, I&#8217;m taking over the piano key circuitry.</p>
@@ -133,16 +133,16 @@ like the original board did.</p>
 <p>I personally think that this architecture is the fastest way to get to a working product.
 After all, convincingly synthesizing a piano sound is difficult,
 so reinventing this wheel would be unwise.</p>
-<h2 id="hardware">hardware</h2>
+<h2 id="hardware">Hardware</h2>
 <p>Now, physically, what does that <code>[geode-piano]</code> box in the architecture diagram above look like?
 The answer is that it looks like a mess.</p>
 <p><img src="/public/img/piano/doodad2.jpg" alt="My circuit, on a breadboard with many jumper wires" /></p>
-<h3 id="microcontroller">microcontroller</h3>
+<h3 id="microcontroller">Microcontroller</h3>
 <p>First of all, the heart of geode-piano is the Raspberry Pi Pico microcontroller,
 which is the green chip in the image above.
 I had a few laying around, so it was the obvious choice for me to use.
 This part actually runs the firmware, does all the processing, and also connects back to a computer via a micro-USB port.</p>
-<h3 id="sockets">sockets</h3>
+<h3 id="sockets">Sockets</h3>
 <p>Then, there are the sockets above.
 Those are actually FFC sockets, which the ribbon cables can be plugged into.
 This is definitely one of the cursed parts of this project,
@@ -160,7 +160,7 @@ This was a big mistake on my part, as I found out later that it was 1.25mm.</p>
 <p>After this, I discovered that the socket specsheets had measurements of the distance between the first and last contacts,
 which is easier and less error-prone to measure with a typical ruler.
 Actually reading these documents should help me avoid these kinds of mistakes.</p>
-<h3 id="pin-extenders">pin extenders</h3>
+<h3 id="pin-extenders">Pin extenders</h3>
 <p>The astute among you might have noticed that a Pico microcontroller does not have enough input pins for this project.
 To remedy this issue, I used two <a href="https://www.microchip.com/en-us/product/mcp23017">MCP23017</a> chips, which are pin extenders.
 Each has 16 GPIO pins, and they communicate over <a href="https://en.m.wikipedia.org/wiki/I%C2%B2C">I²C</a> to the Pico,
@@ -184,7 +184,7 @@ Also, the overbar on the pin name in the datasheet means that pulling the pin lo
 not the old one!)</li>
 </ul>
 </blockquote>
-<h2 id="firmware">firmware</h2>
+<h2 id="firmware">Firmware</h2>
 <p>If you&#8217;ve used microcontrollers before,
 you probably know that they&#8217;re programmed using C++, C, or MicroPython,
 or some similar language.
@@ -225,10 +225,10 @@ This means that you should avoid long-lived references,
 and keep lifetimes short.
 Essentially, don&#8217;t overcomplicate the program logic.</p>
 <p>Anyways, the source code for geode-piano&#8217;s firmware is available on the <a href="https://github.com/dogeystamp/geode-piano">project repository</a>.</p>
-<h2 id="other-features">other features</h2>
+<h2 id="other-features">Other features</h2>
 <p>That was the general overview of the project.
 These are a few miscellaneous details that I could not fit well elsewhere.</p>
-<h3 id="velocity-detection">velocity detection</h3>
+<h3 id="velocity-detection">Velocity detection</h3>
 <p>A digital piano is, electronically, just a bunch of buttons that trigger sound when pressed.
 There is, however, a slight nuance to this.
 A button switch has only two states, on and off.
@@ -248,7 +248,7 @@ which is not fine-grained enough to accurately detect velocity.
 Possibly, it is because of the MCP23017 being too slow,
 but it could also be my code.
 At this point though, the piano works well enough that I do not feel it is worth it to optimise this.</p>
-<h3 id="sustain-pedal">sustain pedal</h3>
+<h3 id="sustain-pedal">Sustain pedal</h3>
 <p>Pianos have pedals that control the sound.
 The code for handling this is not quite different from handling regular keys.
 However, connecting the pedal to the microcontroller is more difficult.
@@ -263,7 +263,7 @@ so unless the microcontroller uses the wrong pins (in which case we have bigger 
 there should be no short-circuit risk.</p>
 <p>In my experience so far, this connection actually works remarkably well.
 Another win for terrible wiring.</p>
-<h2 id="conclusion">conclusion</h2>
+<h2 id="conclusion">Conclusion</h2>
 <p>This project was pretty fun to do.
 Before starting it, I thought that it was pretty ambitious for my skill level;
 at the time, I&#8217;d only played with wiring LEDs and buttons up to my microcontroller.
@@ -275,8 +275,8 @@ but I agree with the notion that you should try projects like this that are just
 This kind of hands-on learning is one of the better ways to develop problem-solving skills.</p>
 <p>Anyways, I now have a working piano again!</p>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

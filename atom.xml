@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<title>welcome to my website</title>
+	<title></title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2025-03-02T16:20:59Z</updated>
+	<updated>2025-03-09T21:46:41Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
 	<id>https://www.dogeystamp.com,2023-05-14:default-atom-feed/</id>
 	<entry>
-		<title>contributing to zathura as a novice</title>
-		<content type="html">&lt;h1 id=&quot;contributing-to-zathura-as-a-novice&quot;&gt;contributing to zathura as a novice&lt;/h1&gt;
+		<title>Contributing to Zathura as a novice</title>
+		<content type="html">&lt;h1 id=&quot;contributing-to-zathura-as-a-novice&quot;&gt;Contributing to Zathura as a novice&lt;/h1&gt;
 &lt;p&gt;2023-10-24&lt;/p&gt;
 &lt;p&gt;Earlier this year I made a &lt;a href=&quot;https://git.pwmt.org/pwmt/zathura/-/merge_requests/80&quot;&gt;patch&lt;/a&gt;
 for Zathura, the open-source PDF reader.
@@ -17,7 +17,7 @@ In this post, I&amp;#8217;ll document the journey of how I diagnosed the root ca
 then wrote a bugfix for it.
 As this is my first &amp;#8220;real&amp;#8221; patch that got accepted, the
 most important take-away for me is that it&amp;#8217;s actually not that hard to contribute to open-source.&lt;/p&gt;
-&lt;h1 id=&quot;the-bug&quot;&gt;the bug&lt;/h1&gt;
+&lt;h1 id=&quot;the-bug&quot;&gt;The bug&lt;/h1&gt;
 &lt;p&gt;First of all, as seen in &lt;a href=&quot;../typst-notes/&quot;&gt;my last blog post&lt;/a&gt;, I make use of Zathura extensively in my note-taking setup.
 On one half of my window, I write markup in Neovim, and in the other half Zathura displays the rendered result.
 Every time I save the markup, it is automatically re-compiled, then Zathura reloads the document.
@@ -32,7 +32,7 @@ Unfortunately for me, the thread was nearly empty, and the last comment was from
 on Stack Exchange was also a dead end, with no real answer to the problem.&lt;/p&gt;
 &lt;p&gt;At this point, there was clearly no easy solution to remove flicker from Zathura.
 Since this software is open source, I decided to take a look at the source code in an attempt to diagnose the issue.&lt;/p&gt;
-&lt;h1 id=&quot;investigating-source-code&quot;&gt;investigating source code&lt;/h1&gt;
+&lt;h1 id=&quot;investigating-source-code&quot;&gt;Investigating source code&lt;/h1&gt;
 &lt;p&gt;Zathura&amp;#8217;s source code is available at their git repository.
 I cloned it to my projects folder:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;git clone https:&amp;#47;&amp;#47;git.pwmt.org&amp;#47;pwmt&amp;#47;zathura
@@ -84,7 +84,7 @@ This would explain why the screen flickers during reloads:
 the document disappears entirely before the new one is loaded in its place.
 It seems like there might be a moment between closing and reopening where there is nothing on screen,
 which is what causes jarring flicker.&lt;/p&gt;
-&lt;h1 id=&quot;fixing-the-bug&quot;&gt;fixing the bug&lt;/h1&gt;
+&lt;h1 id=&quot;fixing-the-bug&quot;&gt;Fixing the bug&lt;/h1&gt;
 &lt;p&gt;So now, we&amp;#8217;ve successfully diagnosed the root cause of the flickering.
 However, this provides no clear path towards solving it.&lt;/p&gt;
 &lt;p&gt;At this point, I decided to check out the &lt;code&gt;document_close&lt;/code&gt; and &lt;code&gt;document_open&lt;/code&gt; functions mentioned above.
@@ -124,7 +124,7 @@ It finally worked!
 After this initial success, I collected all these changes into a &lt;a href=&quot;https://git.pwmt.org/pwmt/zathura/-/merge_requests/80&quot;&gt;merge request&lt;/a&gt; on GitLab.
 Finally, after a month of waiting, I got the maintainer to merge my patch.
 All in all, it took a weekend in total to get familiar with the codebase and create this patch.&lt;/p&gt;
-&lt;h1 id=&quot;conclusion&quot;&gt;conclusion&lt;/h1&gt;
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
 &lt;p&gt;&lt;del&gt;At the time of writing, this patch is still only available in the bleeding-edge&amp;#47;git build of Zathura.
 To check that my code has made it into your version of Zathura, you can check in the man page &lt;code&gt;zathurarc(5)&lt;/code&gt; for the option &lt;code&gt;smooth-reload&lt;/code&gt;.&lt;/del&gt;
 (Since 0.5.5, &lt;code&gt;smooth-reload&lt;/code&gt; &lt;a href=&quot;https://github.com/pwmt/zathura/commit/ef6e7e295c9c046368a3202e8c82efd8b9d24a92&quot;&gt;is no longer an option,&lt;/a&gt;
@@ -139,8 +139,8 @@ When you encounter odd behaviour in your favourite software, or you want improve
 		<published>2023-10-24T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>wireguard vpn server setup guide for linux</title>
-		<content type="html">&lt;h1 id=&quot;wireguard-vpn-server-setup-guide-for-linux&quot;&gt;wireguard vpn server setup guide for linux&lt;/h1&gt;
+		<title>WireGuard VPN server setup guide for Linux</title>
+		<content type="html">&lt;h1 id=&quot;wireguard-vpn-server-setup-guide-for-linux&quot;&gt;WireGuard VPN server setup guide for Linux&lt;/h1&gt;
 &lt;p&gt;2024-06-17&lt;/p&gt;
 &lt;p&gt;Recently, I decided to set up a WireGuard VPN server for personal use.
 I found that existing guides about this subject are all lacking in some way.
@@ -163,7 +163,7 @@ the end means that the first 24 bits (the first three bytes &lt;code&gt;192.168.
 fixed, and the remaining 8 bits can be anything. Also, a &lt;code&gt;&amp;#47;32&lt;/code&gt; pattern
 matches only one address.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h2 id=&quot;what-is-a-vpn&quot;&gt;what is a vpn?&lt;/h2&gt;
+&lt;h2 id=&quot;what-is-a-vpn&quot;&gt;What is a VPN?&lt;/h2&gt;
 &lt;p&gt;A VPN (virtual private network) is often advertised to the average user as an
 encrypted tunnel for their Internet connection.
 Mostly, this is useful for changing your IP address.&lt;/p&gt;
@@ -181,7 +181,7 @@ Normally, I would need to expose them to the public Internet to access them.
 Instead, I can access them solely through the local network or the VPN,
 preventing strangers from even seeing the login pages of my services.
 This reduces the attack surface and makes things more secure.&lt;/p&gt;
-&lt;h2 id=&quot;wireguard-setup&quot;&gt;wireguard setup&lt;/h2&gt;
+&lt;h2 id=&quot;wireguard-setup&quot;&gt;WireGuard setup&lt;/h2&gt;
 &lt;p&gt;WireGuard is a relatively recent protocol for implementing VPNs.
 It&amp;#8217;s shiny and new, and also has a slimmer codebase than older, more established protocols.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s go through the process of setting up a VPN to access an internal network.
@@ -219,7 +219,7 @@ Each config file has the name &lt;code&gt;[name].conf&lt;/code&gt;,
 where the file name is used as the &lt;em&gt;interface&lt;/em&gt; name.
 These are the same network interfaces as &lt;code&gt;wlan0&lt;/code&gt; or &lt;code&gt;eth0&lt;/code&gt;;
 WireGuard typically uses names like &lt;code&gt;wg0&lt;/code&gt;.&lt;/p&gt;
-&lt;h3 id=&quot;server-configuration&quot;&gt;server configuration&lt;/h3&gt;
+&lt;h3 id=&quot;server-configuration&quot;&gt;Server configuration&lt;/h3&gt;
 &lt;p&gt;An important thing to understand about WireGuard is that it makes no distinction of server or client:
 every device is a &lt;em&gt;peer&lt;/em&gt;.
 To authenticate with each other, each peer has a private key,
@@ -316,7 +316,7 @@ To prevent it from erasing your changes, uncomment the relevant line:&lt;/p&gt;
 net&amp;#47;ipv4&amp;#47;ip_forward=1
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/blockquote&gt;
-&lt;h3 id=&quot;client-configuration&quot;&gt;client configuration&lt;/h3&gt;
+&lt;h3 id=&quot;client-configuration&quot;&gt;Client configuration&lt;/h3&gt;
 &lt;p&gt;Let&amp;#8217;s now examine the Client&amp;#8217;s configuration file.
 If the client is running Linux, it will also be in &lt;code&gt;&amp;#47;etc&amp;#47;wireguard&amp;#47;*.conf&lt;/code&gt;,
 However, the &lt;code&gt;wg-quick&lt;/code&gt; configuration format can be read by many other clients,
@@ -366,7 +366,7 @@ say &lt;code&gt;192.168.0.4&lt;/code&gt;, WireGuard matches the IP to the subnet
 which then forwards these packets to the machine at &lt;code&gt;192.168.0.4&lt;/code&gt; in the internal network.&lt;/p&gt;
 &lt;p&gt;If the machine then replies with a packet, WireGuard sees it is from the &lt;code&gt;192.168.0.0&amp;#47;24&lt;/code&gt; subnet, then routes it back to the Client.
 Using the VPN, the Client will be able to communicate with machines in the internal network as if it were there.&lt;/p&gt;
-&lt;h2 id=&quot;running-the-vpn&quot;&gt;running the vpn&lt;/h2&gt;
+&lt;h2 id=&quot;running-the-vpn&quot;&gt;Running the VPN&lt;/h2&gt;
 &lt;h3 id=&quot;wg-quick&quot;&gt;wg-quick&lt;/h3&gt;
 &lt;p&gt;To start&amp;#47;stop the VPN for both Client and Server (if they run Linux),
 you can use&lt;/p&gt;
@@ -398,7 +398,7 @@ peer: [snip]
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This can show that there is no handshake at all between peers,
 and thus that there is no connection.&lt;/p&gt;
-&lt;h3 id=&quot;networkmanager&quot;&gt;networkmanager&lt;/h3&gt;
+&lt;h3 id=&quot;networkmanager&quot;&gt;NetworkManager&lt;/h3&gt;
 &lt;p&gt;There is also the option of using &lt;a href=&quot;https://wiki.archlinux.org/title/NetworkManager&quot;&gt;NetworkManager&lt;/a&gt;,
 which is neat if you already use it to manage your existing network connections.
 To do this, save your configuration file, and then import it through &lt;code&gt;nmcli&lt;/code&gt;:&lt;/p&gt;
@@ -409,7 +409,7 @@ To do this, save your configuration file, and then import it through &lt;code&gt
 $ nmcli con up wg0
 $ nmcli con edit wg0
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&quot;mobile-devices&quot;&gt;mobile devices&lt;/h3&gt;
+&lt;h3 id=&quot;mobile-devices&quot;&gt;Mobile devices&lt;/h3&gt;
 &lt;p&gt;On mobile devices, WireGuard apps can also use these configuration files:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;F-Droid: &lt;a href=&quot;https://f-droid.org/packages/com.zaneschepke.wireguardautotunnel/&quot;&gt;WG Tunnel&lt;/a&gt;&lt;/li&gt;
@@ -447,7 +447,7 @@ On your phone, select the option to add a connection via QR code,
 and scan it.
 You can pipe any data to &lt;code&gt;qrencode&lt;/code&gt; this way to generate a code,
 and it also creates PNG files if you select that format.&lt;/p&gt;
-&lt;h2 id=&quot;encrypted-internet-tunnel&quot;&gt;encrypted internet tunnel&lt;/h2&gt;
+&lt;h2 id=&quot;encrypted-internet-tunnel&quot;&gt;Encrypted Internet tunnel&lt;/h2&gt;
 &lt;p&gt;I mentioned earlier that to the average user, a VPN is an encrypted tunnel they can run their Internet traffic through.
 The topology is&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Client -&amp;#62; VPN Server -&amp;#62; public internet -&amp;#62; website
@@ -474,7 +474,7 @@ WireGuard will match that IP to the &lt;code&gt;0.0.0.0&amp;#47;0&lt;/code&gt; (
 and route the packet to the Server.
 Then, the Server will forward that packet to &lt;code&gt;archlinux.org&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Thus, we&amp;#8217;ve made a VPN that works just like NordVPN or ProtonVPN, and all the others.&lt;/p&gt;
-&lt;h2 id=&quot;further-reading&quot;&gt;further reading&lt;/h2&gt;
+&lt;h2 id=&quot;further-reading&quot;&gt;Further reading&lt;/h2&gt;
 &lt;p&gt;This guide distills my knowledge with the network topologies I use,
 i.e. connecting to an internal network, and connecting to the Internet via WireGuard.
 However, that&amp;#8217;s of course not the only way you can use a VPN.
@@ -493,8 +493,8 @@ Here are some resources that were useful to me:&lt;/p&gt;
 		<published>2024-06-17T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>note-taking with typst and neovim</title>
-		<content type="html">&lt;h1 id=&quot;note-taking-with-typst-and-neovim&quot;&gt;note-taking with typst and neovim&lt;/h1&gt;
+		<title>Note-taking with Typst and Neovim</title>
+		<content type="html">&lt;h1 id=&quot;note-taking-with-typst-and-neovim&quot;&gt;Note-taking with Typst and Neovim&lt;/h1&gt;
 &lt;p&gt;2023-08-14&lt;/p&gt;
 &lt;p&gt;A while back, I saw Gilles Castel&amp;#8217;s &lt;a href=&quot;https://castel.dev/post/lecture-notes-1/&quot;&gt;series&lt;/a&gt;
 of blog posts about his note-taking setup with LaTeX and Vim.
@@ -530,7 +530,7 @@ Compare these two snippets:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Because of the above advantages, I decided to start writing things down in Typst.
 In this blog post, I&amp;#8217;ll be documenting my process and tools for Typst note-taking at the time of writing.&lt;/p&gt;
-&lt;h2 id=&quot;neovim-setup&quot;&gt;neovim setup&lt;/h2&gt;
+&lt;h2 id=&quot;neovim-setup&quot;&gt;Neovim setup&lt;/h2&gt;
 &lt;p&gt;Currently, I&amp;#8217;m using the &lt;a href=&quot;https://github.com/kaarmu/typst.vim&quot;&gt;typst.vim&lt;/a&gt; plugin to integrate Typst with Neovim.
 It provides basic syntax highlighting, and recognizes &lt;code&gt;.typ&lt;/code&gt; files as Typst files.
 The plugin also has a &amp;#8220;watch&amp;#8221; command that compiles your Typst file on change to a PDF.
@@ -549,7 +549,7 @@ with another bind to open the PDF in Zathura.
 Every time I save the content in my text editor, it updates the PDF seamlessly.
 It looks like this on screen:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/public/img/typst-notes/nvim.jpg&quot;&gt; &lt;img src=&quot;/public/img/typst-notes/nvim-thumb.jpg&quot; alt=&quot;&quot; /&gt; &lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&quot;templates&quot;&gt;templates&lt;/h3&gt;
+&lt;h3 id=&quot;templates&quot;&gt;Templates&lt;/h3&gt;
 &lt;p&gt;Users of LaTeX or Typst often use templates in order to configure things like document size, layout, fonts, style, and so on.
 Instead of redefining these settings every time, we can just import them from a file.
 I won&amp;#8217;t go into detail here; read the relvant Typst &lt;a href=&quot;https://typst.app/docs/tutorial/making-a-template/&quot;&gt;documentation&lt;/a&gt; for information.
@@ -569,7 +569,7 @@ Here, you can see my snippet for new documents in action:&lt;/p&gt;
 &lt;p&gt;With this setup for Neovim, I have achieved the goal of being able to start writing new notes rapidly.
 It only takes around twenty seconds to open a new file in the editor, then fill out the template information,
 after which I can start writing.&lt;/p&gt;
-&lt;h3 id=&quot;version-control&quot;&gt;version control&lt;/h3&gt;
+&lt;h3 id=&quot;version-control&quot;&gt;Version control&lt;/h3&gt;
 &lt;p&gt;When dealing with any textual content, a good practice is to put it under version control like Git.
 This is the norm for code, but it&amp;#8217;s also viable for LaTeX&amp;#47;Typst content.
 The main advantages of this are:&lt;/p&gt;
@@ -581,7 +581,7 @@ The main advantages of this are:&lt;/p&gt;
 &lt;p&gt;For that reason, I set up a private GitHub repo for storing all my notes in a single folder.
 Besides that, I also set up the templates as a submodule.
 Like this, I can clone the notes repository and also get my templates set up at the same time.&lt;/p&gt;
-&lt;h2 id=&quot;math-code&quot;&gt;math &amp;#38; code&lt;/h2&gt;
+&lt;h2 id=&quot;math-code&quot;&gt;Math &amp;#38; code&lt;/h2&gt;
 &lt;p&gt;In the notes I&amp;#8217;m writing, I often have to deal with mathematical expressions and code.
 You can see &lt;a href=&quot;https://castel.dev/post/lecture-notes-1/#latex-snippets&quot;&gt;here&lt;/a&gt;
 that Castel gets a lot of use out of UltiSnips for rapidly typing math in LaTeX.
@@ -607,7 +607,7 @@ while multi-line code is introduced by triple backticks.
 This is &lt;em&gt;exactly&lt;/em&gt; the same syntax as in Markdown, which is much more familiar than &lt;code&gt;\begin{verbatim}&lt;/code&gt;.
 It also provides syntax highlighting out of the box, without needing to import lstlisting:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/public/img/typst-notes/code.mp4&quot;&gt; &lt;img src=&quot;/public/img/typst-notes/code-thumb.gif&quot; alt=&quot;&quot; /&gt; &lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;figures&quot;&gt;figures&lt;/h2&gt;
+&lt;h2 id=&quot;figures&quot;&gt;Figures&lt;/h2&gt;
 &lt;p&gt;Being able to draw diagrams in the notes is also a necessary feature.
 This part of my setup is mostly unaltered from Castel&amp;#8217;s own method of drawing figures.
 Read his own &lt;a href=&quot;https://castel.dev/post/lecture-notes-2/&quot;&gt;blog post&lt;/a&gt; regarding drawing figures for the best explanation of how it works.
@@ -635,7 +635,7 @@ Here&amp;#8217;s a full demo of drawing a figure (click for a non-gif version):&
 &lt;p&gt;&lt;a href=&quot;/public/img/typst-notes/figure.mp4&quot;&gt; &lt;img src=&quot;/public/img/typst-notes/figure-thumb.gif&quot; alt=&quot;&quot; /&gt; &lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;For now, there&amp;#8217;s the limitation that there is no equivalent of PDF+LaTeX for Typst.
 This means that the font for the document is not synced to the font in the figures themselves.&lt;/p&gt;
-&lt;h2 id=&quot;linkingreferences&quot;&gt;linking&amp;#47;references&lt;/h2&gt;
+&lt;h2 id=&quot;linkingreferences&quot;&gt;Linking&amp;#47;references&lt;/h2&gt;
 &lt;p&gt;Often, when I&amp;#8217;m writing notes for a certain topic, I might want to reference another.
 Now, it is possible to use a relative path link to another PDF,
 but that doesn&amp;#8217;t allow for referencing specific pages or sections.
@@ -651,7 +651,7 @@ For example, here I link to my algorithm notes in a document:&lt;/p&gt;
 This is helpful when you modify notes afterwards and a page number points to different content.
 A key bind in my PDF reader triggers a rofi menu where you select one of the sections visible on the current page,
 after which you can paste the link to that section seamlessly in your notes.&lt;/p&gt;
-&lt;h1 id=&quot;conclusion&quot;&gt;conclusion&lt;/h1&gt;
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
 &lt;p&gt;I&amp;#8217;ve been using the above system for taking notes on competitive programming problems
 and computer science for a few months.
 I think that my goals of having a system for notes that was convenient, easy, and featureful has been accomplished.
@@ -668,12 +668,12 @@ Hopefully, one day Typst will get wider usage, because it&amp;#8217;s a great ty
 		<published>2023-08-14T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>how to not abandon side projects</title>
-		<content type="html">&lt;h1 id=&quot;how-to-not-abandon-side-projects&quot;&gt;how to not abandon side projects&lt;/h1&gt;
+		<title>How to not abandon side projects</title>
+		<content type="html">&lt;h1 id=&quot;how-to-not-abandon-side-projects&quot;&gt;How to not abandon side projects&lt;/h1&gt;
 &lt;p&gt;2023-05-15&lt;/p&gt;
 &lt;p&gt;I don&amp;#8217;t personally have any position of authority to back up the following tips.
 However I can attest that at least for me, they were useful.&lt;/p&gt;
-&lt;h2 id=&quot;the-to-do-list&quot;&gt;the to-do list&lt;/h2&gt;
+&lt;h2 id=&quot;the-to-do-list&quot;&gt;The to-do list&lt;/h2&gt;
 &lt;p&gt;I found that while writing larger personal projects,
 motivation was one of the issues that plagued me the most.
 Oftentimes, I&amp;#8217;d take a break from the project for a week or so, then lose the will to continue.&lt;/p&gt;
@@ -713,7 +713,7 @@ For me, my top-level tasks were components of a system like &lt;code&gt;Implemen
 Every time I&amp;#8217;d get to implementing one of these components, I&amp;#8217;d then divide it into smaller, more concrete pieces, like &lt;code&gt;Implement &amp;#47;users&amp;#47;&amp;#60;id&amp;#62; PATCH&lt;/code&gt;.
 Usually, these small tasks were items I could reasonably complete in an evening.
 So basically, there never was this feeling of being overwhelmed, as I always knew that I&amp;#8217;d make decent progress on the project in one session.&lt;/p&gt;
-&lt;h2 id=&quot;docstrings&quot;&gt;docstrings&lt;/h2&gt;
+&lt;h2 id=&quot;docstrings&quot;&gt;Docstrings&lt;/h2&gt;
 &lt;p&gt;In the spirit of planning things out, I also wrote docstrings before writing important classes and functions.
 Most importantly, it&amp;#8217;s good to have a solid definition of what you&amp;#8217;re about to implement.
 It just so happens the Python docstring is a good way to do that:
@@ -729,7 +729,7 @@ that&amp;#8217;s why leaving good comments and docstrings is helpful.&lt;/p&gt;
 It&amp;#8217;s not a real specification; it&amp;#8217;s a short-term plan.
 Sometimes, midway during implementation, I&amp;#8217;ll realize that the docstring describes a function that can&amp;#8217;t work.
 However, that&amp;#8217;s a good thing: if I didn&amp;#8217;t have the plan, I might not have realized my code wasn&amp;#8217;t coherent.&lt;/p&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;conclusion&lt;/h2&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;To be honest, using a divide-and-conquer strategy to complete projects has been working for me.
 Thanks to planning tasks out in a high-level to-do list, and more fine-grained docstrings,
 I have been avoiding lack of motivation, and forgetting what I&amp;#8217;m supposed to be doing.&lt;/p&gt;</content>
@@ -739,8 +739,8 @@ I have been avoiding lack of motivation, and forgetting what I&amp;#8217;m suppo
 		<published>2023-05-15T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>reviving a digital piano with new brains</title>
-		<content type="html">&lt;h1 id=&quot;reviving-a-digital-piano-with-new-brains&quot;&gt;reviving a digital piano with new brains&lt;/h1&gt;
+		<title>Reviving a digital piano with new brains</title>
+		<content type="html">&lt;h1 id=&quot;reviving-a-digital-piano-with-new-brains&quot;&gt;Reviving a digital piano with new brains&lt;/h1&gt;
 &lt;p&gt;2024-05-17&lt;/p&gt;
 &lt;p&gt;One day, I was playing my Roland HP-1500 digital piano,
 which is an incredibly old model.
@@ -761,7 +761,7 @@ Your browser does not support the video tag.
 &lt;p&gt;This project is powered by a single &lt;a href=&quot;https://www.raspberrypi.com/products/raspberry-pi-pico/&quot;&gt;Raspberry Pi Pico&lt;/a&gt;, which runs firmware written in Rust.
 Source code and build instructions are available on the &lt;a href=&quot;https://github.com/dogeystamp/geode-piano&quot;&gt;project repository&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It took quite a while to get to this point, and so this blog post will document the process of designing and implementing geode-piano.&lt;/p&gt;
-&lt;h2 id=&quot;how-a-digital-piano-works&quot;&gt;how a digital piano works&lt;/h2&gt;
+&lt;h2 id=&quot;how-a-digital-piano-works&quot;&gt;How a digital piano works&lt;/h2&gt;
 &lt;p&gt;First, before even designing anything, I did a bit of research on what was going on inside a digital piano.
 This helps understand how feasible the project is and how complicated it will be.&lt;/p&gt;
 &lt;p&gt;As it turns out, digital pianos are, electrically, pretty simple.
@@ -818,7 +818,7 @@ As it turns out, the matrix is accessible through ribbon cables (or &lt;a href=&
 &lt;p&gt;The metallic contacts on these cables correspond to the columns and rows of the key matrix.
 Usually, you&amp;#8217;ll find one or multiple ribbon cables with one end plugged into the main board of the digital piano,
 and the other ends leading inside the piano key mechanism.&lt;/p&gt;
-&lt;h2 id=&quot;project-architecture&quot;&gt;project architecture&lt;/h2&gt;
+&lt;h2 id=&quot;project-architecture&quot;&gt;Project architecture&lt;/h2&gt;
 &lt;p&gt;geode-piano works by disconnecting the ribbon cables from the original circuit board,
 then reconnecting them into my own circuit.
 Effectively, I&amp;#8217;m taking over the piano key circuitry.&lt;/p&gt;
@@ -850,16 +850,16 @@ like the original board did.&lt;/p&gt;
 &lt;p&gt;I personally think that this architecture is the fastest way to get to a working product.
 After all, convincingly synthesizing a piano sound is difficult,
 so reinventing this wheel would be unwise.&lt;/p&gt;
-&lt;h2 id=&quot;hardware&quot;&gt;hardware&lt;/h2&gt;
+&lt;h2 id=&quot;hardware&quot;&gt;Hardware&lt;/h2&gt;
 &lt;p&gt;Now, physically, what does that &lt;code&gt;[geode-piano]&lt;/code&gt; box in the architecture diagram above look like?
 The answer is that it looks like a mess.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/public/img/piano/doodad2.jpg&quot; alt=&quot;My circuit, on a breadboard with many jumper wires&quot; /&gt;&lt;/p&gt;
-&lt;h3 id=&quot;microcontroller&quot;&gt;microcontroller&lt;/h3&gt;
+&lt;h3 id=&quot;microcontroller&quot;&gt;Microcontroller&lt;/h3&gt;
 &lt;p&gt;First of all, the heart of geode-piano is the Raspberry Pi Pico microcontroller,
 which is the green chip in the image above.
 I had a few laying around, so it was the obvious choice for me to use.
 This part actually runs the firmware, does all the processing, and also connects back to a computer via a micro-USB port.&lt;/p&gt;
-&lt;h3 id=&quot;sockets&quot;&gt;sockets&lt;/h3&gt;
+&lt;h3 id=&quot;sockets&quot;&gt;Sockets&lt;/h3&gt;
 &lt;p&gt;Then, there are the sockets above.
 Those are actually FFC sockets, which the ribbon cables can be plugged into.
 This is definitely one of the cursed parts of this project,
@@ -877,7 +877,7 @@ This was a big mistake on my part, as I found out later that it was 1.25mm.&lt;/
 &lt;p&gt;After this, I discovered that the socket specsheets had measurements of the distance between the first and last contacts,
 which is easier and less error-prone to measure with a typical ruler.
 Actually reading these documents should help me avoid these kinds of mistakes.&lt;/p&gt;
-&lt;h3 id=&quot;pin-extenders&quot;&gt;pin extenders&lt;/h3&gt;
+&lt;h3 id=&quot;pin-extenders&quot;&gt;Pin extenders&lt;/h3&gt;
 &lt;p&gt;The astute among you might have noticed that a Pico microcontroller does not have enough input pins for this project.
 To remedy this issue, I used two &lt;a href=&quot;https://www.microchip.com/en-us/product/mcp23017&quot;&gt;MCP23017&lt;/a&gt; chips, which are pin extenders.
 Each has 16 GPIO pins, and they communicate over &lt;a href=&quot;https://en.m.wikipedia.org/wiki/I%C2%B2C&quot;&gt;I²C&lt;/a&gt; to the Pico,
@@ -901,7 +901,7 @@ Also, the overbar on the pin name in the datasheet means that pulling the pin lo
 not the old one!)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/blockquote&gt;
-&lt;h2 id=&quot;firmware&quot;&gt;firmware&lt;/h2&gt;
+&lt;h2 id=&quot;firmware&quot;&gt;Firmware&lt;/h2&gt;
 &lt;p&gt;If you&amp;#8217;ve used microcontrollers before,
 you probably know that they&amp;#8217;re programmed using C++, C, or MicroPython,
 or some similar language.
@@ -942,10 +942,10 @@ This means that you should avoid long-lived references,
 and keep lifetimes short.
 Essentially, don&amp;#8217;t overcomplicate the program logic.&lt;/p&gt;
 &lt;p&gt;Anyways, the source code for geode-piano&amp;#8217;s firmware is available on the &lt;a href=&quot;https://github.com/dogeystamp/geode-piano&quot;&gt;project repository&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;other-features&quot;&gt;other features&lt;/h2&gt;
+&lt;h2 id=&quot;other-features&quot;&gt;Other features&lt;/h2&gt;
 &lt;p&gt;That was the general overview of the project.
 These are a few miscellaneous details that I could not fit well elsewhere.&lt;/p&gt;
-&lt;h3 id=&quot;velocity-detection&quot;&gt;velocity detection&lt;/h3&gt;
+&lt;h3 id=&quot;velocity-detection&quot;&gt;Velocity detection&lt;/h3&gt;
 &lt;p&gt;A digital piano is, electronically, just a bunch of buttons that trigger sound when pressed.
 There is, however, a slight nuance to this.
 A button switch has only two states, on and off.
@@ -965,7 +965,7 @@ which is not fine-grained enough to accurately detect velocity.
 Possibly, it is because of the MCP23017 being too slow,
 but it could also be my code.
 At this point though, the piano works well enough that I do not feel it is worth it to optimise this.&lt;/p&gt;
-&lt;h3 id=&quot;sustain-pedal&quot;&gt;sustain pedal&lt;/h3&gt;
+&lt;h3 id=&quot;sustain-pedal&quot;&gt;Sustain pedal&lt;/h3&gt;
 &lt;p&gt;Pianos have pedals that control the sound.
 The code for handling this is not quite different from handling regular keys.
 However, connecting the pedal to the microcontroller is more difficult.
@@ -980,7 +980,7 @@ so unless the microcontroller uses the wrong pins (in which case we have bigger 
 there should be no short-circuit risk.&lt;/p&gt;
 &lt;p&gt;In my experience so far, this connection actually works remarkably well.
 Another win for terrible wiring.&lt;/p&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;conclusion&lt;/h2&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;This project was pretty fun to do.
 Before starting it, I thought that it was pretty ambitious for my skill level;
 at the time, I&amp;#8217;d only played with wiring LEDs and buttons up to my microcontroller.
@@ -997,11 +997,11 @@ This kind of hands-on learning is one of the better ways to develop problem-solv
 		<published>2024-05-17T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>minrss, a lightweight feed reader</title>
-		<content type="html">&lt;h1 id=&quot;minrss-a-lightweight-feed-reader&quot;&gt;minrss, a lightweight feed reader&lt;/h1&gt;
+		<title>MinRSS, a lightweight feed reader</title>
+		<content type="html">&lt;h1 id=&quot;minrss-a-lightweight-feed-reader&quot;&gt;MinRSS, a lightweight feed reader&lt;/h1&gt;
 &lt;p&gt;2023-05-14&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/public/img/minrss-mrss.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;purpose&quot;&gt;purpose&lt;/h2&gt;
+&lt;h2 id=&quot;purpose&quot;&gt;Purpose&lt;/h2&gt;
 &lt;p&gt;If you want to read content online from many different websites, the best way is to subscribe to RSS or Atom feeds.
 It&amp;#8217;s a simple, universal format for getting content onto your screen.&lt;/p&gt;
 &lt;p&gt;I personally enjoy living in the terminal.
@@ -1009,7 +1009,7 @@ One of the more popular RSS readers for this environment is &lt;a href=&quot;htt
 Newsboat has tons of useful features and a pretty TUI, and I did use it for a while.&lt;/p&gt;
 &lt;p&gt;However, I thought that it was too complex for what I needed in an RSS reader.
 Therefore, I decided to write a new one: MinRSS.&lt;/p&gt;
-&lt;h2 id=&quot;concept&quot;&gt;concept&lt;/h2&gt;
+&lt;h2 id=&quot;concept&quot;&gt;Concept&lt;/h2&gt;
 &lt;p&gt;MinRSS is a small binary that &amp;#8220;does one thing and does it well&amp;#8221;:
 it downloads RSS articles to disk.&lt;/p&gt;
 &lt;p&gt;Essentially, every feed is represented as a
@@ -1031,7 +1031,7 @@ and you can now parse RSS and implement any custom feature you want.&lt;/p&gt;
 &lt;p&gt;If you felt masochistic, you could even read RSS feeds using only your shell, &lt;code&gt;minrss&lt;/code&gt;, &lt;code&gt;ls&lt;/code&gt;, &lt;code&gt;head&lt;/code&gt; and &lt;code&gt;w3m&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;This sort of structure is inspired by suckless.org&amp;#8217;s
 &lt;a href=&quot;http://tools.suckless.org/ii/&quot;&gt;ii&lt;/a&gt; and &lt;a href=&quot;http://tools.suckless.org/sic/&quot;&gt;sic&lt;/a&gt;.&lt;/p&gt;
-&lt;h3 id=&quot;wrapper-script&quot;&gt;wrapper script&lt;/h3&gt;
+&lt;h3 id=&quot;wrapper-script&quot;&gt;Wrapper script&lt;/h3&gt;
 &lt;p&gt;I wrote my own wrapper script around MinRSS, called &lt;code&gt;mrss&lt;/code&gt;.
 It has the following features:&lt;/p&gt;
 &lt;ul&gt;
@@ -1041,7 +1041,7 @@ It has the following features:&lt;/p&gt;
 &lt;li&gt;Mark articles as &amp;#8220;watch later&amp;#8221;&lt;/li&gt;
 &lt;li&gt;Custom handler for opening videos and podcasts in &lt;code&gt;mpv&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;installation&quot;&gt;installation&lt;/h2&gt;
+&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
 &lt;p&gt;First, ensure you have the requirements:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;libcurl&lt;/li&gt;
@@ -1070,7 +1070,7 @@ static const enum summaryFormats summaryFormat = SUMMARY_FILES;
 &lt;pre&gt;&lt;code&gt;cp contrib&amp;#47;mrss.sh ~&amp;#47;.local&amp;#47;bin&amp;#47;mrss
 chmod 755 ~&amp;#47;.local&amp;#47;bin&amp;#47;mrss
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&quot;usage&quot;&gt;usage&lt;/h2&gt;
+&lt;h2 id=&quot;usage&quot;&gt;Usage&lt;/h2&gt;
 &lt;p&gt;For complete help, run &lt;code&gt;mrss -h&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;To get started, all you need is &lt;code&gt;mrss update&lt;/code&gt; to update feeds, then &lt;code&gt;mrss fzf&lt;/code&gt; to view articles.
 Articles are, by default, saved to &lt;code&gt;~&amp;#47;rss&lt;/code&gt;, but you can set &lt;code&gt;$MRSS_DIR&lt;/code&gt; to change this.&lt;/p&gt;
@@ -1113,7 +1113,7 @@ Articles are, by default, saved to &lt;code&gt;~&amp;#47;rss&lt;/code&gt;, but y
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;You can also use &lt;code&gt;Tab&lt;/code&gt; and &lt;code&gt;Shift-Tab&lt;/code&gt; to select multiple articles to be acted upon.&lt;/p&gt;
-&lt;h4 id=&quot;viewing-specific-folders&quot;&gt;viewing specific folders&lt;/h4&gt;
+&lt;h4 id=&quot;viewing-specific-folders&quot;&gt;Viewing specific folders&lt;/h4&gt;
 &lt;p&gt;The &lt;code&gt;mrss fzf&lt;/code&gt; command can be used to view a specific folder&amp;#8217;s contents.&lt;/p&gt;
 &lt;p&gt;To read all null-program articles (regardless of if they are marked read or not):&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;mrss fzf null-program
@@ -1124,7 +1124,7 @@ Articles are, by default, saved to &lt;code&gt;~&amp;#47;rss&lt;/code&gt;, but y
 &lt;p&gt;To see articles you&amp;#8217;ve marked as &amp;#8220;watch later&amp;#8221;:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;mrss fzf watch-later
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h4 id=&quot;creating-meta-feeds&quot;&gt;creating meta-feeds&lt;/h4&gt;
+&lt;h4 id=&quot;creating-meta-feeds&quot;&gt;Creating meta-feeds&lt;/h4&gt;
 &lt;p&gt;In the latest version of mrss, you can create tags to categorize your feeds.
 First, create a directory for your tag under &lt;code&gt;$MRSS_DIR&lt;/code&gt;:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;mkdir ~&amp;#47;rss&amp;#47;tag
@@ -1144,8 +1144,8 @@ First, create a directory for your tag under &lt;code&gt;$MRSS_DIR&lt;/code&gt;:
 		<published>2023-05-14T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>making a virtual machine from scratch (in rust)</title>
-		<content type="html">&lt;h1 id=&quot;making-a-virtual-machine-from-scratch-in-rust&quot;&gt;making a virtual machine from scratch (in rust)&lt;/h1&gt;
+		<title>Making a virtual machine from scratch (in Rust)</title>
+		<content type="html">&lt;h1 id=&quot;making-a-virtual-machine-from-scratch-in-rust&quot;&gt;Making a virtual machine from scratch (in Rust)&lt;/h1&gt;
 &lt;p&gt;2024-01-20&lt;/p&gt;
 &lt;p&gt;Computers are wonderful machines that can do many things.
 However, even though they are very complex, at their core they are surprisingly simple.
@@ -1162,7 +1162,7 @@ I decided to do this project in Rust, in order to learn how the language works h
 I&amp;#8217;ve mostly had experience with C and Python before this, and this was my first Rust project.
 However, this article will focus more on the virtual machine aspect, rather than the Rust.&lt;/p&gt;
 &lt;p&gt;If you&amp;#8217;re just looking for the source code, check it out on GitHub: &lt;a href=&quot;https://github.com/dogeystamp/lc3-vm&quot;&gt;dogeystamp&amp;#47;lc3-vm&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;prerequisite-reading&quot;&gt;prerequisite reading&lt;/h2&gt;
+&lt;h2 id=&quot;prerequisite-reading&quot;&gt;Prerequisite reading&lt;/h2&gt;
 &lt;p&gt;I assume you have a certain amount of fundamental knowledge before reading this article:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Programming knowledge&lt;/strong&gt; (preferably in Rust or C).
@@ -1178,7 +1178,7 @@ You should also be familiar with hexadecimal and binary number representation.&l
 For all the context and implementation details, see Justin Meiners&amp;#8217; and Ryan Pendleton&amp;#8217;s &lt;a href=&quot;https://www.jmeiners.com/lc3-vm/&quot;&gt;blog post&lt;/a&gt;
 which meticulously explains LC-3,
 as well as the &lt;a href=&quot;https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf&quot;&gt;LC-3 ISA specification&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;whats-inside-a-vm&quot;&gt;what&amp;#8217;s inside a VM?&lt;/h2&gt;
+&lt;h2 id=&quot;whats-inside-a-vm&quot;&gt;What&amp;#8217;s inside a VM?&lt;/h2&gt;
 &lt;p&gt;Starting off, here is some theory to get you in context.
 Skim this if you are familiar with how everything works.&lt;/p&gt;
 &lt;p&gt;LC-3 can be modeled with three simple components: the processor and registers (CPU), and memory (RAM).&lt;/p&gt;
@@ -1194,7 +1194,7 @@ Skim this if you are familiar with how everything works.&lt;/p&gt;
                         +------------------------+
     
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&quot;memory&quot;&gt;memory&lt;/h3&gt;
+&lt;h3 id=&quot;memory&quot;&gt;Memory&lt;/h3&gt;
 &lt;p&gt;First, &lt;em&gt;memory&lt;/em&gt; is where most temporary data lives in the computer.
 The easiest way for me to visualize it is a huge C-style array:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;uint16_t mem[65536];
@@ -1207,7 +1207,7 @@ When the computer shuts down, all data in memory is lost.
 At this level, memory does not have any types as they do in languages like C:
 it&amp;#8217;s all raw binary.
 Typed variables, malloc and the stack are all abstractions on top of memory.&lt;/p&gt;
-&lt;h3 id=&quot;registers&quot;&gt;registers&lt;/h3&gt;
+&lt;h3 id=&quot;registers&quot;&gt;Registers&lt;/h3&gt;
 &lt;p&gt;Second, &lt;em&gt;registers&lt;/em&gt; are where data that is immediately useful is stored.
 They are also 16-bit just like memory elements.
 Think of it as having fixed variables.
@@ -1231,7 +1231,7 @@ Physically, registers are closer to the processor than memory is,
 and are therefore much faster.
 Besides that, reading&amp;#47;writing from memory usually takes more instructions than just using registers.
 However, in exchange for convenience and speed, you have to deal with a limited amount of registers.&lt;/p&gt;
-&lt;h3 id=&quot;processor&quot;&gt;processor&lt;/h3&gt;
+&lt;h3 id=&quot;processor&quot;&gt;Processor&lt;/h3&gt;
 &lt;p&gt;Finally, the &lt;em&gt;processor&lt;/em&gt; is where the real computing happens.
 The processor reads &lt;em&gt;instructions&lt;/em&gt; one by one, and executes them.
 Instructions are like statements in higher level code, but much simpler.&lt;/p&gt;
@@ -1261,7 +1261,7 @@ For example, the above ADD instruction would be&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;ADD R1, R2, R3     ; you can put comments using semicolon
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Using an assembler, a programmer can convert the assembly code into the pure binary program that LC-3 can read.&lt;/p&gt;
-&lt;h3 id=&quot;fetch-execute-loop&quot;&gt;fetch-execute loop&lt;/h3&gt;
+&lt;h3 id=&quot;fetch-execute-loop&quot;&gt;Fetch-execute loop&lt;/h3&gt;
 &lt;p&gt;Now that the individual parts are explained, we move on to how it all works together.
 So far, I haven&amp;#8217;t explained where the instructions actually come from.
 Since instructions are just binary data, we actually just place a series of them (a program) in memory:&lt;/p&gt;
@@ -1284,7 +1284,7 @@ The processor will perform a &lt;em&gt;fetch-execute&lt;/em&gt; loop:&lt;/p&gt;
 Remember that &lt;strong&gt;PC points to the next instruction&lt;/strong&gt;, not the current one!
 This often tripped me up implementing the virtual machine.
 The reason it doesn&amp;#8217;t point to the current instruction is that it makes the mechanisms in the next section easier to understand.&lt;/p&gt;
-&lt;h3 id=&quot;control-flow&quot;&gt;control flow&lt;/h3&gt;
+&lt;h3 id=&quot;control-flow&quot;&gt;Control flow&lt;/h3&gt;
 &lt;p&gt;If statements, switches, and loops are all implemented using two instructions, &lt;code&gt;JMP&lt;/code&gt; and &lt;code&gt;BR&lt;/code&gt;,
 which alter PC.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;JMP&lt;/code&gt; (jump) directly sets the value of PC,
@@ -1318,7 +1318,7 @@ HALT              ; we&amp;#39;re done
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It&amp;#8217;s also common practice to AND a register with itself to check if it is positive&amp;#47;negative&amp;#47;zero.
 The the register AND itself is the same value, which allows testing without altering the register&amp;#8217;s contents.&lt;/p&gt;
-&lt;h3 id=&quot;subroutine-calls&quot;&gt;subroutine calls&lt;/h3&gt;
+&lt;h3 id=&quot;subroutine-calls&quot;&gt;Subroutine calls&lt;/h3&gt;
 &lt;p&gt;LC-3 has support for &amp;#8220;subroutines&amp;#8221;, which are like functions but less convenient.
 Practically, LC-3 can jump into a subroutine, then at the end of the subroutine, jump back to the place where the subroutine was called.
 This works using instructions like JSR, and RET.&lt;/p&gt;
@@ -1335,7 +1335,7 @@ SOME_ROUTINE
     RET                 ; return
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This code will first set R1 to 0, jump into the subroutine, increment R1, then return to the main part and stop the program.&lt;/p&gt;
-&lt;h3 id=&quot;memory-mapped-io&quot;&gt;memory mapped i&amp;#47;o&lt;/h3&gt;
+&lt;h3 id=&quot;memory-mapped-io&quot;&gt;Memory mapped I&amp;#47;O&lt;/h3&gt;
 &lt;p&gt;Earlier, when I described how the LC-3 virtual machine works, I omitted a pretty significant component:
 input and output.
 I&amp;#47;O is the sole method that the virtual machine can communicate with the outside world, whether it&amp;#8217;s receiving user input,
@@ -1376,12 +1376,12 @@ This character is finally sent to the display.&lt;/p&gt;
 &lt;p&gt;The program can also halt the computer (shut it down) by setting MCR to all zeroes.&lt;/p&gt;
 &lt;p&gt;For detailled information, again, consult the &lt;a href=&quot;https://www.jmeiners.com/lc3-vm/supplies/lc3-isa.pdf&quot;&gt;LC-3 ISA specification&lt;/a&gt;,
 specifically the Device Register Assigments.&lt;/p&gt;
-&lt;h2 id=&quot;assorted-implementation-details&quot;&gt;assorted implementation details&lt;/h2&gt;
+&lt;h2 id=&quot;assorted-implementation-details&quot;&gt;Assorted implementation details&lt;/h2&gt;
 &lt;p&gt;Now that we&amp;#8217;ve gone through the basics of how LC-3 works, I&amp;#8217;ll go through some interesting details that I encountered during implementation.
 If you came here to follow along implementing yourself, I recommend you read &lt;a href=&quot;https://www.jmeiners.com/lc3-vm/&quot;&gt;Meiners&amp;#8217; and Pendleton&amp;#8217;s&lt;/a&gt; LC-3 blog post,
 which is actually a tutorial.
 For a Rust version, see &lt;a href=&quot;https://www.rodrigoaraujo.me/posts/lets-build-an-lc-3-virtual-machine/&quot;&gt;Rodrigo Araujo&amp;#8217;s implementation&lt;/a&gt;.&lt;/p&gt;
-&lt;h3 id=&quot;endianness&quot;&gt;endianness&lt;/h3&gt;
+&lt;h3 id=&quot;endianness&quot;&gt;Endianness&lt;/h3&gt;
 &lt;p&gt;Endianness is the order bytes are stored in memory within a word (a single piece of data).
 There&amp;#8217;s big endian, and little endian.
 By definition, big endian starts with the most significant byte,
@@ -1428,7 +1428,7 @@ However, LC-3 data is in big endian order.&lt;/p&gt;
 00000040  00 6f 00 6e 00 74 00 20  00 79 00 6f 00 75 00 00
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It is important to flip bytes or specify that the data is big-endian when reading programs into memory from a file.&lt;/p&gt;
-&lt;h3 id=&quot;integer-overflow&quot;&gt;integer overflow&lt;/h3&gt;
+&lt;h3 id=&quot;integer-overflow&quot;&gt;Integer overflow&lt;/h3&gt;
 &lt;p&gt;You may know that because integers are represented by a finite amount of bits,
 it is possible for them to overflow when they get too big.
 For LC-3, we usually implement registers and memory using unsigned 16-bit integers,
@@ -1462,7 +1462,7 @@ In my own code, I use explicit syntax for a wrapping addition:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;let addr = vm.registers.get_reg(base_r).wrapping_add(offset);
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This code is much clearer, and, quoting the Zen of Python, &lt;code&gt;Explicit is better than implicit.&lt;/code&gt;&lt;/p&gt;
-&lt;h3 id=&quot;traps&quot;&gt;traps&lt;/h3&gt;
+&lt;h3 id=&quot;traps&quot;&gt;Traps&lt;/h3&gt;
 &lt;p&gt;Earlier, in the memory-mapped I&amp;#47;O section, we saw how LC-3 can use memory-mapped I&amp;#47;O to talk to external peripherals.
 You may have noticed that all of this is a very tedious process just to get some user input.
 To simplify things, LC-3 implements &lt;em&gt;traps&lt;/em&gt;.
@@ -1506,11 +1506,11 @@ My own GETC is not really efficient, but using standard library &lt;code&gt;getc
 Right now, with the polling loop, we use up a lot of CPU on the host machine running the VM,
 when we are doing nothing but waiting.
 However, this is the only choice if you actually implement the trap routines in assembly.&lt;/p&gt;
-&lt;h3 id=&quot;terminal-inputoutput&quot;&gt;terminal input&amp;#47;output&lt;/h3&gt;
+&lt;h3 id=&quot;terminal-inputoutput&quot;&gt;Terminal input&amp;#47;output&lt;/h3&gt;
 &lt;p&gt;We&amp;#8217;ve seen in the last section the interface LC-3 provides for I&amp;#47;O, but in this section, I&amp;#8217;ll explain concretely &lt;em&gt;how&lt;/em&gt; the terminal interface works in my own implementation.&lt;/p&gt;
 &lt;p&gt;In my LC-3 VM, only the keyboard device registers and the output-related trap routines are directly implemented.
 The input-related trap routines are based on the keyboard device registers.&lt;/p&gt;
-&lt;h4 id=&quot;output&quot;&gt;output&lt;/h4&gt;
+&lt;h4 id=&quot;output&quot;&gt;Output&lt;/h4&gt;
 &lt;p&gt;First, output is relatively simple : we just use the built-in print functions.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;fn trap_puts(vm: &amp;#38;mut VM) {
     let mut idx = vm.registers.r0;
@@ -1529,7 +1529,7 @@ The input-related trap routines are based on the keyboard device registers.&lt;/
 &lt;p&gt;For example, to output a null-terminated string, we loop through it and print each character, breaking when we see a null.
 Importantly, &lt;em&gt;remember to flush stdout&lt;/em&gt;.
 This makes sure the output actually appears when needed, and fixes some visual glitches.&lt;/p&gt;
-&lt;h4 id=&quot;input&quot;&gt;input&lt;/h4&gt;
+&lt;h4 id=&quot;input&quot;&gt;Input&lt;/h4&gt;
 &lt;p&gt;Input is more difficult.
 There are a few problems we need to fix:&lt;/p&gt;
 &lt;ul&gt;
@@ -1636,7 +1636,7 @@ Then, when the VM gets a key through the Keyboard Data register, we give it this
 it allows for the VM to keep working while waiting on user input,
 and it also doesn&amp;#8217;t take a bunch of boilerplate and working with obscure options like file descriptors.
 The input thread just uses normal input functions, and passes it over to the main thread to be read later.&lt;/p&gt;
-&lt;h2 id=&quot;debugging&quot;&gt;debugging&lt;/h2&gt;
+&lt;h2 id=&quot;debugging&quot;&gt;Debugging&lt;/h2&gt;
 &lt;p&gt;Implementing a virtual machine can often introduce hard-to-find bugs.
 Indeed, there&amp;#8217;s no such thing as a syntax error or a type error when you&amp;#8217;re dealing with assembly.
 When something goes wrong, you&amp;#8217;ll have absolutely no indication of where the issue stems from:
@@ -1726,7 +1726,7 @@ This spread corrupted data everywhere, and was hard to diagnose.&lt;/p&gt;
 I would&amp;#8217;ve noticed this much quicker.
 Indeed, this will serve as a lesson for me to properly check over code I write in the future,
 and make sure that it is not sloppy.&lt;/p&gt;
-&lt;h1 id=&quot;conclusion&quot;&gt;conclusion&lt;/h1&gt;
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
 &lt;p&gt;While LC-3 is still a relatively simple program,
 implementing it as a virtual machine is still quite educational.
 I learned about the core functionality of computers,
@@ -1750,8 +1750,8 @@ I hope you enjoyed my journey with LC-3 as much as I did.&lt;/p&gt;</content>
 		<published>2024-01-20T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>hello world (from barf.sh)</title>
-		<content type="html">&lt;h1 id=&quot;hello-world-from-barf.sh&quot;&gt;hello world (from barf.sh)&lt;/h1&gt;
+		<title>Hello World (from barf.sh)</title>
+		<content type="html">&lt;h1 id=&quot;hello-world-from-barf.sh&quot;&gt;Hello World (from barf.sh)&lt;/h1&gt;
 &lt;p&gt;2023-05-14&lt;/p&gt;
 &lt;p&gt;Another year, another static site generator.&lt;/p&gt;
 &lt;p&gt;This time, for the &lt;a href=&quot;https://git.dogeystamp.com/dogeystamp/wb5&quot;&gt;5th iteration&lt;/a&gt; of the website,
@@ -1773,8 +1773,8 @@ They both work similarly, so I just needed minor changes to port over my (admitt
 		<published>2023-05-14T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>using the shell as a file picker for qutebrowser</title>
-		<content type="html">&lt;h1 id=&quot;using-the-shell-as-a-file-picker-for-qutebrowser&quot;&gt;using the shell as a file picker for qutebrowser&lt;/h1&gt;
+		<title>Using the shell as a file picker for Qutebrowser</title>
+		<content type="html">&lt;h1 id=&quot;using-the-shell-as-a-file-picker-for-qutebrowser&quot;&gt;Using the shell as a file picker for Qutebrowser&lt;/h1&gt;
 &lt;p&gt;2023-06-28&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/qutebrowser/qutebrowser&quot;&gt;Qutebrowser&lt;/a&gt; is pretty great (thanks The-Compiler &amp;#60;3).
 For those who don&amp;#8217;t know about it, it&amp;#8217;s essentially a Vim-like browser:
@@ -1784,12 +1784,12 @@ is the ability to do everything without taking your hands off the keyboard.&lt;/
 &lt;p&gt;Anyways, an issue I had was that when uploading a file in Qutebrowser is that it calls on a normal GUI file picker.
 This is probably a sane default, but the default file picker does not have Vim shortcuts (absolutely unusable!).
 Now, you &lt;em&gt;could&lt;/em&gt; use &lt;a href=&quot;https://github.com/ranger/ranger&quot;&gt;ranger&lt;/a&gt;, or &lt;a href=&quot;https://github.com/vifm/vifm&quot;&gt;vifm&lt;/a&gt;
-in the way described &lt;a href=&quot;https://reddit.baby/r/qutebrowser/comments/r9igqe/need_help_using_ranger_as_file_chooser/&quot;&gt;here&lt;/a&gt;,
+in the way described &lt;a href=&quot;https://old.reddit.com/r/qutebrowser/comments/r9igqe/need_help_using_ranger_as_file_chooser/&quot;&gt;here&lt;/a&gt;,
 but that&amp;#8217;s boring.
 Instead, as a masochist power user, I manage all my files exclusively in the shell,
 and I wanted to have that experience in Qutebrowser.
 So, I made a 25-line script &lt;code&gt;fish-fm&lt;/code&gt; that does just that.&lt;/p&gt;
-&lt;h2 id=&quot;demonstration&quot;&gt;demonstration&lt;/h2&gt;
+&lt;h2 id=&quot;demonstration&quot;&gt;Demonstration&lt;/h2&gt;
 &lt;p&gt;Here&amp;#8217;s an example usage of fish-fm.&lt;/p&gt;
 &lt;p&gt;First, when a website asks you to upload a file, qutebrowser opens a terminal window with fish-fm.
 Then, you have a full fish shell in which
@@ -1805,7 +1805,7 @@ As a demo:&lt;/p&gt;
 which uses sxiv to view your images.
 Then, you can mark the images (see sxiv&amp;#8217;s man page), and those will be uploaded.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;../public/img/fish-fm/sxiv.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;installation&quot;&gt;installation&lt;/h2&gt;
+&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;Install the dependencies: qutebrowser, fish&lt;/li&gt;
 &lt;li&gt;Copy &lt;a href=&quot;https://github.com/dogeystamp/dots/blob/main/src/.local/bin/fish-fm&quot;&gt;fish-fm&lt;/a&gt; somewhere in your PATH.&lt;/li&gt;
@@ -1830,8 +1830,8 @@ so fish-fm can&amp;#8217;t just print the files selected.&lt;/p&gt;
 		<published>2023-06-28T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>lower bound, upper bound in c++, visually explained</title>
-		<content type="html">&lt;h1 id=&quot;lower-bound-upper-bound-in-c-visually-explained&quot;&gt;lower bound, upper bound in c++, visually explained&lt;/h1&gt;
+		<title>Lower bound, upper bound in C++, visually explained</title>
+		<content type="html">&lt;h1 id=&quot;lower-bound-upper-bound-in-c-visually-explained&quot;&gt;Lower bound, upper bound in C++, visually explained&lt;/h1&gt;
 &lt;p&gt;2024-04-02&lt;/p&gt;
 &lt;p&gt;One of the most common problems programmers have to solve is retrieving specific data — finding the needle in the haystack.
 To make this simpler, languages provide standard tools to perform this task:
@@ -1844,7 +1844,7 @@ describes &lt;code&gt;lower_bound&lt;/code&gt; like this:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;That sounds like gibberish, and is too technical to quickly understand.
 For that reason, I&amp;#8217;m making this blog post to explain my own mental model of these functions.&lt;/p&gt;
-&lt;h2 id=&quot;refresher-on-binary-search&quot;&gt;refresher on binary search&lt;/h2&gt;
+&lt;h2 id=&quot;refresher-on-binary-search&quot;&gt;Refresher on binary search&lt;/h2&gt;
 &lt;p&gt;First, it&amp;#8217;s important to understand how &lt;code&gt;lower_bound&lt;/code&gt; and &lt;code&gt;upper_bound&lt;/code&gt; work under the hood.&lt;/p&gt;
 &lt;p&gt;As you know, finding words in a dictionary is relatively fast.
 This is possible because the words are in alphabetical order.
@@ -1866,7 +1866,7 @@ For step 1, the computer is halving the range &lt;code&gt;1-1000&lt;/code&gt;.
 In step 2, &lt;code&gt;500-1000&lt;/code&gt;. Then for step 3, &lt;code&gt;500-750&lt;/code&gt;.
 This is like the way humans look at dictionaries, but more structured.&lt;/p&gt;
 &lt;p&gt;Anyways, this is not intended to be a full explanation of binary search: refer to &lt;a href=&quot;https://youtube.com/watch?v=KXJSjte_OAI&quot;&gt;Tom Scott&amp;#8217;s video&lt;/a&gt; about it for more information.&lt;/p&gt;
-&lt;h2 id=&quot;lower-bound-and-upper-bound&quot;&gt;lower bound and upper bound&lt;/h2&gt;
+&lt;h2 id=&quot;lower-bound-and-upper-bound&quot;&gt;Lower bound and upper bound&lt;/h2&gt;
 &lt;p&gt;Back to the real subject of this post: &lt;code&gt;lower_bound&lt;/code&gt; and &lt;code&gt;upper_bound&lt;/code&gt; in C++.
 What I used to understand of these functions is that they use binary search to find elements in a sorted container.
 However, I didn&amp;#8217;t get what differentiated them.
@@ -1931,7 +1931,7 @@ and as such the loop stops.&lt;/p&gt;
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Anyways, I&amp;#8217;ll repeat it again: &lt;code&gt;lower_bound&lt;/code&gt; and &lt;code&gt;upper_bound&lt;/code&gt; represent the &lt;em&gt;interval&lt;/em&gt; that matches what you&amp;#8217;re looking for.&lt;/p&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;conclusion&lt;/h2&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;So, that is my &amp;#8220;visual&amp;#8221; explanation how lower and upper bound works in C++.
 In hindsight, this seems obvious, but back when I was first told about these functions,
 I could not understand it because of the confusing descriptions.
@@ -1943,8 +1943,8 @@ you don&amp;#8217;t want to be stuck memorizing things that don&amp;#8217;t make
 		<published>2024-04-02T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>box-drawing test</title>
-		<content type="html">&lt;h1 id=&quot;box-drawing-test&quot;&gt;box-drawing test&lt;/h1&gt;
+		<title>Box-drawing test</title>
+		<content type="html">&lt;h1 id=&quot;box-drawing-test&quot;&gt;Box-drawing test&lt;/h1&gt;
 &lt;p&gt;2024-02-03&lt;/p&gt;
 &lt;p&gt;In my &lt;a href=&quot;/lc3&quot;&gt;last blog post&lt;/a&gt; about the LC-3 virtual machine, I made a few diagrams with ASCII art.
 I found out recently that I didn&amp;#8217;t have to use &lt;code&gt;+&lt;/code&gt; and &lt;code&gt;-&lt;/code&gt; and &lt;code&gt;|&lt;/code&gt; symbols to make boxes; Unicode has symbols specifically for that.
@@ -2044,8 +2044,8 @@ put newlines, and then expand the box to fit the text:&lt;/p&gt;
 		<published>2024-02-03T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>making custom arch linux live ISOs without arch linux</title>
-		<content type="html">&lt;h1 id=&quot;making-custom-arch-linux-live-isos-without-arch-linux&quot;&gt;making custom arch linux live ISOs without arch linux&lt;/h1&gt;
+		<title>Making custom Arch Linux live ISOs without Arch Linux</title>
+		<content type="html">&lt;h1 id=&quot;making-custom-arch-linux-live-isos-without-arch-linux&quot;&gt;Making custom Arch Linux live ISOs without Arch Linux&lt;/h1&gt;
 &lt;p&gt;2023-06-07&lt;/p&gt;
 &lt;p&gt;If you&amp;#8217;ve ever installed any Linux distro, you probably had to do it using a live install environment.
 Once you flashed the USB drive, you could boot off it and you&amp;#8217;d be greeted with a Linux system.&lt;/p&gt;
@@ -2063,7 +2063,7 @@ In fact, it&amp;#8217;s the tool that Arch&amp;#8217;s maintainers use to genera
 &lt;p&gt;As I run another distro on my laptop, I could not use archiso.
 So, in the last few days, I set out to make archiso run on my system.
 The final results of this endeavour can be found &lt;a href=&quot;https://github.com/dogeystamp/archiso-portable&quot;&gt;on GitHub&lt;/a&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;pacstrap&quot;&gt;pacstrap&lt;/h2&gt;
+&lt;h2 id=&quot;pacstrap&quot;&gt;Pacstrap&lt;/h2&gt;
 &lt;p&gt;One of the essential dependencies of archiso is pacstrap.
 Essentially, what pacstrap does is that it creates a small Arch Linux system in a folder.
 This is the bootstrapped root filesystem (root FS).
@@ -2085,7 +2085,7 @@ it runs the arch-chroot inside the downloaded Arch filesystem.&lt;/p&gt;
 &lt;p&gt;Somewhat annoyingly though, archstrap does not operate exactly the same way pacstrap does:
 I had to patch it to get it working with archiso.
 Also, I patched archiso itself to remove some flags archstrap doesn&amp;#8217;t parse.&lt;/p&gt;
-&lt;h2 id=&quot;other-changes&quot;&gt;other changes&lt;/h2&gt;
+&lt;h2 id=&quot;other-changes&quot;&gt;Other changes&lt;/h2&gt;
 &lt;p&gt;The other main dependency missing in archiso is pacman, Arch&amp;#8217;s package manager.
 Since we aren&amp;#8217;t running Arch, we of course do not have it on our host system.
 However, the bootstrapped Arch root FS we downloaded earlier does have pacman inside of it.
@@ -2094,7 +2094,7 @@ Therefore, I replaced all invocations of pacman inside archiso with invocations 
 I added a check to it that switches some hard-coded paths.
 In Arch, the path is &lt;code&gt;&amp;#47;usr&amp;#47;share&amp;#47;edk2-ovmf&amp;#47;x64&lt;/code&gt;,
 but on my system it was at &lt;code&gt;&amp;#47;usr&amp;#47;share&amp;#47;edk2-ovmf&lt;/code&gt;.&lt;/p&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;conclusion&lt;/h2&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;It turns out that modifying open source software isn&amp;#8217;t that difficult.
 Given that archiso&amp;#8217;s maintainers wrote very structured and organized code,
 it&amp;#8217;s surprisingly easy to navigate around the script to patch things.&lt;/p&gt;

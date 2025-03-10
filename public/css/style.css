@@ -27,7 +27,7 @@ I stole a decent amount of code from the stylesheet of https://barf.bt.ht/
 so here's the license
 */
 
-@import "/public/fonts/inter/inter.css";
+@import "/public/fonts/nimbus/nimbus.css";
 
 @font-face
 {
@@ -43,16 +43,17 @@ so here's the license
 }
 
 body {
-	font-family: Inter, sans-serif;
+	font-family: Nimbus Sans, Arial, Helvetica, sans-serif;
 	max-width: 55em;
 	margin: auto;
-	background: #000000;
-	color: #e3e3e3;
+	padding: 2em;
 	font-size: 105%;
+	background: white;
 }
 
 .header {
 	margin-top: 2%;
+	margin-left: -1ex;
 	display: flex;
 	align-items: center;
 }
@@ -61,8 +62,6 @@ body {
 	font-size: 175%;
 	position: relative;
 	margin-right: 0.7em;
-	bottom: .09em;
-	color: #ffffff;
 }
 
 .header a {
@@ -70,6 +69,12 @@ body {
 	font-weight: 600;
 	font-size: 125%;
 	text-decoration: none;
+	color: gray;
+}
+
+.header img {
+	position: relative;
+	bottom: .2ex;
 }
 
 * {
@@ -87,38 +92,26 @@ nav {
 }
 article {
 	hyphens: auto;
-	padding: 1em;
 }
 article p {
-	margin: 1rem 1em;
-	line-height: 1.5;
+	margin: 1rem 0.2ex;
+	line-height: 1.25;
 }
 h1,h2,h3,h4 {
 	margin: 2rem 0 0;
 	font-weight: 700;
-	color: #eeeeee;
 }
 h1 {
-	margin-bottom: 0.5rem;
-	font-size: 175%;
-}
-h2 {
-	margin-left: 0.25rem;
-}
-h3 {
-	margin-left: 0.6rem;
-}
-h4 {
-	margin-left: 0.75rem;
+	margin: 2rem 0 0;
+	font-size: 200%;
 }
 span.created {
 	display: block;
 	margin: 4px 15px;
-	font-family: JetBrainsMono, monospace;
-	color: #aaaaaa;
+	font-variant-numeric: tabular-nums;
 }
 span.created a {
-	font-family: Inter, sans-serif;
+	color: black;
 }
 
 img {
@@ -144,10 +137,9 @@ video {
 }
 
 blockquote {
-	border: 1px solid #ffffff55;
 	border-left: 0.5em solid;
-	margin: 2rem 0;
-	padding: 10px;
+	margin: 1rem 0;
+	padding: 0.5em;
 }
 blockquote p {
 	margin: 0;
@@ -158,6 +150,7 @@ blockquote p {
 blockquote ul {
 	font-style: italic;
 	font-size: 90%;
+	padding: 0;
 }
 
 figure {
@@ -167,8 +160,7 @@ figcaption {
 	color: slategrey;
 }
 code {
-	border: 1px solid #444444;
-	padding: 0.05rem 0.15rem;
+	padding: 0.0rem 0.15rem;
 	tab-size: 4;
 	font-family: JetBrainsMono;
 	font-size: 80%;
@@ -181,7 +173,7 @@ pre code {
 	display: block;
 	overflow-x: auto;
 	padding: 0.3rem 0.6rem;
-	color: #aaaaaa;
+	color: black;
 }
 table {
 	border-collapse: collapse;
@@ -193,7 +185,7 @@ tr {
 	border-bottom: 1px solid lightgrey;
 }
 tr:nth-of-type(odd) td {
-	background-color: #151515;
+	background-color: #f7f7f7;
 }
 th,td {
 	padding: 6px;
@@ -210,17 +202,16 @@ a {
 	font-weight: 500;
 }
 a:hover {
-	background-color: #222222;
-	color: #99aabb;
+	color: #444444;
 }
 p, pre, table, blockquote {
-	margin-left: 1rem;
+	margin-left: 0.5ex;
 	text-align: justify;
 }
 
 ul li {
 	list-style: square;
-	margin: 0.5em;
+	margin: 0.25em;
 }
 
 @media only screen and (max-device-width: 60em) {

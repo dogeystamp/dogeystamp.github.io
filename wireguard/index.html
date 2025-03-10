@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>wireguard vpn server setup guide for linux</title>
+	<title>WireGuard VPN server setup guide for Linux</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="wireguard-vpn-server-setup-guide-for-linux">wireguard vpn server setup guide for linux</h1>
+<h1 id="wireguard-vpn-server-setup-guide-for-linux">WireGuard VPN server setup guide for Linux</h1>
 <p>2024-06-17</p>
 <p>Recently, I decided to set up a WireGuard VPN server for personal use.
 I found that existing guides about this subject are all lacking in some way.
@@ -46,7 +46,7 @@ the end means that the first 24 bits (the first three bytes <code>192.168.0</cod
 fixed, and the remaining 8 bits can be anything. Also, a <code>&#47;32</code> pattern
 matches only one address.</p>
 </blockquote>
-<h2 id="what-is-a-vpn">what is a vpn?</h2>
+<h2 id="what-is-a-vpn">What is a VPN?</h2>
 <p>A VPN (virtual private network) is often advertised to the average user as an
 encrypted tunnel for their Internet connection.
 Mostly, this is useful for changing your IP address.</p>
@@ -64,7 +64,7 @@ Normally, I would need to expose them to the public Internet to access them.
 Instead, I can access them solely through the local network or the VPN,
 preventing strangers from even seeing the login pages of my services.
 This reduces the attack surface and makes things more secure.</p>
-<h2 id="wireguard-setup">wireguard setup</h2>
+<h2 id="wireguard-setup">WireGuard setup</h2>
 <p>WireGuard is a relatively recent protocol for implementing VPNs.
 It&#8217;s shiny and new, and also has a slimmer codebase than older, more established protocols.</p>
 <p>Let&#8217;s go through the process of setting up a VPN to access an internal network.
@@ -102,7 +102,7 @@ Each config file has the name <code>[name].conf</code>,
 where the file name is used as the <em>interface</em> name.
 These are the same network interfaces as <code>wlan0</code> or <code>eth0</code>;
 WireGuard typically uses names like <code>wg0</code>.</p>
-<h3 id="server-configuration">server configuration</h3>
+<h3 id="server-configuration">Server configuration</h3>
 <p>An important thing to understand about WireGuard is that it makes no distinction of server or client:
 every device is a <em>peer</em>.
 To authenticate with each other, each peer has a private key,
@@ -199,7 +199,7 @@ To prevent it from erasing your changes, uncomment the relevant line:</p>
 net&#47;ipv4&#47;ip_forward=1
 </code></pre>
 </blockquote>
-<h3 id="client-configuration">client configuration</h3>
+<h3 id="client-configuration">Client configuration</h3>
 <p>Let&#8217;s now examine the Client&#8217;s configuration file.
 If the client is running Linux, it will also be in <code>&#47;etc&#47;wireguard&#47;*.conf</code>,
 However, the <code>wg-quick</code> configuration format can be read by many other clients,
@@ -249,7 +249,7 @@ say <code>192.168.0.4</code>, WireGuard matches the IP to the subnet <code>192.1
 which then forwards these packets to the machine at <code>192.168.0.4</code> in the internal network.</p>
 <p>If the machine then replies with a packet, WireGuard sees it is from the <code>192.168.0.0&#47;24</code> subnet, then routes it back to the Client.
 Using the VPN, the Client will be able to communicate with machines in the internal network as if it were there.</p>
-<h2 id="running-the-vpn">running the vpn</h2>
+<h2 id="running-the-vpn">Running the VPN</h2>
 <h3 id="wg-quick">wg-quick</h3>
 <p>To start&#47;stop the VPN for both Client and Server (if they run Linux),
 you can use</p>
@@ -281,7 +281,7 @@ peer: [snip]
 </code></pre>
 <p>This can show that there is no handshake at all between peers,
 and thus that there is no connection.</p>
-<h3 id="networkmanager">networkmanager</h3>
+<h3 id="networkmanager">NetworkManager</h3>
 <p>There is also the option of using <a href="https://wiki.archlinux.org/title/NetworkManager">NetworkManager</a>,
 which is neat if you already use it to manage your existing network connections.
 To do this, save your configuration file, and then import it through <code>nmcli</code>:</p>
@@ -292,7 +292,7 @@ To do this, save your configuration file, and then import it through <code>nmcli
 $ nmcli con up wg0
 $ nmcli con edit wg0
 </code></pre>
-<h3 id="mobile-devices">mobile devices</h3>
+<h3 id="mobile-devices">Mobile devices</h3>
 <p>On mobile devices, WireGuard apps can also use these configuration files:</p>
 <ul>
 <li>F-Droid: <a href="https://f-droid.org/packages/com.zaneschepke.wireguardautotunnel/">WG Tunnel</a></li>
@@ -330,7 +330,7 @@ On your phone, select the option to add a connection via QR code,
 and scan it.
 You can pipe any data to <code>qrencode</code> this way to generate a code,
 and it also creates PNG files if you select that format.</p>
-<h2 id="encrypted-internet-tunnel">encrypted internet tunnel</h2>
+<h2 id="encrypted-internet-tunnel">Encrypted Internet tunnel</h2>
 <p>I mentioned earlier that to the average user, a VPN is an encrypted tunnel they can run their Internet traffic through.
 The topology is</p>
 <pre><code>Client -&#62; VPN Server -&#62; public internet -&#62; website
@@ -357,7 +357,7 @@ WireGuard will match that IP to the <code>0.0.0.0&#47;0</code> (all IPs) mask,
 and route the packet to the Server.
 Then, the Server will forward that packet to <code>archlinux.org</code>.</p>
 <p>Thus, we&#8217;ve made a VPN that works just like NordVPN or ProtonVPN, and all the others.</p>
-<h2 id="further-reading">further reading</h2>
+<h2 id="further-reading">Further reading</h2>
 <p>This guide distills my knowledge with the network topologies I use,
 i.e. connecting to an internal network, and connecting to the Internet via WireGuard.
 However, that&#8217;s of course not the only way you can use a VPN.
@@ -371,8 +371,8 @@ Here are some resources that were useful to me:</p>
 <hr/>
 <p>Edit: the &#8220;our internal setup&#8221; diagram has been corrected (2025-03-02)</p>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

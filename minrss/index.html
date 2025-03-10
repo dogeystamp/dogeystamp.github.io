@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>minrss, a lightweight feed reader</title>
+	<title>MinRSS, a lightweight feed reader</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,17 +16,17 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="minrss-a-lightweight-feed-reader">minrss, a lightweight feed reader</h1>
+<h1 id="minrss-a-lightweight-feed-reader">MinRSS, a lightweight feed reader</h1>
 <p>2023-05-14</p>
 <p><img src="/public/img/minrss-mrss.jpg" alt="" /></p>
-<h2 id="purpose">purpose</h2>
+<h2 id="purpose">Purpose</h2>
 <p>If you want to read content online from many different websites, the best way is to subscribe to RSS or Atom feeds.
 It&#8217;s a simple, universal format for getting content onto your screen.</p>
 <p>I personally enjoy living in the terminal.
@@ -34,7 +34,7 @@ One of the more popular RSS readers for this environment is <a href="https://new
 Newsboat has tons of useful features and a pretty TUI, and I did use it for a while.</p>
 <p>However, I thought that it was too complex for what I needed in an RSS reader.
 Therefore, I decided to write a new one: MinRSS.</p>
-<h2 id="concept">concept</h2>
+<h2 id="concept">Concept</h2>
 <p>MinRSS is a small binary that &#8220;does one thing and does it well&#8221;:
 it downloads RSS articles to disk.</p>
 <p>Essentially, every feed is represented as a
@@ -56,7 +56,7 @@ and you can now parse RSS and implement any custom feature you want.</p>
 <p>If you felt masochistic, you could even read RSS feeds using only your shell, <code>minrss</code>, <code>ls</code>, <code>head</code> and <code>w3m</code>.</p>
 <p>This sort of structure is inspired by suckless.org&#8217;s
 <a href="http://tools.suckless.org/ii/">ii</a> and <a href="http://tools.suckless.org/sic/">sic</a>.</p>
-<h3 id="wrapper-script">wrapper script</h3>
+<h3 id="wrapper-script">Wrapper script</h3>
 <p>I wrote my own wrapper script around MinRSS, called <code>mrss</code>.
 It has the following features:</p>
 <ul>
@@ -66,7 +66,7 @@ It has the following features:</p>
 <li>Mark articles as &#8220;watch later&#8221;</li>
 <li>Custom handler for opening videos and podcasts in <code>mpv</code></li>
 </ul>
-<h2 id="installation">installation</h2>
+<h2 id="installation">Installation</h2>
 <p>First, ensure you have the requirements:</p>
 <ul>
 <li>libcurl</li>
@@ -95,7 +95,7 @@ static const enum summaryFormats summaryFormat = SUMMARY_FILES;
 <pre><code>cp contrib&#47;mrss.sh ~&#47;.local&#47;bin&#47;mrss
 chmod 755 ~&#47;.local&#47;bin&#47;mrss
 </code></pre>
-<h2 id="usage">usage</h2>
+<h2 id="usage">Usage</h2>
 <p>For complete help, run <code>mrss -h</code>.</p>
 <p>To get started, all you need is <code>mrss update</code> to update feeds, then <code>mrss fzf</code> to view articles.
 Articles are, by default, saved to <code>~&#47;rss</code>, but you can set <code>$MRSS_DIR</code> to change this.</p>
@@ -138,7 +138,7 @@ Articles are, by default, saved to <code>~&#47;rss</code>, but you can set <code
 </tbody>
 </table>
 <p>You can also use <code>Tab</code> and <code>Shift-Tab</code> to select multiple articles to be acted upon.</p>
-<h4 id="viewing-specific-folders">viewing specific folders</h4>
+<h4 id="viewing-specific-folders">Viewing specific folders</h4>
 <p>The <code>mrss fzf</code> command can be used to view a specific folder&#8217;s contents.</p>
 <p>To read all null-program articles (regardless of if they are marked read or not):</p>
 <pre><code>mrss fzf null-program
@@ -149,7 +149,7 @@ Articles are, by default, saved to <code>~&#47;rss</code>, but you can set <code
 <p>To see articles you&#8217;ve marked as &#8220;watch later&#8221;:</p>
 <pre><code>mrss fzf watch-later
 </code></pre>
-<h4 id="creating-meta-feeds">creating meta-feeds</h4>
+<h4 id="creating-meta-feeds">Creating meta-feeds</h4>
 <p>In the latest version of mrss, you can create tags to categorize your feeds.
 First, create a directory for your tag under <code>$MRSS_DIR</code>:</p>
 <pre><code>mkdir ~&#47;rss&#47;tag
@@ -164,8 +164,8 @@ First, create a directory for your tag under <code>$MRSS_DIR</code>:</p>
 <pre><code>mrss fzf tag
 </code></pre>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>

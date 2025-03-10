@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>making custom arch linux live ISOs without arch linux</title>
+	<title>Making custom Arch Linux live ISOs without Arch Linux</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
     <meta name="description" content="dogeystamp's personal website">
     <meta name="author" content="dogeystamp">
@@ -16,14 +16,14 @@
 <div class="header">
 	<img src="/public/img/logo.svg" class="logo">
 	<b>dogeystamp</b>
-	<a href="/index.html">home</a>
-	<a href="/about">about</a>
-	<a href="/projects">projects</a>
-	<a href="https://git.dogeystamp.com">gitea</a>
+	<a href="/index.html">Home</a>
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="https://github.com/dogeystamp">GitHub</a>
 </div>
 
 <article>
-<h1 id="making-custom-arch-linux-live-isos-without-arch-linux">making custom arch linux live ISOs without arch linux</h1>
+<h1 id="making-custom-arch-linux-live-isos-without-arch-linux">Making custom Arch Linux live ISOs without Arch Linux</h1>
 <p>2023-06-07</p>
 <p>If you&#8217;ve ever installed any Linux distro, you probably had to do it using a live install environment.
 Once you flashed the USB drive, you could boot off it and you&#8217;d be greeted with a Linux system.</p>
@@ -41,7 +41,7 @@ In fact, it&#8217;s the tool that Arch&#8217;s maintainers use to generate the o
 <p>As I run another distro on my laptop, I could not use archiso.
 So, in the last few days, I set out to make archiso run on my system.
 The final results of this endeavour can be found <a href="https://github.com/dogeystamp/archiso-portable">on GitHub</a>.</p>
-<h2 id="pacstrap">pacstrap</h2>
+<h2 id="pacstrap">Pacstrap</h2>
 <p>One of the essential dependencies of archiso is pacstrap.
 Essentially, what pacstrap does is that it creates a small Arch Linux system in a folder.
 This is the bootstrapped root filesystem (root FS).
@@ -63,7 +63,7 @@ it runs the arch-chroot inside the downloaded Arch filesystem.</p>
 <p>Somewhat annoyingly though, archstrap does not operate exactly the same way pacstrap does:
 I had to patch it to get it working with archiso.
 Also, I patched archiso itself to remove some flags archstrap doesn&#8217;t parse.</p>
-<h2 id="other-changes">other changes</h2>
+<h2 id="other-changes">Other changes</h2>
 <p>The other main dependency missing in archiso is pacman, Arch&#8217;s package manager.
 Since we aren&#8217;t running Arch, we of course do not have it on our host system.
 However, the bootstrapped Arch root FS we downloaded earlier does have pacman inside of it.
@@ -72,7 +72,7 @@ Therefore, I replaced all invocations of pacman inside archiso with invocations 
 I added a check to it that switches some hard-coded paths.
 In Arch, the path is <code>&#47;usr&#47;share&#47;edk2-ovmf&#47;x64</code>,
 but on my system it was at <code>&#47;usr&#47;share&#47;edk2-ovmf</code>.</p>
-<h2 id="conclusion">conclusion</h2>
+<h2 id="conclusion">Conclusion</h2>
 <p>It turns out that modifying open source software isn&#8217;t that difficult.
 Given that archiso&#8217;s maintainers wrote very structured and organized code,
 it&#8217;s surprisingly easy to navigate around the script to patch things.</p>
@@ -85,8 +85,8 @@ check out <a href="https://github.com/dogeystamp/archiso-portable">archiso-porta
 <p>As a bonus, here&#8217;s a screenshot of the Arch Linux live environment I made earlier on a Gentoo system:</p>
 <p><img src="/public/img/archiso-portable-desktop.jpg" alt="preview" /></p>
 <footer role="contentinfo">
-    <span><a href="#">↑ back to top</a></span><br><br>
+    <span><a href="#">Back to top ↑</a></span><br><br>
     <small>
-        built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
     </small>
 </footer>
