@@ -46,36 +46,8 @@ body {
 	font-family: Nimbus Sans, Arial, Helvetica, sans-serif;
 	max-width: 55em;
 	margin: auto;
-	padding: 2em;
 	font-size: 105%;
 	background: white;
-}
-
-.header {
-	margin-top: 2%;
-	margin-left: -1ex;
-	display: flex;
-	align-items: center;
-}
-
-.header b {
-	font-size: 175%;
-	position: relative;
-	margin-right: 0.7em;
-	bottom: 0.2ex;
-}
-
-.header a {
-	margin-right: 0.7em;
-	font-weight: 600;
-	font-size: 125%;
-	text-decoration: none;
-	color: gray;
-}
-
-.header img {
-	position: relative;
-	bottom: .2ex;
 }
 
 * {
@@ -88,10 +60,8 @@ hr {
 	height: 1px;
 	margin: 2rem 0;
 }
-nav {
-	margin: 2rem 0 0;
-}
 article {
+	padding: 0 2em;
 	hyphens: auto;
 }
 article p {
@@ -138,7 +108,7 @@ video {
 }
 
 blockquote {
-	border-left: 0.5em solid;
+	border-left: 0.4em solid gray;
 	margin: 1rem 0;
 	padding: 0.5em;
 }
@@ -163,7 +133,7 @@ figcaption {
 code {
 	padding: 0.0rem 0.15rem;
 	tab-size: 4;
-	font-family: JetBrainsMono;
+	font-family: JetBrainsMono, monospace;
 	font-size: 80%;
 }
 pre {
@@ -198,12 +168,17 @@ footer {
 }
 a {
 	display: inline-flex;
-	color: #99aabb;
 	border-radius: 0.1em;
 	font-weight: 500;
 }
 a:hover {
 	color: #444444;
+}
+a:link {
+	color: #99aabb;
+}
+a:visited {
+	color: #884444;
 }
 p, pre, table, blockquote {
 	margin-left: 0.5ex;
@@ -215,6 +190,56 @@ ul li {
 	margin: 0.25em;
 }
 
+/*
+ * Header and navigation links
+*/
+
+.header {
+	margin-top: 2%;
+	display: flex;
+	align-items: center;
+	padding: 0.25em 1.6em;
+}
+
+nav {
+	margin: 0;
+	display: inline;
+	position: relative;
+	bottom: 0.2ex;
+}
+
+nav a {
+	margin-right: 0.7em;
+	font-weight: 600;
+	font-size: 3.0ex;
+	text-decoration: none;
+}
+nav a:link, nav a:visited {
+	color: gray;
+}
+
+.dogeystamp b {
+	font-size: 175%;
+	position: relative;
+	bottom: 0.2ex;
+	margin-right: 0.9em;
+}
+
+.dogeystamp img {
+	position: relative;
+	bottom: 0.2ex;
+}
+
+.dogeystamp {
+	display: flex;
+	align-items: center;
+}
+
+
+/*
+ * Mobile devices
+*/
+
 @media only screen and (max-device-width: 60em) {
 	body {
 		font-size: 100%;
@@ -222,22 +247,19 @@ ul li {
 	h1,h2,h3,h4 {
 		font-weight: 700;
 	}
+	h1 {
+		font-size: clamp(130%, 5vw, 200%);
+	}
 	.header {
 		flex-flow: column nowrap;
 		margin-bottom: 0em;
+		margin-top: 0em;
 	}
-	.logo {
-		display: none;
+	.dogeystamp {
+		font-size: 0.75em;
 	}
-	.header b {
-		margin-right: 0;
-		margin-bottom: 0.5em;
-		margin-top: 0.5em;
-		font-size: 125%;
-	}
-	.header a {
-		margin-right: 0;
-		margin-bottom: 0.5em;
+	nav a {
+		font-size: 100%;
 	}
 	span.created {
 		font-size: 1em;
