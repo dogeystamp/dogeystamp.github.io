@@ -205,24 +205,27 @@ nav {
 	margin: 0;
 	display: inline;
 	position: relative;
-	bottom: 0.2ex;
+	bottom: 0.3ex;
 }
 
 nav a {
 	margin-right: 0.7em;
 	font-weight: 600;
-	font-size: 3.0ex;
+	font-size: 2.9ex;
 	text-decoration: none;
 }
 nav a:link, nav a:visited {
 	color: gray;
+}
+nav a:hover {
+	color: #99aabb;
 }
 
 .dogeystamp b {
 	font-size: 175%;
 	position: relative;
 	bottom: 0.2ex;
-	margin-right: 0.9em;
+	margin-right: 1.1em;
 }
 
 .dogeystamp img {
@@ -252,8 +255,7 @@ nav a:link, nav a:visited {
 	}
 	.header {
 		flex-flow: column nowrap;
-		margin-bottom: 0em;
-		margin-top: 0em;
+		margin: 1em 0 0 0;
 	}
 	.dogeystamp {
 		font-size: 0.75em;
