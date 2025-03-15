@@ -46,8 +46,9 @@ body {
 	font-family: Nimbus Sans, Arial, Helvetica, sans-serif;
 	max-width: 55em;
 	margin: auto;
-	font-size: 105%;
+	font-size: 1.05rem;
 	background: white;
+	color: black;
 }
 
 * {
@@ -65,40 +66,45 @@ article {
 	hyphens: auto;
 }
 article p {
-	margin: 1rem 0.2ex;
+	margin: 0.25rem 0 1rem 0;
 	line-height: 1.25;
 }
 h1,h2,h3,h4 {
-	margin: 2rem 0 0;
 	font-weight: 700;
 }
 h1 {
-	margin: 2rem 0 0;
 	font-size: 200%;
 }
-span.created {
-	display: block;
-	margin: 4px 15px;
-	font-variant-numeric: tabular-nums;
+h1, h2, h3, h4 {
+	margin: 0 0 0.5rem -0.05rem;
 }
-span.created a {
-	color: black;
+
+/* lists */
+ul li {
+	list-style: square;
+	margin: 0.25em;
+}
+ul {
+	padding: 0 1.5em;
 }
 
 img {
-	border-radius: 0.5vmin;
 	height: auto;
 	max-width: 100%;
 	width: auto;
-	padding: .25em;
 }
 
 video {
-	border-radius: 0.5vmin;
 	height: auto;
 	max-width: 100%;
 	width: auto;
-	padding: .25em;
+}
+
+img, video {
+	display: block;
+	margin: 1.5em auto;
+	border-radius: 0.25em;
+	overflow: clip;
 }
 
 .logo {
@@ -108,20 +114,18 @@ video {
 }
 
 blockquote {
-	border-left: 0.4em solid gray;
 	margin: 1rem 0;
 	padding: 0.5em;
+	background-color: #f0f0f0;
+	border-radius: 0.25em;
 }
 blockquote p {
 	margin: 0;
-	font-style: italic;
 	font-size: 90%;
 	display: inline;
 }
 blockquote ul {
-	font-style: italic;
 	font-size: 90%;
-	padding: 0;
 }
 
 figure {
@@ -138,12 +142,13 @@ code {
 }
 pre {
 	border: 1px solid #444444;
+	border-radius: 0.25em;
 }
 pre code {
 	border: 0;
 	display: block;
 	overflow-x: auto;
-	padding: 0.3rem 0.6rem;
+	padding: 0.6rem 0.6rem;
 	color: black;
 }
 table {
@@ -171,23 +176,17 @@ a {
 	border-radius: 0.1em;
 	font-weight: 500;
 }
-a:hover {
-	color: #444444;
-}
 a:link {
 	color: #99aabb;
 }
 a:visited {
 	color: #884444;
 }
-p, pre, table, blockquote {
-	margin-left: 0.5ex;
-	text-align: justify;
+a:hover {
+	color: #444444;
 }
-
-ul li {
-	list-style: square;
-	margin: 0.25em;
+p, pre, table, blockquote {
+	text-align: justify;
 }
 
 /*
@@ -195,10 +194,10 @@ ul li {
 */
 
 .header {
-	margin-top: 2%;
+	margin: 1rem 0;
 	display: flex;
 	align-items: center;
-	padding: 0.25em 1.6em;
+	padding: 0.25em 1.85em;
 }
 
 nav {
@@ -209,7 +208,7 @@ nav {
 }
 
 nav a {
-	margin-right: 0.7em;
+	margin: 0 0.35em;
 	font-weight: 600;
 	font-size: 2.9ex;
 	text-decoration: none;
@@ -225,17 +224,33 @@ nav a:hover {
 	font-size: 175%;
 	position: relative;
 	bottom: 0.2ex;
-	margin-right: 1.1em;
 }
 
 .dogeystamp img {
 	position: relative;
 	bottom: 0.2ex;
+	box-shadow: none;
+	margin: 0 0.6em 0 0;
+	height: 5ex;
 }
 
 .dogeystamp {
 	display: flex;
 	align-items: center;
+	margin-right: 1.5rem;
+}
+
+/* Blog article links on index page */
+span.created {
+	display: block;
+	margin: 4px 15px;
+	font-variant-numeric: tabular-nums;
+}
+span.created a:link {
+	color: gray;
+}
+span.created a:hover {
+	color: black;
 }
 
 
@@ -255,13 +270,16 @@ nav a:hover {
 	}
 	.header {
 		flex-flow: column nowrap;
-		margin: 1em 0 0 0;
+		margin: 1em 0 1em 0;
 	}
 	.dogeystamp {
 		font-size: 0.75em;
+		margin-bottom: 0.5rem;
+		margin-right: 0;
 	}
 	nav a {
 		font-size: 100%;
+		font-size: clamp(80%, 4vw, 2.9ex);
 	}
 	span.created {
 		font-size: 1em;
