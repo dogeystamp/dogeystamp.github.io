@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>Chess engine, pt. 1: Getting started</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<div class="dogeystamp">
+		<img src="/public/img/logo.svg" class="logo">
+		<b>dogeystamp</b>
+	</div>
+	<nav>
+		<a href="/index.html">Home</a>
+		<a href="/about">About</a>
+		<a href="/projects">Projects</a>
+		<a href="https://github.com/dogeystamp">GitHub</a>
+	</nav>
+</div>
+
+<article>
+<h1 id="chess-engine-pt.-1-getting-started">Chess engine, pt. 1: Getting started</h1>
+<p>2025-03-06</p>
+<link rel="contents" href="/chess0" />
+<link rel="prev" href="/chess0" />
+<link rel="next" href="/chess2" />
+<div class="callout markdown-alert markdown-alert-callout">
+<p>This post is part of a series about building a chess-playing engine.</p>
+<p><a href="/chess0">Introduction (0)</a>
+| <a href="/chess2">Next part (2) →</a></p>
+</div>
+<p>In this part of the series,
+I go over all the information you need to
+write a basic chess engine,
+one that plays random moves.
+Such an engine is the &#8220;hello world&#8221; of chess;
+once you get it to run, adding more features is simple.
+If you follow along through this entire post,
+you will be able to play games of chess against your engine.
+You could even connect your bot to Lichess, where it can play chess online.</p>
+<h2 id="the-uci-protocol">The UCI protocol</h2>
+<p>I&#8217;ll start off by explaining the <strong>Universal Chess Interface</strong>,
+or <strong>UCI</strong>.</p>
+<p>In computer science,
+protocols are quite powerful.
+Once your program implements an interface,
+or a simple subset of it,
+it suddenly has a common language to talk to other devices that also implement the protocol.
+For example, take HTTP; you can implement a server using any language, any hardware.
+Once you build something that talks HTTP, you can effortlessly expose it to
+billions of devices on the Web.</p>
+<p>The equivalent standard protocol for chess engine programming is UCI.
+In UCI, there are two parties involved:
+the GUI, and the engine.</p>
+<ul>
+<li>The GUI keeps track of the chessboard, takes move input from human players, and determines who wins the game.</li>
+<li>The engine plays chess, i.e. given a chess position, it finds the best move.</li>
+</ul>
+<p>Because the GUI handles a lot of tasks in UCI, your engine only needs to implement logic to play good moves.
+You can use GUIs built by other people, like <a href="https://github.com/cutechess/cutechess">CuteChess</a>
+or <a href="http://www.playwitharena.de/">Arena</a>,
+which saves time and lets you focus on actually playing chess.
+The most exciting part is that once you have UCI,
+you can hook your engine up to <a href="https://github.com/lichess-bot-devs/lichess-bot">lichess-bot</a>,
+which lets it play rated chess online against <a href="https://lichess.org/player/bots">other bots</a>,
+and even human players on <a href="https://lichess.org">Lichess</a>.</p>
+<p>So now, let&#8217;s go over the actual protocol.
+Of course, I won&#8217;t go over every single detail in UCI;
+please see the <a href="https://backscattering.de/chess/uci/">UCI specification</a> for more details.
+We&#8217;ll only look at a subset of UCI, but once an engine implements this, it can play chess through any compatible GUI.</p>
+<p>First off, UCI communication happens over a command-line through <code>stdin</code> &#47; <code>stdout</code>.
+For example, in Python, you could use <code>input()</code>, and <code>print()</code> in the engine to receive and send messages to the GUI.</p>
+<p>Here is an example UCI communication.
+I&#8217;ll prefix the engine&#8217;s messages with <code>&#62;&#62;&#62;</code>, and the GUI&#8217;s messages with <code>&#60;&#60;&#60;</code>
+for demonstration purposes,
+but remember that these aren&#8217;t actually part of UCI.</p>
+<pre><code>&#60;&#60;&#60; uci
+
+&#62;&#62;&#62; id name chess_inator
+&#62;&#62;&#62; id author dogeystamp
+&#62;&#62;&#62; option name Hash type spin default 16 min 1 max 6200
+&#62;&#62;&#62; uciok
+
+&#60;&#60;&#60; isready
+&#62;&#62;&#62; readyok
+
+&#60;&#60;&#60; ucinewgame
+
+&#60;&#60;&#60; position startpos moves e2e4
+&#60;&#60;&#60; go wtime 59780 winc 0 btime 60000 binc 0
+
+&#62;&#62;&#62; info score cp 43
+&#62;&#62;&#62; bestmove g8f6
+
+&#60;&#60;&#60; position startpos moves e2e4 g8f6 b1c3
+&#60;&#60;&#60; go wtime 59323 winc 0 btime 59123 binc 0
+
+&#62;&#62;&#62; info score cp 28
+&#62;&#62;&#62; bestmove b8c6
+
+&#60;&#60;&#60; quit
+</code></pre>
+<p>Let&#8217;s break this down.</p>
+<h3 id="section"><code>uci</code></h3>
+<p>First, right after the engine is started,
+the GUI sends a <code>uci</code>.
+This command means <em>&#8220;let&#8217;s talk using UCI&#8221;</em>.
+The engine must reply with an <code>uciok</code>, which means <em>&#8220;yup, I support UCI.&#8221;</em>
+These messages exist because UCI isn&#8217;t the only protocol out there;
+others exist, like the <a href="https://www.chessprogramming.org/Chess_Engine_Communication_Protocol">Chess Engine Communication Protocol (CECP)</a>.
+Between <code>uci</code> and <code>uciok</code>, the engine may also send the <code>id</code> and <code>option</code> messages,
+which specify metadata about the engine, like its name, or the settings you can tweak.
+Typically, in the GUI, options will be displayed as buttons, or sliders, or checkboxes, depending on the <code>type</code>.</p>
+<h3 id="section-1"><code>isready</code></h3>
+<p>Then, there&#8217;s an <code>isready</code> from the GUI, following by a <code>readyok</code> from the engine.
+This command is sort of an &#8220;are you still alive?&#8221; check from the GUI.
+If the chess engine is busy with initialization, it should send <code>readyok</code> after finishing up,
+i.e. when it is ready to play.</p>
+<h3 id="section-2"><code>ucinewgame</code></h3>
+<p>Next, the <code>ucinewgame</code> from the GUI tells the engine to reset its state.
+This makes it possible to play multiple games without completely rebooting the engine every time.</p>
+<h3 id="section-3"><code>position</code></h3>
+<p>Now for the actual game.
+In this example, we could assume White is a human player making moves on a chessboard GUI,
+while the engine plays Black.
+Here, the human plays the move <em>e4</em>
+(this is <a href="https://en.m.wikipedia.org/wiki/Algebraic_notation_(chess)">Standard Algebraic Notation</a>, or <strong>SAN</strong> for moves).
+The GUI therefore sends this command to the engine:</p>
+<pre><code>&#60;&#60;&#60; position startpos moves e2e4
+</code></pre>
+<p>Here, the GUI is giving the state of the chessboard,
+i.e. &#8220;from the starting position, White made the move <em>e4</em>&#8221;.
+In UCI though, we don&#8217;t use standard algebraic notation like <em>e4</em> to denote moves.</p>
+<p>Instead, we use <strong>UCI long algebraic notation</strong>, like <code>e2e4</code> to denote moves.
+This means &#8220;the piece on <em>e2</em> moved to <em>e4</em>&#8221;.</p>
+<ul>
+<li>For promotions, the piece being promoted to is added to the end,
+for example <code>e7e8q</code> is &#8220;promote a pawn on <em>e7</em> to queen&#8221;, or <code>e7e8r</code> is &#8220;promote to rook&#8221;.</li>
+<li>Castling is denoted as the king moving two squares in either direction,
+for instance <code>e1g1</code> is kingside castling, while <code>e1c1</code> is queenside castling for White.</li>
+</ul>
+<p>Long algebraic notation is easier for programs to deal with,
+since it&#8217;s more explicit about what piece is moving.</p>
+<h3 id="section-4"><code>go</code></h3>
+<p>The <code>go</code> command is the most important one in UCI.
+It tells the engine to start searching the for the best move in the current position (e.g. after White played <em>e4</em>, the engine thinks of Black&#8217;s best response).</p>
+<pre><code>&#60;&#60;&#60; go wtime 59780 winc 0 btime 60000 binc 0
+</code></pre>
+<p>The <code>wtime</code>, <code>winc</code>, <code>btime</code>, <code>binc</code> parameters give information about how much time the engine has left to think.</p>
+<ul>
+<li><code>wtime</code> and <code>btime</code> are the clocks for White and Black, given in milliseconds.
+In the example, White has 59.78 seconds on the clock, while Black has 60 seconds.</li>
+<li><code>winc</code>, <code>binc</code> are the increments for the timer. In a <code>10+10</code> time format game, each side would have a <code>10000</code> increment,
+meaning after every move they gain 10 seconds on the clock.</li>
+</ul>
+<p>Once the <code>go</code> command is received, the engine must reply with a <code>bestmove</code>:</p>
+<pre><code>&#62;&#62;&#62; info score cp 43
+&#62;&#62;&#62; bestmove g8f6
+</code></pre>
+<p>This is essentially the engine saying &#8220;I play <em>Nf6</em>.&#8221;</p>
+<p>Your engine may also print <code>info</code> lines.
+Here, <code>score cp 43</code> means the engine thinks this position is a <code>0.43</code> pawn advantage for itself,
+i.e. a slight advantage for Black.
+The <code>cp</code> stands for &#8220;centipawns&#8221;.
+There are fields other than <code>score</code> (see the <a href="https://backscattering.de/chess/uci/">UCI spec</a>), and these would be printed on the same <code>info</code> line.
+Ideally, you would print multiple <code>info</code> lines while the engine thinks
+in order to get a sense of the engine&#8217;s thought process,
+but this is not necessary.</p>
+<h3 id="section-5"><code>quit</code></h3>
+<p>The <code>quit</code> command is self-explanatory;
+it tells your engine to terminate the program.
+(In C&#47;C++ for example, this would be returning from <code>main</code>.)
+This is not to be confused with <code>stop</code>,
+that only stops an individual search.</p>
+<h3 id="section-6"><code>position fen</code></h3>
+<p>This command is not in the example, because I don&#8217;t think it&#8217;s strictly necessary for a functioning chess engine.
+However, it&#8217;s very useful, so I&#8217;m including it in this list.</p>
+<p><code>position fen</code> takes a <em>Forsyth-Edwards Notation</em>, or <strong>FEN</strong> code,
+which is a string that represents a chess position.
+FEN is used commonly; for example, in Lichess, the <a href="https://lichess.org/analysis/pgn/">analysis board</a> always shows the current position&#8217;s FEN.
+You can then copy-paste the position into your engine, which is quite convenient.</p>
+<p>For example, after <em>1. e4</em> from the starting position,
+you would have:</p>
+<pre><code>position fen rnbqkbnr&#47;pppppppp&#47;8&#47;8&#47;8&#47;8&#47;PPPPPPPP&#47;RNBQKBNR w KQkq - 0 1 moves e2e4
+</code></pre>
+<p>For brevity&#8217;s sake, I will not fully explain how FEN works; please read the <a href="https://en.m.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation">Wikipedia article</a> about it.
+However, I will give some extra tips.</p>
+<p>First, remember that <em>half-moves</em> and <em>moves</em> are different.</p>
+<ul>
+<li>A <strong>half-move</strong>, or <strong>ply</strong> is a single movement of a piece, e.g. <em>e4</em> is a half-move.</li>
+<li>A <strong>full move</strong>, or just <strong>move</strong> is when White makes a half-move, then Black makes a half-move, e.g. <em>1. e4 e5</em> is a full move.</li>
+</ul>
+<p>This distinction is important, because FEN tracks full move and half move numbers.</p>
+<p>Another thing is that the en-passant square in the FEN is the <em>target</em> square that can be captured.
+For example, if White plays pawn to <em>e4</em>, then the target square is <em>e3</em>, the square the pawn crossed over.
+Black could then play <em>cxe3</em>, capturing the pawn en passant.</p>
+<p>FEN implementations differ on how they treat the en passant target square.
+Some, like Lichess, only include the en passant square in the FEN if it would be legal to take en passant.
+In the Wikipedia example, after pawn <em>e4</em>, the en passant square is <em>e3</em>;
+Lichess would say <a href="https://github.com/lichess-org/lila/issues/6827">there is no en passant square</a>, because Black&#8217;s pawns are not in the right place to take en passant.</p>
+<p>When writing an engine, you may also notice that UCI GUIs usually send <code>position startpos moves ...</code> instead of a <code>position fen ...</code>.
+This is because FEN is not actually able to fully represent a chess position.
+Due to the <a href="https://en.m.wikipedia.org/wiki/Threefold_repetition">threefold repetition</a> rule,
+you also need the board history to accurately evaluate a position.
+This is why a series of moves from the start position, which does encode the full history, is used instead.</p>
+<h3 id="section-7"><code>stop</code></h3>
+<p>Another command you should technically handle is
+<code>stop</code>.</p>
+<p>While the engine is thinking, if it receives a <code>stop</code> command,
+it should stop thinking and be ready to process other commands from the GUI.</p>
+<p>This is relatively difficult to implement,
+since programs usually can&#8217;t process user input while doing computations simultaneously.
+Typically, chess engines will have two threads, one input thread, and one engine thread.
+The input thread processes the UCI commands,
+and the engine thread thinks.
+At regular intervals (but not too often to avoid performance issues), the engine thread will check in
+with the input thread to see if it has received a stop.
+If so, the engine will abort its thinking.</p>
+<h2 id="move-generation">Move generation</h2>
+<p>Now that we know how to get the engine to talk to the GUI, 
+we need to figure out the best moves to play.
+To do this, our engine needs to figure out what moves <em>can</em> be played legally.
+This is known as <em>move generation</em>.
+As mentioned in the introduction section,
+I assume that you know the rules of chess,
+so I will not go over how each piece can move.</p>
+<h3 id="board-representation">Board representation</h3>
+<p>To generate moves, we must first have a board representation,
+i.e. a data structure in code that represents a chessboard.
+Two important ways of doing this are the <em>mailbox</em> and <em>bitboard</em> approaches.</p>
+<p>In a <strong>mailbox</strong> board representation, the board is represented as a 2D grid, or array of 64 squares.
+Each square has a value that indicates either no piece, or the color and type of the piece on it.
+As I understand it, &#8220;mailbox&#8221; refers to the squares, and the pieces are the &#8220;mail&#8221; in the boxes.
+Mailbox board representation is usually the first implementation that programmers think of, and it is the simplest.</p>
+<p>In a <strong>bitboard</strong> representation, each piece type and color (e.g. black rook, white pawn, white queen), has a 64-bit binary value
+that represents which squares it occupies, i.e. its &#8220;occupancy&#8221;.
+For example, in the starting position, the white rook bitboard could be <code>0b10000001</code>, which means there is a white rook on <em>a1</em>,
+and a white rook on <em>h1</em>.
+Each bit in the binary value represents one of the 64 squares of the chessboard; typically the least significant (rightmost) bit is <em>a1</em>, and the most significant (leftmost) is <em>h8</em>.
+(See <a href="https://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/rep.html">this page</a> for a neat visualization and explanation of bitboards.)</p>
+<p>A way to distinguish bitboards and mailbox is to think of them as piece-centric and square-centric.
+The bitboard answers the question &#8220;where is this piece?&#8221; while the mailbox answers the question &#8220;what is on this square?&#8221;.
+Because of their complementary nature, it can be useful to use both representations despite their redundancy.</p>
+<p>The advantage of bitboards is that modern computers love dealing with 64-bit binary values,
+and as such they can be optimized really really well.
+However, algorithms using bitboards can be relatively complicated.
+The mailbox representation&#8217;s biggest advantage is that it&#8217;s simple to understand,
+because it maps well to our idea of what a chessboard is like.</p>
+<p>In my chess engine, I decided to mostly use mailbox board representation,
+because it does a good enough job and it is simple to implement.</p>
+<p>I&#8217;m skipping over many details about board representation above;
+if you&#8217;re curious, see the relevant <a href="https://www.chessprogramming.org/Board_Representation">CPW article</a> on the topic.</p>
+<h3 id="move-encoding">Move encoding</h3>
+<p>After representing the chessboard, we also need to figure out how to represent moves.</p>
+<p>A <a href="https://www.chessprogramming.org/Encoding_Moves">typical representation</a> in strong engines packs moves into 16 bits.
+The source square takes 6 bits, and the destination square takes 6 bits,
+leaving 4 bits to encode things like the piece being promoted to,
+or any other information.
+In chess-inator, efficiency is not the primary concern,
+so moves are represented as a 24-bit Rust <code>struct</code> containing the same information.</p>
+<p>Another important point is how moves are applied.</p>
+<p>At first, in chess-inator, I thought it would be conceptually neat
+to implement chessboards as immutable states,
+such that moves could take in a chessboard to produce a distinct, updated chessboard state.
+The issue with this method is that copying entire chessboards around is painfully slow.</p>
+<p>A faster method is <strong>make-unmake</strong>, where the engine has a single chessboard in memory.
+When the engine calculates, it makes moves on this board,
+then &#8220;unmakes&#8221; (undoes) the moves when it&#8217;s done with that line of thought.</p>
+<h3 id="move-legality">Move legality</h3>
+<p>Coding the basic piece movement rules can be relatively simple.
+For instance, the rook can move in any square along 4 directions,
+but it is blocked by other pieces.
+Similar logic applies for the queen and bishop.</p>
+<p>What complicates move generation is that in chess, players must not make moves that put their king in check.
+Such moves are illegal, and can not be played.</p>
+<p>Engines therefore have to filter out illegal moves.
+A simple way to do this, and the way chess-inator does it,
+is to try every move, and determine if the king is in check.
+If it is, then the move is illegal.</p>
+<p>A common method to determine if the king is in check is the
+&#8220;I see you, you see me&#8221; method.
+Let&#8217;s say we want to detect checks from rooks.
+Pretend the king can move like a rook.
+If the king, with rook movement, could capture an enemy rook,
+then that means the enemy rook can capture the king.</p>
+<p>This method works for all other pieces (be careful with pawns, since their moves aren&#8217;t symmetric). It&#8217;s also decently
+efficient, since this method only needs to trace rays for 8 directions, and
+check for knight attacks, which will always be less than 64 squares checked.
+Still, my benchmarks show that check detection is one of the most expensive operations
+in my engine, since it&#8217;s called so often.</p>
+<h3 id="testing-with-perft">Testing with perft</h3>
+<p>Once you&#8217;ve written a move generation algorithm,
+you need to make sure it actually works.</p>
+<p>The canonical test for move generation is the <a href="https://www.chessprogramming.org/Perft">perft</a> (performance test) function.
+<code>perft(n)</code> is the count of all unique chess &#8220;games&#8221; you can play, where each game lasts at most <code>n</code> half-moves.
+In other words, perft counts the leaf nodes of a legal game tree limited to some depth <code>n</code>.</p>
+<p>For instance, from the starting position,
+<code>perft(1) = 20</code>.
+This is because there are 20 &#8220;games&#8221; of 1 half-move:
+White has 16 pawn moves (8 pawns can be pushed one or two squares),
+and 4 knight moves,
+giving <code>16 + 4 = 20</code>.
+Then <code>perft(2) = 400</code>, because for each of those 20 opening moves from White,
+Black has 20 responses, giving <code>20 * 20 = 400</code> unique games of two half-moves.</p>
+<p>Using your own move generation code,
+you can write a perft function,
+and generate your own numbers.
+If your results are different from <a href="https://www.chessprogramming.org/Perft_Results">known numbers</a>,
+you can quickly deduce that there is a bug in the code.
+<em>However, if your results are the same, that does not prove that there are no bugs.</em></p>
+<p>A test suite I&#8217;ve often seen recommended is Andy Grant&#8217;s <a href="https://github.com/AndyGrant/Ethereal/raw/refs/heads/master/src/perft/standard.epd"><code>standard.epd</code></a>,
+which contains different positions, as well as their expected perft results for different depths.</p>
+<h2 id="the-bare-minimum-engine">The bare minimum engine</h2>
+<p>Now that we have both UCI, and move generation,
+we have the tools to make the most basic engine,
+the equivalent of a &#8220;Hello World&#8221;:
+an engine that plays random moves.</p>
+<p>My engine chess-inator achieved this milestone
+with commit <a href="https://github.com/dogeystamp/chess_inator/commit/5751215ffa8f48a2b109c10f6c6a4dcb9debc3e2"><code>5751215</code></a>,
+implementing an engine that plays the first move it generates.
+This took a while to implement properly,
+so finally putting the executable in the GUI and seeing my code play moves was pretty exciting.</p>
+<p>For reference, here&#8217;s a game of me playing against this engine (credit to Lichess for the animation).
+As you can see, it&#8217;s not that great at chess, though nor am I:</p>
+<p><img src="../public/img/chess1/game.gif" alt="An animated GIF of a chess game. &quot;dogeystamp&quot; is White, and &quot;chess_inator&quot; is Black." /></p>
+<p>We&#8217;re only getting started though; take a look at the next part of this series,
+which talks about ways the engine can more intelligently select the next move.</p>
+<p><a href="/chess2">Next part →</a></p>
+<footer role="contentinfo">
+    <span><a href="#">Back to top ↑</a></span><br><br>
+    <small>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

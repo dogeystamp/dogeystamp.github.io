@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>Chess engine, pt. 4: α-β pruning and better search</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<div class="dogeystamp">
+		<img src="/public/img/logo.svg" class="logo">
+		<b>dogeystamp</b>
+	</div>
+	<nav>
+		<a href="/index.html">Home</a>
+		<a href="/about">About</a>
+		<a href="/projects">Projects</a>
+		<a href="https://github.com/dogeystamp">GitHub</a>
+	</nav>
+</div>
+
+<article>
+<h1 id="chess-engine-pt.-4---pruning-and-better-search">Chess engine, pt. 4: α-β pruning and better search</h1>
+<p>2025-04-18</p>
+<link rel="contents" href="/chess0" />
+<link rel="prev" href="/chess3" />
+<link rel="next" href="/chess5" />
+<div class="callout markdown-alert markdown-alert-callout">
+<p>This post is part of a series about building a chess-playing engine.</p>
+<p><a href="/chess0">Introduction (0)</a>
+| <a href="/chess3">← Last part (3)</a>
+| <a href="/chess5">Next part (5) →</a></p>
+</div>
+<p>In the <a href="/chess2">part 2</a> of this series, I discussed how the negamax
+algorithm can be used to construct a chess-playing program.
+We saw that as negamax thinks more and more moves ahead,
+it increases exponentially in runtime.
+Because of that, we used a heuristic approach that limits how deep the algorithm calculates.
+The advantage of this approach is that negamax can run in a reasonable timeframe, but the disadvantage is that it now no longer plays perfect chess.</p>
+<p>In the current state of the engine, it can think around 4 half-moves ahead;
+anything deeper and the runtime grows exponentially to the point where it freezes.
+However, many human chess players can calculate much further into the future than that,
+so they can easily defeat the chess engine.
+Meanwhile, modern, good chess engines can calculate lines dozens of moves deep.
+Many of them actually use the exact same negamax algorithm shown earlier;
+the difference between our bad engine and a good engine is how the negamax is optimized.</p>
+<p><strong>Search</strong> is the process of traversing the gametree, and negamax is one way to do it.
+Optimizing this part of the engine is how we can go from thinking 4 half-moves ahead, to thinking 30 half-moves ahead.
+Search is one main component of chess engines; <em>evaluation</em> is the other, and I&#8217;ll discuss that in a future post.</p>
+<p>In this post, I&#8217;ll explore some of the main optimizations that can make our engine&#8217;s search more efficient,
+and therefore make it play better chess.
+Specifically, I&#8217;ll be examining <a href="https://www.chessprogramming.org/Alpha-Beta">alpha-beta pruning</a>,
+<a href="https://www.chessprogramming.org/Transposition_Table">transposition tables</a>,
+<a href="https://www.chessprogramming.org/Move_Ordering">move ordering</a>, and
+<a href="https://www.chessprogramming.org/Iterative_Deepening">iterative deepening</a>.
+These are the optimizations that I think are the easiest to implement, but that give the biggest gains in performance.</p>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> If you&#8217;re following along by writing your own chess engine, remember to <em>SPRT your changes,</em> as I discuss <a href="/chess3">in the last post</a>.
+This will ensure that your optimizations actually improve the engine.</p>
+</div>
+<h2 id="alpha-beta-pruning">Alpha-beta pruning</h2>
+<p>The main issue with our current negamax search is that it examines every possible move in every position,
+which takes a long time.
+What if we could reduce the number of nodes that it examines?
+This is known as <em>pruning</em> the game tree;
+we are cutting branches, i.e. not examining some moves in some positions.</p>
+<p>Alpha-beta pruning is one strategy for pruning.
+Its core idea is that <strong>once you realize a move is a mistake, you stop analyzing this line,</strong>
+and you think about other moves instead.</p>
+<h3 id="an-example-situation">An example situation</h3>
+<p>Here&#8217;s a concrete example position, White to move:</p>
+<iframe src="https://lichess.org/study/embed/86CNdSfx/MjqySCXG#last" frameborder=0></iframe>
+<p><em>(If you can&#8217;t see the interactive Lichess study widget,
+a picture of the position is provided below.)</em></p>
+<p>Suppose our chess engine generates moves in this order:</p>
+<ol>
+<li>Rf1</li>
+<li>Rd2</li>
+<li>Rd8#</li>
+</ol>
+<p>I know that a human player would immediately see the checkmate,
+but bear with me, because the computer has a different thought process.</p>
+<p>We can draw a game tree as follows:</p>
+<p><img src="../public/img/chess4/example_gametree.svg" alt="A tree diagram representing a chess game." /></p>
+<p>This game tree is limited to two half-moves.
+I&#8217;ve marked the evaluations for each end position,
+which are either material evaluations (0 because equal material)
+or checkmate evaluations (M0).</p>
+<p>Here is how the engine evaluates the three moves:</p>
+<ul>
+<li><p>The first move evaluated, <strong>Rf1</strong>, leads to a drawish position
+where both sides are equal in material.
+Therefore, this move has an evaluation of 0.
+So far, this is the best move.</p></li>
+<li><p>Then, the engine will look at <strong>Rd2</strong>.
+This is a severe mistake, as it lets Black checkmate in one (Re1#).
+Without alpha-beta pruning, the engine, once it sees the checkmate, will keep examining Black&#8217;s other responses that don&#8217;t checkmate,
+like Re2 and a6.
+In other words, the engine thinks, &#8220;well, what if Black <em>doesn&#8217;t</em> do mate in one?&#8221;
+This is a waste of time;
+a human in the same situation, knowing that Rd2 is a mistake,
+would simply reject this candidate move, and think about other possibilities.</p></li>
+<li><p>Finally, the engine sees that it can checkmate with <strong>Rd8#</strong>;
+this is the best move, and the final move it picks.</p></li>
+</ul>
+<p>So, in this example, what we&#8217;d want to prune are the moves Re2, a6, and so on that
+we know aren&#8217;t worth considering.
+In a non-contrived example where the depth is higher,
+these moves would all have their own subtrees, which the engine would fully examine.
+Thus, pruning these moves creates big time savings;
+alpha-beta is the mechanism used to perform this pruning.
+(From my own experience, alpha-beta pruning noticeably improves the performance of the engine,
+shortening the search time from a few seconds to less than a second.)</p>
+<h3 id="alpha-and-beta">Alpha and beta</h3>
+<p>To implement alpha-beta pruning,
+we introduce two arguments to negamax&#8217;s function signature:</p>
+<pre><code>negamax(position, depth: int, alpha: int, beta: int)
+</code></pre>
+<p>This function takes a node in the game tree,
+and returns the score of the node, along with the best move.
+Alpha and beta represent scores, in centipawns.</p>
+<p><em>Alpha</em> represents the <strong>best score obtained by the current player (us) in the current search.</strong>
+Meanwhile, <em>beta</em> is the best score obtained by the <strong>other player (them)</strong> in the current search.
+The current player is the one whose turn it is in the current node.</p>
+<p>Every time negamax computes a score for a node,
+alpha is updated to the score (if it is better).
+Then, when negamax recurses, alpha and beta are switched and negated, because it&#8217;s now the other player&#8217;s turn.</p>
+<p>Pruning happens when the current player finds a move from this node that&#8217;s &#8220;too good&#8221;,
+therefore the opponent will avoid letting this situation happen in the first place.
+Because of that, after finding that good move, we no longer examine other moves from this position.</p>
+<p>Specifically, a move that is &#8220;too good&#8221; is a move that gives a score better than beta.
+This means that in some ancestor node above in the tree,
+the opponent found a candidate move that had a score of beta.
+Then, they examined another candidate move (which is a mistake) that leads to the current node.
+We got a score that&#8217;s better than beta (i.e. worse for the opponent).
+Since the current node is only reached by a bad move, we do not need to analyze it any further.</p>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> When alpha-beta causes pruning, this is known as the node <strong>failing high</strong>.
+This means that the position will never happen, because it has a too <em>high</em> score for us.
+Since the score is better than beta, the pruning is also known as a <strong>beta cutoff</strong>.</p>
+</div>
+<p>Let&#8217;s now quickly examine how negamax with alpha-beta pruning works
+on the example position (see annotated game tree below).</p>
+<ul>
+<li><p><strong>Rf1</strong> gives a score of 0 for White:
+no matter what both players do after Rf1, nobody has a material advantage.
+Then, alpha (White&#8217;s best score) is set to this score, α = 0.</p></li>
+<li><p>Next, negamax tries <strong>Rd2</strong>,
+and now it is Black&#8217;s turn.
+Alpha now becomes beta, β = 0.</p></li>
+<li><p>Black now responds with Re1#, giving a mate score (positive infinity for Black).
+This score is above beta (+∞ ≥ 0), which means we have a cutoff.
+Therefore, the rest of the moves, Re2, a6, and so on, are pruned and not considered at all.</p></li>
+</ul>
+<p>In other words, from White&#8217;s perspective, Rf1 results in a score of 0, and Rd2 results in a score of -∞.<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>
+The move Rd2 is clearly a mistake for White, so they will never play that move.
+Therefore, we don&#8217;t need to consider Re2, a6 and all the other replies Black can play to Rd2.</p>
+<p>Below, I&#8217;ve annotated the game tree diagram.
+The pruned moves have been grayed out and crossed with a red line.
+Dotted arrows also show where the 0 value comes from for alpha then beta.</p>
+<p><img src="../public/img/chess4/example_gametree_pruned.svg" alt="A tree diagram representing a chess game." /></p>
+<p>I intentionally did not go through every step of negamax here, like some other sites do;
+I only wrote down the important values that caused the pruning.
+Personally, I think stepping through the algorithm for each node is useful,
+but it clutters a post like this.
+Do remember that each node has its own alpha and beta, which is transmitted down the tree.</p>
+<p>Now, an implementation of alpha-beta in pseudo-code:</p>
+<pre><code class="language-python">def negamax(position, depth: int, alpha: int, beta: int) -&#62; (Move, int):
+    """
+    Return the best move and evaluation of a chess position.
+
+    Will only think `depth` half-moves ahead.
+    """
+
+    if depth == 0:
+        return eval(position)
+
+    possible_moves = generate_moves(position)
+
+    if possible_moves.empty():
+        # checkmate or stalemate
+        return eval(position), None
+
+    best_score = -infinity
+    best_move = None
+
+    for each move in possible_moves:
+        updated_position = apply_move_to_position(position, move)
+        opponent_move, opponent_score = negamax(updated_position, depth - 1, -beta, -alpha)
+        our_score = negate_score(opponent_score)
+
+        if our_score &#62; best_score:
+            best_score = our_score
+            best_move = move
+
+        if our_score &#62;= beta:
+            # Beta cut-off
+            break
+
+        alpha = max(alpha, our_score)
+
+    return best_move, best_score
+</code></pre>
+<p>Initially, alpha and beta should be set to negative infinity and positive infinity
+(the worst scores for us and them respectively, from our perspective.).</p>
+<h2 id="transposition-table">Transposition table</h2>
+<h3 id="transpositions">Transpositions</h3>
+<p>A <em>transposition</em> in chess is when you get to the same position
+in a different way.
+For example, look at this game tree from the starting position (<a href="https://lichess.org/study/86CNdSfx/lpn4n0HN">Lichess study</a>):</p>
+<p><img src="../public/img/chess4/transposition.svg" alt="A tree diagram representing a chess game." /></p>
+<p>Both branches have different moves,
+but in the end, both reach the same outcome.
+Currently, each time our engine gets to a node that is a transposition,
+it does the entire negamax computation again.
+This is wasteful, so we want to avoid re-computing the same values.</p>
+<h3 id="hashing">Hashing</h3>
+<p>Generally, the solution to avoid costly recomputation is caching, or memoization.
+Essentially, once we compute the score for a position, we store it in a hash table.
+(In our case, the hash table is usually a big array.)
+Every time we encounter the same position in our search, we can reuse this cached score.</p>
+<p>Importantly though, how do we hash a chess position?
+We want to be able to take a chess position and turn it into an integer array index,
+so that every time we encounter the same position, we can reuse the score in the array.</p>
+<p>The common method to hash chess positions is <a href="https://www.chessprogramming.org/Zobrist_Hashing">Zobrist hashing</a>.
+I&#8217;m not good enough at math to explain <em>why</em> this is a good hashing method with low collision probability,
+but I can explain how it works.</p>
+<p>First, randomly generate a bunch of 64-bit integers, known as keys. Generate:</p>
+<ul>
+<li>one key for every combination of square (64 squares), piece type (6 types) and colors (2 colors),
+for a total of 768 keys;</li>
+<li><code>2**4</code>, so 16 keys for every combination of castling rights. There are two colors, and each can have either kingside castling, queenside castling, both, or neither;</li>
+<li>8 keys for the current en-passant file;</li>
+<li>one key for every color, to mark the current turn.</li>
+</ul>
+<p>Essentially, these keys all represent individual attributes of a chess position.
+These are most of the fields in a FEN, except for the move counters.
+Using these attributes (what pieces are on which squares, what castling rights does everyone have, if and where we can en-passant, whose turn it is),
+we can uniquely identify a chess position.</p>
+<p>Then, to hash a chess position,
+take all the keys that represent it,
+then <a href="https://en.m.wikipedia.org/wiki/Exclusive_or#Bitwise_operation">bitwise XOR</a> the keys.
+This will produce a numeric, 64-bit integer hash.</p>
+<p>If two positions have a matching Zobrist hash, then chances are they&#8217;re the same position.</p>
+<h3 id="incremental-hashing">Incremental hashing</h3>
+<p>The main advantage of Zobrist hashing
+is that it can be incrementally updated.</p>
+<p>Let&#8217;s say we move a White pawn from e2 to e4.
+Then, to get the Zobrist hash for the new position,
+we take the old hash, XOR the <code>(pawn, e2, White)</code> key,
+and XOR the <code>(pawn, e4, White)</code> key.
+This works because if you XOR twice by the same thing,
+it cancels out and undoes the first operation.
+Then, do the same XOR operations for the current turn &#47; color keys.</p>
+<p>So, computing the new hash is only four operations,
+which is good for performance.
+Every single negamax call will have to compute a hash,
+which is why we want to optimize this step as much as possible.</p>
+<h3 id="indexing">Indexing</h3>
+<p>Our hash table &#47; cache can be implemented as a big array.
+In C-style pseudo-code, it looks like this:</p>
+<pre><code>TTableEntry hashTable[N];
+</code></pre>
+<p>where N is the number of entries in our cache.
+Ideally, we would have <code>2**64</code> entries,
+that is, for every possible Zobrist hash,
+we store an entry.
+However, if we had <code>2**64</code> entries, each a byte,
+that would be in total 18.4 exabytes in memory usage,
+which is infeasible.</p>
+<p>Typically, hash tables are around the scale of 100 megabytes,
+so <code>N = 10**8</code> entries.</p>
+<p>Therefore, we need to find a way to convert a hash
+into an index that is smaller than <code>10**8</code>, or some reasonable number like that.</p>
+<p>To do this, we take the hash modulo N.
+For example, if the hash was 223, but the array only has <code>N = 100</code> entries,
+then I would use the index <code>223 % 100</code>, i.e. the index <code>23</code>.</p>
+<p>Better engines that strongly optimize performance don&#8217;t explicitly use the modulo,
+because this operation is relatively slow.
+Instead, they set their hash table&#8217;s size to some power of two.
+Then, truncating the high bits off the hash is equivalent to the modulo operation.
+For example, say <code>N = 8</code>, and the hash is <code>0b110110</code>.
+Then, the top two bits would be truncated to give an index <code>0b0110</code>.
+This is equivalent to <code>0b110110 % 8</code>.</p>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> Even better engines, like Stockfish, use arcane math magic to use fast CPU instructions,
+while also allowing any N, not just powers of two. See <a href="https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/">Daniel Lemire&#8217;s post</a> about this technique.</p>
+</div>
+<h3 id="using-the-transposition-table">Using the transposition table</h3>
+<p>Once we have the indexing scheme,
+we can use it to cache our negamax results.</p>
+<p>Earlier, I used the type <code>TTableEntry</code> for the individual array elements of the transposition table.
+This could be a struct, and the important fields stored in the transposition table are usually:</p>
+<ul>
+<li>the Zobrist hash of the position;</li>
+<li>the <code>depth</code> parameter of negamax;</li>
+<li>the score returned;</li>
+<li>the best move returned.</li>
+</ul>
+<p>Then, at the start of the negamax function, we attempt to use a cached result.
+If there is a matching table entry, we check the depth of the result.
+If the cached result&#8217;s depth is greater or equal to the depth we want
+(i.e. the cached result is accurate enough),
+we may use the cached result directly.</p>
+<pre><code>entry = hashTable[indexFrom(position.hash)]
+if entry is not None and entry.hash == position.hash:
+    if entry.depth &#62;= depth:
+        return entry.score, entry.best_move
+</code></pre>
+<p>Notice how we compare the transposition table entry&#8217;s hash to the position&#8217;s hash.
+Since we use modulo to get the index in the transposition table,
+two hashes will often map to the same index.
+Therefore, we need to compare the full 64-bit hash to be certain the
+cache entry matches our current position.</p>
+<p>At the end of the negamax function, we save the result to the transposition table:</p>
+<pre><code>hashTable[indexFrom(position.hash)] = (position.hash, depth, best_score, best_move)
+</code></pre>
+<p>Here, we&#8217;re overwriting the hash entry at that index.
+Possibly, there might already be an entry with this index,
+which we would erase by doing this.
+This is known as an <em>always replace</em> replacement strategy.
+There are <a href="https://www.chessprogramming.org/Transposition_Table#Replacement_Strategies">other replacement strategies</a>,
+but empirically, always replace is a simple and decent one.</p>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> When testing the transposition table, it may be useful to implement the <a href="https://backscattering.de/chess/uci/#engine-info-hashfull"><code>info hashfull</code></a> statistic
+in UCI. This represents, in permille (0 permille is 0%, and 1000 permille is 100%), how many entries in the hash table are used.
+When <code>hashfull</code> is high, that means entries are often being replaced.
+Ideally, this number would be low, so that you aren&#8217;t throwing away entries.</p>
+</div>
+<h2 id="move-ordering">Move ordering</h2>
+<p>Move ordering is the order in which moves are evaluated by the engine in each position.
+Optimizing move ordering is an easy, yet very effective approach for improving the performance of alpha-beta pruning.
+We saw earlier how alpha beta pruning can easily cut out dozens of moves from the game tree,
+like with Re1# in this diagram:</p>
+<p><img src="../public/img/chess4/prune.svg" alt="A tree diagram representing a chess game." /></p>
+<p>However, this relies on Re1# being the first move examined.
+If Re1# was the last move, then the beta cutoff would only be triggered at the end,
+and that would save no computation at all.</p>
+<p>Because of how alpha-beta pruning works,
+finding a good move first can either immediately cause a beta cutoff,
+or, otherwise, raise alpha so that later there is a beta cutoff.
+Therefore, we want to examine good, or at least promising moves first,
+and then examine bad moves.
+This way, we maximize the chances of pruning the game tree and saving time.</p>
+<p>The problem with getting good move ordering is that computers have zero intuition about chess.
+A hypothetical chess engine could evaluate a3 first from the starting position,
+simply <a href="https://xkcd.com/3045/">because of alphabetical order</a>,
+even though it&#8217;s not a great move.</p>
+<p>Generally, the strategy to teach the computer about move ordering
+is to assign a score to each move based on some heuristics,
+then sort the list of possible moves based on that.</p>
+<h3 id="mvv-lva">MVV-LVA</h3>
+<p>A good heuristic to order moves is <a href="https://www.chessprogramming.org/MVV-LVA">MVV-LVA</a>, <em>most valuable victim, least valuable attacker</em>.
+Essentially, this heuristic assigns a score to each capture move, which is:</p>
+<pre><code>(material value of captured piece) - (value of capturer piece)
+</code></pre>
+<p>For example, capturing a queen with a pawn has a score of <code>9 - 1 = 8</code>, so pretty good.
+But capturing a pawn with a queen is <code>1 - 9 = -8</code>, so not a good idea.
+Thus, MVV-LVA provides some decent intuition to the chess engine about what makes a good capture.</p>
+<h3 id="recapture-heuristic">Recapture heuristic</h3>
+<p>In chess, trading pieces is an important part of the game.
+For instance, in this position, White can trade its pieces on the d5 square to gain 700 centipawns of material:</p>
+<iframe src="https://lichess.org/study/embed/86CNdSfx/6IIlb9uI" frameborder=0></iframe>
+<p>When exchanging pieces, most of the time the best move is very obvious:
+it&#8217;s to recapture the piece on the square you are trading on.
+The computer does not understand this, and it might generate completely irrelevant moves that lose material,
+like Nd7?? in the above study.</p>
+<p>Therefore, the recapture heuristic says the engine should <em>recapture with the least valuable attacker</em>.
+This is practically always the best move in an exchange of pieces.
+Since we have MVV-LVA, we already have a bonus for the least valuable attacker, so we just keep track of the square where a capture last happened,
+then add a bonus to the move&#8217;s score if it&#8217;s a recapture on that square.</p>
+<h2 id="iterative-deepening">Iterative deepening</h2>
+<p>Iterative deepening is another strategy that helps with move ordering.
+The key idea is that the best move you get running negamax at depth N
+is probably the same move you&#8217;ll get running negamax at depth N + 1.</p>
+<p>Because of that, we can run negamax at a lower depth,
+then use the results from that search to help with move ordering
+at a higher depth.
+Practically speaking,
+that means we run negamax at depth 1 to get a rough idea of what the best move is,
+then run it again at depth 2 to get a better idea,
+then depth 3, 4, 5, and so on.
+Each iteration improves on the accuracy of the best move returned.</p>
+<p>In pseudo-code:</p>
+<pre><code>i = 1
+while True:
+    negamax(depth = i)
+    i += 1
+
+    if good enough:
+        break
+</code></pre>
+<p>Iterative deepening might seem like a waste of time because it re-runs negamax over and over again,
+but in combination with the transposition table and alpha-beta pruning,
+it is actually a big improvement.</p>
+<p>We can use the transposition table as a move ordering heuristic:
+always consider the transposition table&#8217;s best move (the &#8220;hash move&#8221;) first in negamax,
+even when the entry&#8217;s depth is lower than the search&#8217;s depth.
+When using iterative deepening, we&#8217;ll re-run negamax on the same nodes multiple times,
+and it will be able to use the hash move from prior iterations to guide the move ordering.</p>
+<p>Better move ordering creates more beta cutoffs,
+and this completely offsets the time spent repeating negamax at lower depths.</p>
+<h3 id="time-management">Time management</h3>
+<p>Iterative deepening is good for move ordering,
+but as a side note, it is also necessary for clock management.
+When playing bullet (~1 minute) chess,
+the chess engine doesn&#8217;t have as much time to think as in classical (~1 hour) chess.
+Therefore, depending on how much time the engine has left,
+it must manage how deep it thinks.</p>
+<p>Typically, engines will use iterative deepening to
+first perform low depth searches,
+and if it has more time,
+start higher depth searches.</p>
+<p>The way this is usually implemented is with two deadlines:
+one soft, one hard.
+If iterative deepening finishes a negamax search
+and the time is past the soft deadline,
+it breaks out of the loop.
+Meanwhile, if the hard deadline is passed,
+negamax immediately aborts,
+even in the middle of the search.<sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>In this post, I covered some of my favourite optimizations for chess engine search.
+Unfortunately, because I didn&#8217;t implement all these features in this order
+in my own chess engine, I can&#8217;t show an example game between the improved and original version.
+Trust me though, they do make the engine play much better chess.</p>
+<p>Again, these are just some of the most simple to implement techniques;
+if you wish to read more, there are a bunch of links in this post,
+and you can also consult <a href="https://www.chessprogramming.org/Search">Search</a> on the Chess Programming Wiki
+for more inspiration.
+Note that the wiki documents a wide variety of search strategies and optimizations,
+many of which are rare and not necessarily worth implementing.</p>
+<p>At this point in the series, there are still some major issues with our chess engine.
+Some of the most annoying ones are that it constantly does repetition draws,
+makes obvious blunders,
+and, worst of all,
+according to my friend, it &#8220;plays weird&#8221;.
+In the coming posts, I&#8217;ll discuss strategies to fix all of these issues.</p>
+<p><a href="/chess5">Next part →</a></p>
+<hr/>
+<p><em>(Thanks to Lichess for the interactive studies and chessboard diagrams.)</em></p>
+<div class="footnotes">
+<hr/>
+<ol>
+
+<li id="fn1">
+<p>When there is a beta cutoff,
+the score that causes the cutoff (+∞ for Black in the example) is a lower bound on the true score.
+We never actually examine the pruned moves,
+which may have a higher score.
+From the opponent&#8217;s perspective, the score (-∞ for White in the example) is an upper bound.&#160;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>The hard deadline can be implemented with a check in negamax
+that runs occasionally, e.g. every 65536 nodes searched,
+to avoid a performance hit.
+If the hard deadline is passed, the search is aborted.&#160;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+<footer role="contentinfo">
+    <span><a href="#">Back to top ↑</a></span><br><br>
+    <small>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>

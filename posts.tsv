@@ -8,5 +8,12 @@ posts/lc3.md	Making a virtual machine from scratch (in Rust)
 posts/hello_world.md	Hello World (from barf.sh)		
 posts/fish-fm.md	Using the shell as a file picker for Qutebrowser		
 posts/cpp-binary-search.md	Lower bound, upper bound in C++, visually explained		
+posts/chess6.md	Chess engine, pt. 6: Neural-net evaluation		
+posts/chess5.md	Chess engine, pt. 5: Quiescence search, endgames, repetition avoidance		
+posts/chess4.md	Chess engine, pt. 4: α-β pruning and better search		
+posts/chess3.md	Chess engine, pt. 3: Elo, and rigorous SPRT testing		
+posts/chess2.md	Chess engine, pt. 2: Negamax search		
+posts/chess1.md	Chess engine, pt. 1: Getting started		
+posts/chess0.md	Chess engine, pt. 0: Index		
 posts/boxdraw.md	Box-drawing test		
 posts/archiso-portable.md	Making custom Arch Linux live ISOs without Arch Linux		

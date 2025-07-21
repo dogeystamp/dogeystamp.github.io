@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
+	<title>Chess engine, pt. 3: Elo, and rigorous SPRT testing</title>
+	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
+    <meta name="description" content="dogeystamp's personal website">
+    <meta name="author" content="dogeystamp">
+	
+	<link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<div class="header">
+	<div class="dogeystamp">
+		<img src="/public/img/logo.svg" class="logo">
+		<b>dogeystamp</b>
+	</div>
+	<nav>
+		<a href="/index.html">Home</a>
+		<a href="/about">About</a>
+		<a href="/projects">Projects</a>
+		<a href="https://github.com/dogeystamp">GitHub</a>
+	</nav>
+</div>
+
+<article>
+<h1 id="chess-engine-pt.-3-elo-and-rigorous-sprt-testing">Chess engine, pt. 3: Elo, and rigorous SPRT testing</h1>
+<p>2025-03-15</p>
+<link rel="contents" href="/chess0" />
+<link rel="prev" href="/chess2" />
+<link rel="next" href="/chess4" />
+<div class="callout markdown-alert markdown-alert-callout">
+<p>This post is part of a series about building a chess-playing engine.</p>
+<p><a href="/chess0">Introduction (0)</a>
+| <a href="/chess2">← Last part (2)</a>
+| <a href="/chess4">Next part (4) →</a></p>
+</div>
+<p>In the last part,
+we went over the negamax algorithm,
+which is the core of how a chess engine
+can play good chess.</p>
+<p>Honestly though, I think the content in this post is the most important part of the series,
+in terms of how essential it is to writing a good chess engine.
+Minmax and negamax are really well-covered, even trite topics at this point.
+But proper testing methodology is something many other websites won&#8217;t teach you.
+Despite the relative obscurity of this topic, you <em>need</em> to test, and you should start as soon as possible.</p>
+<p>This post will talk about the <strong>Sequential Probability Ratio Test</strong><sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>, or <strong>SPRT</strong>.
+What is this test?
+Essentially, it is a statistical technique that can help you determine if an improved version of your engine
+is actually better than the old version.</p>
+<p>By always running an SPRT when you create an improved version,
+you are certain that your engine is better,
+and it&#8217;s not a fluke.
+Otherwise, you might be introducing changes that weaken your engine,
+but because of bad testing methods, you&#8217;ll think it&#8217;s actually better.
+And then, in the worst case scenario,
+you&#8217;ll have to tear apart then re-test every single piece of your code.</p>
+<p>So, learn good habits; do SPRT.</p>
+<p>In this post, I&#8217;m not going to thoroughly explain all the details of the mathematics of SPRT
+(since I don&#8217;t have a solid background in statistics).
+For our purposes, we just need to understand what it&#8217;s doing, and its main results.</p>
+<h2 id="elo-ratings">Elo ratings</h2>
+<p>First, some prerequisite context.
+How do we determine that a chess engine (or a version of the engine) is better than another?
+We measure the performance of the engines by having them play matches against each other.
+Usually, wins are assigned a score of 1 point, draws are 0.5 points, and a loss is 0 points.</p>
+<p>For example, if Engine A wins 3, draws 1, and loses 1 game against Engine B,
+then Engine A has 3.5 points, and Engine B has 1.5 points.
+In total in this match, 5 games were played, and these 5 points were distributed between the players.</p>
+<p>However, comparing performance based on win&#47;draw&#47;loss counts or points is a bit unwieldy.
+For example, if Engine A and Engine B play each other and their score is 12.5 to 10.5,
+while Engine B and Engine C get a score of 8.5 to 9.5,
+which engine is the best?
+Are you confused by all these numbers?</p>
+<p>If so, you should be happy to know that a certain chess player, Arpad Elo,
+invented the <a href="https://en.m.wikipedia.org/wiki/Elo_rating_system#cite_note-3"><strong>Elo rating system</strong></a> to make our life easier.
+Using the point scores,
+Elo&#8217;s system lets you calculate a single rating number that quantifies a chess player&#8217;s performance,
+whether the player is human or machine.
+(If you want to see these calculations, please consult <a href="https://en.m.wikipedia.org/wiki/Elo_rating_system#Theory">the relevant section</a> on Wikipedia.)</p>
+<p>Elo rating lets you easily compare the performance of players.
+If a player A has a higher rating than player B,
+player A is expected, <em>on average</em>, to perform better, i.e. score more points
+against player B.
+A bigger rating difference also predicts that there is a bigger skill difference,
+i.e. one player will score a lot more points than the other.</p>
+<p>For instance, as of writing,
+Magnus Carlsen has a FIDE rating of 2837.1,
+and Hikaru Nakamura has a rating of 2799.4.
+Generally, Magnus Carlsen is considered to be a better chess player.</p>
+<p>Note that Elo&#8217;s performance predictions say what should &#8220;probably&#8221; happen;
+it&#8217;s always possible, but improbable, that a bad player wins against a better player.
+Elo provides a framework that assigns probabilities for these outcomes.</p>
+<p>FIDE and many other chess organizations use an Elo rating system.<sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup>
+Generally, even between different player pools that both use the same Elo system,
+ratings are not comparable.
+Machines also have their own Elo ratings.
+At the <a href="http://www.computerchess.org/">CCRL</a> website,
+you can see a leaderboard of some of the best chess engines,
+as well as their rating.
+As I said,
+this is not really comparable to FIDE rating,
+or any other rating.</p>
+<h2 id="the-sprt">The SPRT</h2>
+<p>Now that we know what Elo is,
+let&#8217;s return to the main topic of the <a href="https://en.m.wikipedia.org/wiki/Sequential_probability_ratio_test">sequential probabilility ratio test</a>.</p>
+<h3 id="what-is-an-sprt">What is an SPRT?</h3>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note</strong>: This section is more mathematical in nature, and is not absolutely essential to using SPRT in engine development.
+However, I wrote this because having a base level understanding of what you&#8217;re doing is helpful.
+Skip this if you&#8217;re allergic to maths.
+Practically, this process is handled entirely by existing tools, so you don&#8217;t <em>need</em> to understand it.</p>
+</div>
+<p>The goal of an SPRT in chess is to accurately estimate the performance of an engine
+versus another engine.
+When testing, we run a series of games between the engines we want to test.
+Let&#8217;s say we want to test that engine A is better than engine B by some amount.
+We have two possible hypotheses:</p>
+<ul>
+<li>Engine A is 0 Elo points better than engine B (no improvement).</li>
+<li>Engine A is 10 Elo points better than engine B (improvement).<sup id="fnref3"><a href="#fn3" rel="footnote">3</a></sup></li>
+</ul>
+<p>These can be considered as &#8220;models&#8221; for the data.
+The models give the probability of certain outcomes.
+For example, let&#8217;s say we ran 1000 games, and the outcomes of these games for Engine A are <code>WDLWWDWLLWLLWWWDD...</code>.
+That is, Engine A won, then drew, then lost, then won, won, and so on, for a total of 1000 games.<sup id="fnref4"><a href="#fn4" rel="footnote">4</a></sup>
+Here are some invented probabilities:</p>
+<ul>
+<li>The &#8220;non improvement&#8221; hypothesis could say &#8220;there is a 1% chance of these outcomes happening.&#8221;</li>
+<li>The &#8220;improvement&#8221; hypothesis could say &#8220;there is a 3% chance of these outcomes happening.&#8221;</li>
+</ul>
+<p>These percentages are called the <strong>likelihood</strong> of this outcome, under a given hypothesis.
+If the likelihood for a given hypothesis is higher,
+that means the hypothesis is better at explaining the results we got,
+thus it seems like a better model.</p>
+<p>Let&#8217;s define the <strong>likelihood ratio</strong> <code>LR</code> of our hypotheses as follows:</p>
+<pre><code>LR = (likelihood with "improvement" model) &#47; (likelihood with "no improvement" model)
+</code></pre>
+<p>So, <code>LR</code> is a value between <code>0</code> and <code>infinity</code>.
+When it is lower than 1, that means our hypothesis of &#8220;no improvement&#8221; is a better explanation of our data.
+When it is higher than 1, our hypothesis of &#8220;improvement&#8221; is a better explanation.</p>
+<p>Often, chess SPRT tools will convert this into a neat number using a logarithm.
+We can define the <strong>log-likelihood ratio</strong> as</p>
+<pre><code>log-likelihood-ratio = log(LR)
+</code></pre>
+<p>so that if the improvement hypothesis is more likely, it will be positive,
+and otherwise it will be negative.
+This is the number you&#8217;ll be seeing when you run an SPRT in practice.</p>
+<p>We set some bounds, <code>A</code> and <code>B</code>.
+We set <code>A</code> to be a negative number, and <code>B</code> to a positive number.
+If <code>log(LR) &#60;= A</code>, then we are mostly certain that the &#8220;no improvement&#8221; hypothesis is true.
+If <code>log(LR) &#62;= B</code>, then we think &#8220;improvement&#8221; is the correct hypothesis.</p>
+<p>But what happens if <code>A &#60; log(LR) &#60; B</code>?
+That means we don&#8217;t have enough data to convincingly pick either hypothesis over the other.
+Remember: at this point we are running chess games between engine A and engine B,
+and collecting the outcomes of the game.
+So, in SPRT, if we don&#8217;t have enough data,
+we keep running more games, until we get enough data to prove either hypothesis.</p>
+<p>Once SPRT is confident of the hypothesis,
+we stop playing the chess games.
+Thus, we collect exactly enough samples to prove that one of our hypotheses is more likely than the other.</p>
+<p>Now, where do the parameters <code>A</code> and <code>B</code> come from?
+There&#8217;s a formula that takes two parameters, <code>α</code> and <code>β</code>,
+and gives us values for <code>A</code> and <code>B</code>.
+<code>α</code> represents the probability of a false positive (i.e. a type I error),
+and <code>β</code> represents the probability of a false negative (i.e. a type II error).</p>
+<p>So if you configure it so that <code>α = 0.05</code>,
+there is a 5% chance that the SPRT will wrongly determine that the &#8220;improvement&#8221; hypothesis is true,
+when it is actually false.</p>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> For more information about the mathematics of SPRT, please see these links:</p>
+<ul>
+<li><a href="https://mattlapa.com/sprt/">Matt Lapa &#8211; The Sequential Probability Ratio Test</a></li>
+<li><a href="https://en.m.wikipedia.org/wiki/Sequential_probability_ratio_test">Wikipedia &#8211; Sequential probability ratio test</a></li>
+</ul>
+<p>A lot of the information in this section comes from these pages.</p>
+</div>
+<h3 id="practical-use-fastchess">Practical use: fastchess</h3>
+<p>Alright, enough math.
+How do we use the SPRT to test chess engines?</p>
+<p>As it turns out, other people have already developed tools that perform SPRT tests for us.
+The one I use is <a href="https://github.com/Disservin/fastchess">fastchess</a>.
+Once you have an engine that supports UCI (i.e. it implements the essential UCI commands from <a href="../chess1/">part 1</a> of this series),
+you can plug it into fastchess, and it will take care of everything.</p>
+<p>First, you need to install fastchess and compile it using <code>make</code> from source.
+It is written in C++.</p>
+<p>Next, you need to download an opening book.
+This is because if you play the same engine against the same other engine
+1000 times,
+the outcome will probably be the exact same every time.
+Adding an opening book introduces some variation
+by playing a few unique moves in the opening before the engine starts playing.
+For my project, I used <a href="https://github.com/official-stockfish/books/raw/refs/heads/master/8moves_v3.pgn.zip">8moves_v3.pgn</a> from stockfish.</p>
+<p>Then, you can start an engine chess tournament using fastchess:</p>
+<pre><code>fastchess \
+    -engine cmd=engine_old name="The old engine" \
+    -engine cmd=engine_new name="The new engine" \
+    -pgnout file="games.pgn" \
+    -openings file=8moves_v3.pgn format=pgn order=random \
+    -each tc=8+0.08 \
+    -rounds 5000 -repeat \
+    -concurrency 8 \
+    -recover \
+    -sprt elo0=0 elo1=10 alpha=0.05 beta=0.1
+</code></pre>
+<p>Flag by flag, this is what this command means:</p>
+<ul>
+<li><code>-engine</code>: This is the path to the executables of the engines you want to test.
+You can assign a human-readable name to each of them.</li>
+<li><code>-pgnout</code>: This is a <a href="https://en.wikipedia.org/wiki/Portable_Game_Notation">Portable Game Notation</a> (PGN) output file,
+where fastchess will export all the games played in the tournament.
+<ul>
+<li>Notably, the Lichess <a href="https://lichess.org/analysis/">analysis board</a> lets you import these games for you to review them.</li>
+<li>You may also create a <a href="https://lichess.org/study">Lichess study</a> and import multiple games at once.</li>
+</ul></li>
+<li><code>-openings</code>: This specifies the opening file mentioned above.</li>
+<li><code>-each tc</code>: The &#8220;each&#8221; sets an option for both engines. The &#8220;tc&#8221; is the time control.
+This specifically means &#8220;8 seconds, plus an increment of 0.08 seconds per move played.&#8221;<sup id="fnref5"><a href="#fn5" rel="footnote">5</a></sup></li>
+<li><code>-rounds</code>: Play 5000 rounds at most. Each round uses one single opening.</li>
+<li><code>-repeat</code>: Each round, play two games (swap the players&#8217; colors for the second game).</li>
+<li><code>-concurrency</code>: Play 8 games at once. The more cores you have on your computer, the faster you can perform an SPRT.</li>
+<li><code>-recover</code>: If an engine crashes, restart it.</li>
+<li><code>-sprt</code>: These set the parameters for SPRT. Alpha and beta are the false positive and false negative rates,
+and elo0 and elo1 are the two hypotheses we want to test.</li>
+</ul>
+<p>Fastchess has a decent man page and <code>--help</code> page, so consult those for more information.</p>
+<p>One of the main pain points of using fastchess
+is that you have to compile your engines repeatedly and deal with all the executable files.
+Seemingly, many people (including me) accelerate this process by writing a shell script to automate it.
+Here is <a href="https://github.com/dogeystamp/chess_inator/blob/main/contrib/fast-chess-tag.sh">my shell script</a>.
+Essentially, in my code repository, I can use <code>git tag</code> to mark the old and new version with descriptive names.
+Then, the script can take the tags, compile the respective versions, then run fastchess on them.</p>
+<p>Another important point is the time control.
+Humans typically don&#8217;t play 8+0.08,
+because they can&#8217;t really think that fast.
+But in SPRT, you typically need thousands of games to achieve a statistically significant result.
+Therefore, developers often use a short time control (called STC),
+so that we can run these games in a practical time frame.
+The opposite is a long time control (LTC), which is closer to human blitz chess.</p>
+<p>At this point in the series,
+I still haven&#8217;t covered time management yet,
+so if you&#8217;re writing an engine and you don&#8217;t have that feature,
+set its depth searched
+to some low number such that it&#8217;s fast enough to play a game in 8+0.08 time.</p>
+<p>The other parameter you might want to tune are the SPRT hypotheses.
+<code>[0, 10]</code> works for testing a relatively big improvement.
+But if you are doing a non-regression test,
+i.e. testing that engine A is <em>just as good as</em> than engine B,
+you should use <code>[-10, 0]</code> instead.
+For example, this could be useful if you do a refactor
+and you want to make sure you did not accidentally weaken the engine&#8217;s code.</p>
+<p>Also, if you&#8217;re testing really minuscule changes that only slightly affect engine performance,
+you might want to consider using a smaller value, like <code>[0, 5]</code>.
+See <a href="https://www.chessprogramming.org/Sequential_Probability_Ratio_Test">the Chess Programming Wiki article</a> about SPRT for more examples.</p>
+<h3 id="interpreting-the-output">Interpreting the output</h3>
+<p>Once you&#8217;re running fastchess,
+you should start seeing the outcomes of the chess games.
+Periodically, fastchess will also give a status report that looks like this:</p>
+<pre><code>--------------------------------------------------
+Results of c_i nnue08a-512 (920bea1) vs c_i eval-saturating (9b3074e) (8+0.08, NULL, 500MB, 8moves_v3.pgn):
+Elo: 107.54 +&#47;- 127.62, nElo: 144.54 +&#47;- 152.27
+LOS: 96.86 %, DrawRatio: 50.00 %, PairsRatio: 4.00
+Games: 20, Wins: 12, Losses: 6, Draws: 2, Points: 13.0 (65.00 %)
+Ptnml(0-2): [0, 1, 5, 1, 3], WL&#47;DD Ratio: inf
+LLR: 0.17 (-2.25, 2.89) [0.00, 10.00]
+--------------------------------------------------
+</code></pre>
+<p>The main statistic you want to look at in this status report is the LLR (here, <code>0.17</code>),
+which is the log-likelihood ratio of SPRT,
+as discussed above.
+The <code>(-2.25, 2.89)</code> represent the <code>A</code> and <code>B</code> bounds,
+and <code>[0.00, 10.00]</code> are the Elo hypotheses.</p>
+<p><strong>Never ever stop the SPRT prematurely.</strong>
+In this example, you want to wait for the LLR to either be above <code>2.89</code>, or below <code>-2.25</code>.
+If you see something like 30 wins and 50 losses, and you think &#8220;wow, this version must be worse, so I will stop the test&#8221;,
+that is wrong!
+For all we know, the engine might just be having a bad day and isn&#8217;t performing well.
+The whole point of SPRT is that the log-likelihood ratio will tell you if the
+engine is better or not, statistically speaking.</p>
+<p>Once the SPRT is confident about a hypothesis,
+fastchess will automatically stop itself.
+Here, for example, is the final outcome of a passed SPRT:</p>
+<pre><code>--------------------------------------------------
+Results of c_i nnue08a-512 (920bea1) vs c_i eval-saturating (9b3074e) (8+0.08, NULL, 500MB, 8moves_v3.pgn):
+Elo: 19.57 +&#47;- 13.22, nElo: 22.46 +&#47;- 15.13
+LOS: 99.82 %, DrawRatio: 37.81 %, PairsRatio: 1.27
+Games: 2026, Wins: 867, Losses: 753, Draws: 406, Points: 1070.0 (52.81 %)
+Ptnml(0-2): [134, 143, 383, 181, 172], WL&#47;DD Ratio: 8.34
+LLR: 2.91 (-2.25, 2.89) [0.00, 10.00]
+--------------------------------------------------
+</code></pre>
+<p>As you can see, <code>2.91 &#62; 2.89</code>, so we are confident
+that the version <code>nnue08a-512</code> is more likely to be 10 Elo better than <code>eval-saturating</code>, rather than 0 Elo.
+A negative LLR would be the opposite.</p>
+<p>However, if your LLR is <em>between</em> the bounds <code>(-2.25, 2.89)</code>,
+then that is <em>not a valid result!</em>
+You need to run the test for longer to get enough data to prove your hypothesis.</p>
+<p>If you do accidentally stop fastchess,
+it automatically saves its state to a file called <code>config.json</code>.
+You can resume the SPRT by running</p>
+<pre><code>$ fastchess -config file=config.json
+</code></pre>
+<p>and it will restore your existing data.</p>
+<h3 id="game-pairs-pentanomial-results">Game pairs &#38; pentanomial results</h3>
+<p>Remember when I said that fastchess
+will run two games per round?
+These are called <em>game pairs</em>,
+and the two games use the same opening.
+We use game pairs because every opening will give an advantage to a certain player.
+Even the starting position in chess is unfair, because White moves first.
+Therefore, for fairness reasons,
+we need players to play both White and Black in the round.</p>
+<p>If we have engine A, and engine B,
+then on the first game, A is White, B is Black.
+Then on the second game, we swap it so B is White, A is Black.
+Because of this symmetric nature,
+we can say that the outcomes of individual games may be biased by the opening,
+but the outcomes of game pairs are unbiased in that regard.</p>
+<p>These are the outcomes possible for the two games in a game pair:</p>
+<table>
+<thead>
+<tr>
+<th>Points</th>
+<th>Outcome</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>LL</code></td>
+<td>loss, loss</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td><code>LD</code></td>
+<td>loss, draw</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>WL</code></td>
+<td>win, loss</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>DD</code></td>
+<td>draw, draw</td>
+</tr>
+<tr>
+<td>1.5</td>
+<td><code>WD</code></td>
+<td>win, draw</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>WW</code></td>
+<td>win, win</td>
+</tr>
+</tbody>
+</table>
+<p>Since both <code>DD</code> and <code>WL</code> are 1 point, they are considered the same outcome.
+Thus, we have 5 possible outcomes, giving a <strong>pentanomial model</strong>.
+In fastchess, the <code>Ptnml(0-2)</code> statistic
+counts the game pairs that had each outcome.
+For example, if you see
+<code>
+Ptnml(0-2): [134, 143, 383, 181, 172]
+</code>
+that means there were 134 <code>LL</code>, 143 <code>LD</code>, 383 <code>WL</code> or <code>DD</code>, and so on.</p>
+<p>Fastchess is faster than some other SPRT tools,
+because the pentanomial model <a href="https://www.chessprogramming.org/Sequential_Probability_Ratio_Test#:~:text=fast%2Dchess%20is%20recommended%20as%20it%20supports%20pentanomial%20statistics%2C%20which%20can%20make%20tests%20finish%20faster.">will pick a hypothesis
+faster</a>
+than using the trinomial (win, draw, loss only) model,
+using the same data.</p>
+<h2 id="making-your-own-elo-leaderboard">Making your own Elo leaderboard</h2>
+<p>SPRT is the right tool for saying,
+&#8220;I am confident this version is better than that version.&#8221;
+However, if you want to rank a bunch of engines on a leaderboard,
+the better tool is <a href="https://github.com/michiguel/Ordo">Ordo</a>.</p>
+<p>Ordo takes the outcomes of chess games between any amount of players (human or engine),
+and computes Elo ratings based on it.</p>
+<p>Once you build it from source,
+here is an example usage:</p>
+<pre><code>$ ordo -o ratings.txt -- file1.pgn file2.pgn
+</code></pre>
+<p><code>-o ratings.txt</code> means output to ratings.txt,
+and <code>file1.pgn</code>, <code>file2.pgn</code> are the games
+it should read from.
+You can use a glob like <code>games&#47;*.pgn</code> to match all PGN files in a directory <code>games&#47;</code>.</p>
+<p>Here are some ratings of different versions of my engine:</p>
+<pre><code>   # PLAYER                                :  RATING   POINTS  PLAYED   (%)
+   1 c_i ttable-smaller4 (3060140)         :  1719.0   5897.0   11770    50
+   2 c_i nnue08a-512 (920bea1)             :  1718.3   9428.0   18760    50
+   3 c_i duplicate (920bea1)               :  1717.8   2478.0    4963    50
+   4 c_i eval-saturating (9b3074e)         :  1698.8   3358.0    6804    49
+   5 c_i ttable-smaller3 (a40e3b7)         :  1696.9   4636.5    9159    51
+   6 c_i ttable-smaller2 (7123e9e)         :  1688.5   1510.0    2997    50
+   7 c_i ttable-beta-cutoff (3baeda6)      :  1685.8   7544.0   15104    50
+   8 c_i ttable-alpha-cutoff (a3649e4)     :  1685.5   2609.5    5223    50
+   9 c_i ttable-smaller (bd477ba)          :  1674.2    689.0    1425    48
+  10 c_i recap-heuristic2 (de55bab)        :  1654.8   1448.5    2839    51
+
+  25 c_i lmr-new-new3 (cf52e13)            :  1501.8   4811.0    9626    50
+  26 c_i lmr-new-new2 (3b748a1)            :  1499.3   4814.5    9614    50
+  27 c_i no-frac (c0e36f5)                 :  1495.5  10259.5   19983    51
+  28 c_i null-window-more2 (f5a17d8)       :  1484.4    749.5    1548    48
+  29 c_i history-heuristic (dcff015)       :  1481.5    638.5    1330    48
+
+ 150 c_i nnue3-512 (4503401)               :  1012.4     11.5      28    41
+ 151 c_i contempt-disabled (caa3bc4)       :  1008.7     28.5      58    49
+ 152 c_i promote-extension2 (9b711bd)      :  1006.4     28.5      60    48
+ 153 c_i hash-opt-fix (79cfbef v)          :  1002.3     83.5     183    46
+ 154 c_i short-time2 (290a69a)             :  1000.5     28.0      60    47
+ 155 c_i promote-extension (359dd5a)       :  1000.0     41.0      88    47
+ 156 c_i contempt (3fe4b8c)                :   995.0     11.5      26    44
+ 157 c_i engine2 (97db55b)                 :   990.7    139.5     950    15
+ 158 c_i avoid-rep7 (e27e18e)              :   990.6    110.5     258    43
+ 159 c_i contempt3 (68d3d7e)               :   976.4     10.5      26    40
+ 160 c_i avoid-rep (db365c1)               :   972.4     13.5      32    42
+</code></pre>
+<p>(Since there are many versions, I&#8217;ve cut out many rows.)</p>
+<p>Ordo provides nice leaderboard-style
+ratings for your engines.
+So, once you test a lot,
+you&#8217;ll be able to see the progression.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>If you are writing a chess engine,
+run an SPRT on every change you make, with no exceptions.
+If you don&#8217;t, it&#8217;s quite possible that you&#8217;ll regret it.</p>
+<p>Before I move on to the next topic, here is some further reading about engine testing:</p>
+<ul>
+<li><a href="https://dannyhammer.github.io/engine-testing-guide/strength-testing.html">Danny Hammer &#8211; Proper Chess Engine Testing</a>: This guide is more thorough, and outlines how to use <a href="https://github.com/AndyGrant/OpenBench">OpenBench</a>, which allows you to runs tests on multiple computers.
+It also goes over a way you can <a href="https://dannyhammer.github.io/engine-testing-guide/determining-strength.html">estimate your engine&#8217;s CCRL rating</a>.</li>
+<li>Stockfish Docs &#8211; <a href="https://official-stockfish.github.io/docs/fishtest-wiki/Fishtest-Mathematics.html">Fishtest Mathematics</a> &#38; <a href="https://official-stockfish.github.io/docs/fishtest-wiki/Fishtest-FAQ.html">Fishtest FAQ</a>: Stockfish is the #1 engine in the world; these pages go over some details of how their advanced testing framework functions.</li>
+</ul>
+<p>In the coming parts of this series,
+I&#8217;ll be going over the main improvements that you can make to a chess engine.
+If you&#8217;re following along by writing your own engine,
+you should be able to implement these changes and,
+using SPRT,
+be confident that your engine is improving.</p>
+<p><a href="/chess4">Next part →</a></p>
+<div class="footnotes">
+<hr/>
+<ol>
+
+<li id="fn1">
+<p>My apologies for writing &#8220;SPR Test testing&#8221; in the title.&#160;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>A notable exception is Lichess, which <a href="https://lichess.org/page/rating-systems">uses the Glicko 2 rating system.</a>&#160;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn3">
+<p>Internally, tools first convert Elo values to scores before performing the SPRT. See <a href="https://github.com/Disservin/fastchess/blob/master/app/src/matchmaking/sprt/sprt.cpp">fastchess&#8217;s source code</a> for an example.&#160;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn4">
+<p>In practice, SPRT isn&#8217;t performed on the win&#47;draw&#47;loss outcomes of individual games in computer chess; we use the outcomes of game pairs to reduce bias.
+See <a href="#game-pairs-pentanomial-results">this section</a> of this post.&#160;<a href="#fnref4" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn5">
+<p>I personally had to talk to the Engine Programming Discord members
+to discover the 8+0.08 time control,
+since it&#8217;s not really documented in many places online.
+Less than this, and your engine
+could forfeit games on time, and more time takes too long for the SPRT to finish.&#160;<a href="#fnref5" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+<footer role="contentinfo">
+    <span><a href="#">Back to top ↑</a></span><br><br>
+    <small>
+        Built with <a href="https://git.sr.ht/~bt/barf">barf</a>. <br>
+    </small>
+</footer>
