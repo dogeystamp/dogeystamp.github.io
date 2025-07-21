@@ -27,24 +27,9 @@ I stole a decent amount of code from the stylesheet of https://barf.bt.ht/
 so here's the license
 */
 
-@import "/public/fonts/nimbus/nimbus.css";
-
-@font-face
-{
-	font-family: JetBrainsMono;
-	src: url(/public/fonts/JetBrainsMono-Regular.ttf);
-}
-
-@font-face
-{
-	font-family: JetBrainsMono;
-	src: url(/public/fonts/JetBrainsMono-Bold.ttf);
-	font-weight: bold;
-}
-
 body {
-	font-family: Nimbus Sans, Arial, Helvetica, sans-serif;
-	max-width: 55em;
+	font-family: "Helvetica Neue", Helvetica, "Nimbus Sans", Arial, sans-serif;
+	max-width: 50em;
 	margin: auto;
 	font-size: 1.05rem;
 	background: white;
@@ -63,20 +48,21 @@ hr {
 }
 article {
 	padding: 0 2em;
-	hyphens: auto;
+
 }
-article p {
-	margin: 0.25rem 0 1rem 0;
+article p, .markdown-alert {
 	line-height: 1.25;
+	margin-top: 1.25em;
+	margin-bottom: 1.25em;
 }
 h1,h2,h3,h4 {
 	font-weight: 700;
 }
 h1 {
-	font-size: 200%;
+	font-size: 185%;
 }
 h1, h2, h3, h4 {
-	margin: 0 0 0.5rem -0.05rem;
+	margin: 0 0 0 -0.05rem;
 }
 
 /* lists */
@@ -110,7 +96,6 @@ iframe {
 }
 
 .markdown-alert {
-	margin: 1rem 0;
 	padding: 0.5em;
 	border-radius: 0.1em;
 	border-left: 0.25em solid #ddd;
@@ -136,7 +121,7 @@ figcaption {
 code {
 	padding: 0.0rem 0.15rem;
 	tab-size: 4;
-	font-family: JetBrainsMono, monospace;
+	font-family: 'Courier New', Courier, monospace;
 	font-size: 80%;
 }
 pre {
@@ -185,7 +170,7 @@ a:hover {
 	color: #444444;
 }
 p, pre, table, blockquote {
-	text-align: justify;
+	text-align: left;
 }
 
 /*
@@ -193,10 +178,10 @@ p, pre, table, blockquote {
 */
 
 .header {
-	margin: 1rem 0;
 	display: flex;
 	align-items: center;
-	padding: 0.25em 1.85em;
+	padding: 0.5em 0;
+	margin: 1rem 1.85em;
 }
 
 nav {
@@ -220,7 +205,7 @@ nav a:hover {
 }
 
 .dogeystamp b {
-	font-size: 175%;
+	font-size: 150%;
 	position: relative;
 	bottom: 0.2ex;
 }
@@ -252,6 +237,18 @@ span.created a:hover {
 	color: black;
 }
 
+/* Footnotes */
+
+sup, sub
+{
+	height: 0;
+	line-height: 1;
+	position: relative;
+	vertical-align: baseline;
+}
+sup {
+	bottom: 0.75ex;
+}
 
 /*
  * Mobile devices
@@ -265,7 +262,7 @@ span.created a:hover {
 		font-weight: 700;
 	}
 	h1 {
-		font-size: clamp(130%, 5vw, 200%);
+		font-size: clamp(120%, 5vw, 185%);
 	}
 	.header {
 		flex-flow: column nowrap;
