@@ -7,8 +7,8 @@
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
 	<title>Contributing to Zathura as a novice</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="dogeystamp's personal website">
-    <meta name="author" content="dogeystamp">
+    <meta name="description" content="DogeyStamp's personal website">
+    <meta name="author" content="DogeyStamp">
 	
 	<link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -16,7 +16,7 @@
 <div class="header">
 	<div class="dogeystamp">
 		<img src="/public/img/logo.svg" class="logo">
-		<b>dogeystamp</b>
+		<b>DogeyStamp</b>
 	</div>
 	<nav>
 		<a href="/index.html">Home</a>
@@ -28,14 +28,16 @@
 
 <article>
 <h1 id="contributing-to-zathura-as-a-novice">Contributing to Zathura as a novice</h1>
-<p>2023-10-24</p>
+<div class="creation-date">
+2023-10-24
+</div>
 <p>Earlier this year I made a <a href="https://github.com/pwmt/zathura/commit/c11ba01cfbdc57f9d3a61585520ae1ac8c9c4fd3">patch</a>
 for Zathura, the open-source PDF reader.
 In this post, I&#8217;ll document the journey of how I diagnosed the root cause of a bug in Zathura,
 then wrote a bugfix for it.
 As this is my first &#8220;real&#8221; patch that got accepted, the
 most important take-away for me is that it&#8217;s actually not that hard to contribute to open-source.</p>
-<h1 id="the-bug">The bug</h1>
+<h2 id="the-bug">The bug</h2>
 <p>First of all, as seen in <a href="../typst-notes/">my last blog post</a>, I make use of Zathura extensively in my note-taking setup.
 On one half of my window, I write markup in Neovim, and in the other half Zathura displays the rendered result.
 Every time I save the markup, it is automatically re-compiled, then Zathura reloads the document.
@@ -50,7 +52,7 @@ Unfortunately for me, the thread was nearly empty, and the last comment was from
 on Stack Exchange was also a dead end, with no real answer to the problem.</p>
 <p>At this point, there was clearly no easy solution to remove flicker from Zathura.
 Since this software is open source, I decided to take a look at the source code in an attempt to diagnose the issue.</p>
-<h1 id="investigating-source-code">Investigating source code</h1>
+<h2 id="investigating-source-code">Investigating source code</h2>
 <p>Zathura&#8217;s source code is available at their git repository.
 I cloned it to my projects folder:</p>
 <pre><code>git clone https:&#47;&#47;github.com&#47;pwmt&#47;zathura
@@ -102,7 +104,7 @@ This would explain why the screen flickers during reloads:
 the document disappears entirely before the new one is loaded in its place.
 It seems like there might be a moment between closing and reopening where there is nothing on screen,
 which is what causes jarring flicker.</p>
-<h1 id="fixing-the-bug">Fixing the bug</h1>
+<h2 id="fixing-the-bug">Fixing the bug</h2>
 <p>So now, we&#8217;ve successfully diagnosed the root cause of the flickering.
 However, this provides no clear path towards solving it.</p>
 <p>At this point, I decided to check out the <code>document_close</code> and <code>document_open</code> functions mentioned above.
@@ -142,7 +144,7 @@ It finally worked!
 After this initial success, I collected all these changes into a <a href="https://github.com/pwmt/zathura/issues/542">merge request</a> on GitLab.<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>
 Finally, after a month of waiting, I got the maintainer to merge my patch.
 All in all, it took a weekend in total to get familiar with the codebase and create this patch.</p>
-<h1 id="conclusion">Conclusion</h1>
+<h2 id="conclusion">Conclusion</h2>
 <p><del>At the time of writing, this patch is still only available in the bleeding-edge&#47;git build of Zathura.
 To check that my code has made it into your version of Zathura, you can check in the man page <code>zathurarc(5)</code> for the option <code>smooth-reload</code>.</del>
 (Since 0.5.5, <code>smooth-reload</code> <a href="https://github.com/pwmt/zathura/commit/ef6e7e295c9c046368a3202e8c82efd8b9d24a92">is no longer an option,</a>

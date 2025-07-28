@@ -7,8 +7,8 @@
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
 	<title>Lower bound, upper bound in C++, visually explained</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="dogeystamp's personal website">
-    <meta name="author" content="dogeystamp">
+    <meta name="description" content="DogeyStamp's personal website">
+    <meta name="author" content="DogeyStamp">
 	
 	<link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -16,7 +16,7 @@
 <div class="header">
 	<div class="dogeystamp">
 		<img src="/public/img/logo.svg" class="logo">
-		<b>dogeystamp</b>
+		<b>DogeyStamp</b>
 	</div>
 	<nav>
 		<a href="/index.html">Home</a>
@@ -28,7 +28,9 @@
 
 <article>
 <h1 id="lower-bound-upper-bound-in-c-visually-explained">Lower bound, upper bound in C++, visually explained</h1>
-<p>2024-04-02</p>
+<div class="creation-date">
+2024-04-02
+</div>
 <p>One of the most common problems programmers have to solve is retrieving specific data — finding the needle in the haystack.
 To make this simpler, languages provide standard tools to perform this task:
 in particular, this post focuses on C++&#8217;s <code>lower_bound</code> and <code>upper_bound</code>.</p>
@@ -81,10 +83,10 @@ Also, put simply, the functions return by default:</p>
 <li><code>lower_bound</code>: the first element <code>e</code> where <code>k &#60;= e</code>;</li>
 <li><code>upper_bound</code>: the first element <code>e</code> where <code>k &#60; e</code>.</li>
 </ul>
-<blockquote>
-<p>Note: Both functions return <code>v.end()</code> if no valid element is found.
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> Both functions return <code>v.end()</code> if no valid element is found.
 This iterator points just <strong>after</strong> the last element of <code>v</code>.</p>
-</blockquote>
+</div>
 <p>This is the technical definition; it doesn&#8217;t mean much by itself.
 However, with a concrete example with real numbers, it clicked in my mind.
 For example, let <code>k = 3</code>.
@@ -116,9 +118,9 @@ If we want to iterate over all elements of a vector, we&#8217;d use:</p>
 <p>Here, we use <code>!=</code> instead of <code>&#60;</code> for iterators, but it does practically the same thing.
 When the iterator goes past the end of the vector, it&#8217;ll hit <code>v.end()</code> (which is one past the last element),
 and as such the loop stops.</p>
-<blockquote>
-<p>Note: Usually, you&#8217;d do <code>for (auto number : v)</code> to iterate over the entire array.</p>
-</blockquote>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> Usually, you&#8217;d do <code>for (auto number : v)</code> to iterate over the entire array.</p>
+</div>
 <p>So, having the upper bound be right past the end of the interval makes this possible:</p>
 <pre><code>for (auto it = lb; it != ub; it++) {
     &#47;&#47; *it is like pointer dereference:

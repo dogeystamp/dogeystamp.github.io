@@ -7,8 +7,8 @@
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
 	<title>WireGuard VPN server setup guide for Linux</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="dogeystamp's personal website">
-    <meta name="author" content="dogeystamp">
+    <meta name="description" content="DogeyStamp's personal website">
+    <meta name="author" content="DogeyStamp">
 	
 	<link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -16,7 +16,7 @@
 <div class="header">
 	<div class="dogeystamp">
 		<img src="/public/img/logo.svg" class="logo">
-		<b>dogeystamp</b>
+		<b>DogeyStamp</b>
 	</div>
 	<nav>
 		<a href="/index.html">Home</a>
@@ -28,7 +28,9 @@
 
 <article>
 <h1 id="wireguard-vpn-server-setup-guide-for-linux">WireGuard VPN server setup guide for Linux</h1>
-<p>2024-06-17</p>
+<div class="creation-date">
+2024-06-17
+</div>
 <p>Recently, I decided to set up a WireGuard VPN server for personal use.
 I found that existing guides about this subject are all lacking in some way.
 The server setup tutorials I found all go through the commands and configurations needed very throughly,
@@ -41,15 +43,15 @@ I assume that you have some knowledge of networking,
 but aren&#8217;t familiar with WireGuard.
 I also assume Linux knowledge.
 This guide should work generally, but I tested it on Arch Linux.</p>
-<blockquote>
-<p><strong>CIDR notation</strong>:</p>
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong></p>
 <p>In this post, if you see an <code>&#47;24</code> at the end of an IP address, that&#8217;s <a href="https://en.m.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR notation</a>.
 <code>192.168.0.0&#47;24</code> could be written as &#8220;any address that fits the pattern
 <code>192.168.0.*</code>&#8221;. Because there are 32 bits in an IPv4 address, the <code>&#47;24</code> at
 the end means that the first 24 bits (the first three bytes <code>192.168.0</code>) are
 fixed, and the remaining 8 bits can be anything. Also, a <code>&#47;32</code> pattern
 matches only one address.</p>
-</blockquote>
+</div>
 <h2 id="what-is-a-vpn">What is a VPN?</h2>
 <p>A VPN (virtual private network) is often advertised to the average user as an
 encrypted tunnel for their Internet connection.
@@ -144,13 +146,13 @@ The address marked here is the Server&#8217;s address.
 Its subnet is completely different from the LAN the Server is actually on (<code>192.168.0.0&#47;24</code>).
 This is because we&#8217;re creating a brand new private network (<code>10.0.0.0&#47;24</code>) inside the VPN connection,
 where our Client and Server will coexist.</p>
-<blockquote>
-<p>Note:
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong>
 <code>10.0.0.0&#47;8</code>, <code>172.16.0.0&#47;12</code> and <code>192.168.0.0&#47;24</code> are all entirely reserved for private subnets, and you will not see them on the open Internet.
 To avoid collisions, the new VPN subnet should be different from the real LAN subnets for all peers.
 OpenVPN <a href="https://openvpn.net/community-resources/numbering-private-subnets/">recommends</a> obscure subnets like <code>10.66.77.0&#47;24</code>,
 which are equivalent to the middle of nowhere in IP address space.</p>
-</blockquote>
+</div>
 <p>There is also the <code>PostUp</code> and <code>PostDown</code> fields.
 These are commands run in <code>bash</code> after starting and stopping the VPN Server.
 I&#8217;m not going to go into the details, but I&#8217;ll explain in general what they mean:</p>
@@ -193,8 +195,8 @@ by default, Linux disables IP forwarding. To enable it, edit <code>&#47;etc&#47;
 <p>to load the new configuration.
 If your VPN server is on the public internet,
 be sure to have sane firewall rules before doing this.</p>
-<blockquote>
-<p>Note: If you use <a href="https://wiki.archlinux.org/title/Uncomplicated_Firewall">UFW</a> as a firewall like me, note that it has its own <code>sysctl.conf</code>, which lives at <code>&#47;etc&#47;ufw&#47;sysctl.conf</code>.
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> If you use <a href="https://wiki.archlinux.org/title/Uncomplicated_Firewall">UFW</a> as a firewall like me, note that it has its own <code>sysctl.conf</code>, which lives at <code>&#47;etc&#47;ufw&#47;sysctl.conf</code>.
 This will override the regular <code>sysctl</code> if you follow the instructions above.
 To prevent it from erasing your changes, uncomment the relevant line:</p>
 <pre><code># &#47;etc&#47;ufw&#47;sysctl.conf
@@ -202,7 +204,7 @@ To prevent it from erasing your changes, uncomment the relevant line:</p>
 # Uncomment this to allow this host to route packets between interfaces
 net&#47;ipv4&#47;ip_forward=1
 </code></pre>
-</blockquote>
+</div>
 <h3 id="client-configuration">Client configuration</h3>
 <p>Let&#8217;s now examine the Client&#8217;s configuration file.
 If the client is running Linux, it will also be in <code>&#47;etc&#47;wireguard&#47;*.conf</code>,
@@ -239,13 +241,13 @@ This marks the Server&#8217;s public address on the open Internet.
 The <code>Endpoint</code> field is omitted in the Server configuration,
 as it is implicit:
 the Server will find out the endpoint IP when the Client reaches out to it for the first time.</p>
-<blockquote>
-<p>Note: technically, the <code>Endpoint</code> field not always strictly necessary.
+<div class="notecard note markdown-alert markdown-alert-note">
+<p><strong>Note:</strong> technically, the <code>Endpoint</code> field not always strictly necessary.
 If <code>SaveConfig</code> is enabled in the <code>[Interface]</code> section, and either the Server or Client changes IP address
 while connected, <a href="https://www.wireguard.com/#built-in-roaming">roaming</a> allows WireGuard to keep working
 and update <code>Endpoint</code> to the new address in the config file.
 I haven&#8217;t tested this, though.</p>
-</blockquote>
+</div>
 <p>Most importantly, we also have the <code>AllowedIPs</code> for the server.
 Here, it&#8217;s an entire subnet, and not just a single address.
 What this means is that if the Client wants to send a packet to a device on the internal network,

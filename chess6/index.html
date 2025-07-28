@@ -7,8 +7,8 @@
     <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
 	<title>Chess engine, pt. 6: Neural-net evaluation</title>
 	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="dogeystamp's personal website">
-    <meta name="author" content="dogeystamp">
+    <meta name="description" content="DogeyStamp's personal website">
+    <meta name="author" content="DogeyStamp">
 	
 	<link rel="stylesheet" href="/public/css/style.css">
 </head>
@@ -16,7 +16,7 @@
 <div class="header">
 	<div class="dogeystamp">
 		<img src="/public/img/logo.svg" class="logo">
-		<b>dogeystamp</b>
+		<b>DogeyStamp</b>
 	</div>
 	<nav>
 		<a href="/index.html">Home</a>
@@ -28,7 +28,9 @@
 
 <article>
 <h1 id="chess-engine-pt.-6-neural-net-evaluation">Chess engine, pt. 6: Neural-net evaluation</h1>
-<p>2025-05-28</p>
+<div class="creation-date">
+2025-05-28
+</div>
 <link rel="contents" href="/chess0" />
 <link rel="prev" href="/chess5" />
 <div class="callout markdown-alert markdown-alert-callout">
@@ -802,7 +804,6 @@ In the engine, the main thing we need to do is de-scale the output at the very e
 The de-scaling is the last step, because integer division loses precision;
 in other words, we round only at the end.</p>
 <h2 id="conclusion">Conclusion</h2>
-<h3 id="results">Results</h3>
 <p>I&#8217;m done explaining how my engine&#8217;s NNUE works.
 Now, here&#8217;s the fun part: pitting the smarter engine against the old engine, which has material counting evaluation.
 When I did this, the NNUE engine crushed the material counting engine,

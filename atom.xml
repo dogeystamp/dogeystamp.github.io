@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title></title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2025-07-21T12:46:51Z</updated>
+	<updated>2025-07-28T17:11:04Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -10,14 +10,16 @@
 	<entry>
 		<title>Contributing to Zathura as a novice</title>
 		<content type="html">&lt;h1 id=&quot;contributing-to-zathura-as-a-novice&quot;&gt;Contributing to Zathura as a novice&lt;/h1&gt;
-&lt;p&gt;2023-10-24&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-10-24
+&lt;/div&gt;
 &lt;p&gt;Earlier this year I made a &lt;a href=&quot;https://github.com/pwmt/zathura/commit/c11ba01cfbdc57f9d3a61585520ae1ac8c9c4fd3&quot;&gt;patch&lt;/a&gt;
 for Zathura, the open-source PDF reader.
 In this post, I&amp;#8217;ll document the journey of how I diagnosed the root cause of a bug in Zathura,
 then wrote a bugfix for it.
 As this is my first &amp;#8220;real&amp;#8221; patch that got accepted, the
 most important take-away for me is that it&amp;#8217;s actually not that hard to contribute to open-source.&lt;/p&gt;
-&lt;h1 id=&quot;the-bug&quot;&gt;The bug&lt;/h1&gt;
+&lt;h2 id=&quot;the-bug&quot;&gt;The bug&lt;/h2&gt;
 &lt;p&gt;First of all, as seen in &lt;a href=&quot;../typst-notes/&quot;&gt;my last blog post&lt;/a&gt;, I make use of Zathura extensively in my note-taking setup.
 On one half of my window, I write markup in Neovim, and in the other half Zathura displays the rendered result.
 Every time I save the markup, it is automatically re-compiled, then Zathura reloads the document.
@@ -32,7 +34,7 @@ Unfortunately for me, the thread was nearly empty, and the last comment was from
 on Stack Exchange was also a dead end, with no real answer to the problem.&lt;/p&gt;
 &lt;p&gt;At this point, there was clearly no easy solution to remove flicker from Zathura.
 Since this software is open source, I decided to take a look at the source code in an attempt to diagnose the issue.&lt;/p&gt;
-&lt;h1 id=&quot;investigating-source-code&quot;&gt;Investigating source code&lt;/h1&gt;
+&lt;h2 id=&quot;investigating-source-code&quot;&gt;Investigating source code&lt;/h2&gt;
 &lt;p&gt;Zathura&amp;#8217;s source code is available at their git repository.
 I cloned it to my projects folder:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;git clone https:&amp;#47;&amp;#47;github.com&amp;#47;pwmt&amp;#47;zathura
@@ -84,7 +86,7 @@ This would explain why the screen flickers during reloads:
 the document disappears entirely before the new one is loaded in its place.
 It seems like there might be a moment between closing and reopening where there is nothing on screen,
 which is what causes jarring flicker.&lt;/p&gt;
-&lt;h1 id=&quot;fixing-the-bug&quot;&gt;Fixing the bug&lt;/h1&gt;
+&lt;h2 id=&quot;fixing-the-bug&quot;&gt;Fixing the bug&lt;/h2&gt;
 &lt;p&gt;So now, we&amp;#8217;ve successfully diagnosed the root cause of the flickering.
 However, this provides no clear path towards solving it.&lt;/p&gt;
 &lt;p&gt;At this point, I decided to check out the &lt;code&gt;document_close&lt;/code&gt; and &lt;code&gt;document_open&lt;/code&gt; functions mentioned above.
@@ -124,7 +126,7 @@ It finally worked!
 After this initial success, I collected all these changes into a &lt;a href=&quot;https://github.com/pwmt/zathura/issues/542&quot;&gt;merge request&lt;/a&gt; on GitLab.&lt;sup id=&quot;fnref1&quot;&gt;&lt;a href=&quot;#fn1&quot; rel=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;
 Finally, after a month of waiting, I got the maintainer to merge my patch.
 All in all, it took a weekend in total to get familiar with the codebase and create this patch.&lt;/p&gt;
-&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;&lt;del&gt;At the time of writing, this patch is still only available in the bleeding-edge&amp;#47;git build of Zathura.
 To check that my code has made it into your version of Zathura, you can check in the man page &lt;code&gt;zathurarc(5)&lt;/code&gt; for the option &lt;code&gt;smooth-reload&lt;/code&gt;.&lt;/del&gt;
 (Since 0.5.5, &lt;code&gt;smooth-reload&lt;/code&gt; &lt;a href=&quot;https://github.com/pwmt/zathura/commit/ef6e7e295c9c046368a3202e8c82efd8b9d24a92&quot;&gt;is no longer an option,&lt;/a&gt;
@@ -151,7 +153,9 @@ When you encounter odd behaviour in your favourite software, or you want improve
 	<entry>
 		<title>WireGuard VPN server setup guide for Linux</title>
 		<content type="html">&lt;h1 id=&quot;wireguard-vpn-server-setup-guide-for-linux&quot;&gt;WireGuard VPN server setup guide for Linux&lt;/h1&gt;
-&lt;p&gt;2024-06-17&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2024-06-17
+&lt;/div&gt;
 &lt;p&gt;Recently, I decided to set up a WireGuard VPN server for personal use.
 I found that existing guides about this subject are all lacking in some way.
 The server setup tutorials I found all go through the commands and configurations needed very throughly,
@@ -164,15 +168,15 @@ I assume that you have some knowledge of networking,
 but aren&amp;#8217;t familiar with WireGuard.
 I also assume Linux knowledge.
 This guide should work generally, but I tested it on Arch Linux.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;CIDR notation&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;In this post, if you see an &lt;code&gt;&amp;#47;24&lt;/code&gt; at the end of an IP address, that&amp;#8217;s &lt;a href=&quot;https://en.m.wikipedia.org/wiki/Classless_Inter-Domain_Routing&quot;&gt;CIDR notation&lt;/a&gt;.
 &lt;code&gt;192.168.0.0&amp;#47;24&lt;/code&gt; could be written as &amp;#8220;any address that fits the pattern
 &lt;code&gt;192.168.0.*&lt;/code&gt;&amp;#8221;. Because there are 32 bits in an IPv4 address, the &lt;code&gt;&amp;#47;24&lt;/code&gt; at
 the end means that the first 24 bits (the first three bytes &lt;code&gt;192.168.0&lt;/code&gt;) are
 fixed, and the remaining 8 bits can be anything. Also, a &lt;code&gt;&amp;#47;32&lt;/code&gt; pattern
 matches only one address.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;h2 id=&quot;what-is-a-vpn&quot;&gt;What is a VPN?&lt;/h2&gt;
 &lt;p&gt;A VPN (virtual private network) is often advertised to the average user as an
 encrypted tunnel for their Internet connection.
@@ -267,13 +271,13 @@ The address marked here is the Server&amp;#8217;s address.
 Its subnet is completely different from the LAN the Server is actually on (&lt;code&gt;192.168.0.0&amp;#47;24&lt;/code&gt;).
 This is because we&amp;#8217;re creating a brand new private network (&lt;code&gt;10.0.0.0&amp;#47;24&lt;/code&gt;) inside the VPN connection,
 where our Client and Server will coexist.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Note:
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt;
 &lt;code&gt;10.0.0.0&amp;#47;8&lt;/code&gt;, &lt;code&gt;172.16.0.0&amp;#47;12&lt;/code&gt; and &lt;code&gt;192.168.0.0&amp;#47;24&lt;/code&gt; are all entirely reserved for private subnets, and you will not see them on the open Internet.
 To avoid collisions, the new VPN subnet should be different from the real LAN subnets for all peers.
 OpenVPN &lt;a href=&quot;https://openvpn.net/community-resources/numbering-private-subnets/&quot;&gt;recommends&lt;/a&gt; obscure subnets like &lt;code&gt;10.66.77.0&amp;#47;24&lt;/code&gt;,
 which are equivalent to the middle of nowhere in IP address space.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;p&gt;There is also the &lt;code&gt;PostUp&lt;/code&gt; and &lt;code&gt;PostDown&lt;/code&gt; fields.
 These are commands run in &lt;code&gt;bash&lt;/code&gt; after starting and stopping the VPN Server.
 I&amp;#8217;m not going to go into the details, but I&amp;#8217;ll explain in general what they mean:&lt;/p&gt;
@@ -316,8 +320,8 @@ by default, Linux disables IP forwarding. To enable it, edit &lt;code&gt;&amp;#4
 &lt;p&gt;to load the new configuration.
 If your VPN server is on the public internet,
 be sure to have sane firewall rules before doing this.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Note: If you use &lt;a href=&quot;https://wiki.archlinux.org/title/Uncomplicated_Firewall&quot;&gt;UFW&lt;/a&gt; as a firewall like me, note that it has its own &lt;code&gt;sysctl.conf&lt;/code&gt;, which lives at &lt;code&gt;&amp;#47;etc&amp;#47;ufw&amp;#47;sysctl.conf&lt;/code&gt;.
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; If you use &lt;a href=&quot;https://wiki.archlinux.org/title/Uncomplicated_Firewall&quot;&gt;UFW&lt;/a&gt; as a firewall like me, note that it has its own &lt;code&gt;sysctl.conf&lt;/code&gt;, which lives at &lt;code&gt;&amp;#47;etc&amp;#47;ufw&amp;#47;sysctl.conf&lt;/code&gt;.
 This will override the regular &lt;code&gt;sysctl&lt;/code&gt; if you follow the instructions above.
 To prevent it from erasing your changes, uncomment the relevant line:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# &amp;#47;etc&amp;#47;ufw&amp;#47;sysctl.conf
@@ -325,7 +329,7 @@ To prevent it from erasing your changes, uncomment the relevant line:&lt;/p&gt;
 # Uncomment this to allow this host to route packets between interfaces
 net&amp;#47;ipv4&amp;#47;ip_forward=1
 &lt;/code&gt;&lt;/pre&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;h3 id=&quot;client-configuration&quot;&gt;Client configuration&lt;/h3&gt;
 &lt;p&gt;Let&amp;#8217;s now examine the Client&amp;#8217;s configuration file.
 If the client is running Linux, it will also be in &lt;code&gt;&amp;#47;etc&amp;#47;wireguard&amp;#47;*.conf&lt;/code&gt;,
@@ -362,13 +366,13 @@ This marks the Server&amp;#8217;s public address on the open Internet.
 The &lt;code&gt;Endpoint&lt;/code&gt; field is omitted in the Server configuration,
 as it is implicit:
 the Server will find out the endpoint IP when the Client reaches out to it for the first time.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Note: technically, the &lt;code&gt;Endpoint&lt;/code&gt; field not always strictly necessary.
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; technically, the &lt;code&gt;Endpoint&lt;/code&gt; field not always strictly necessary.
 If &lt;code&gt;SaveConfig&lt;/code&gt; is enabled in the &lt;code&gt;[Interface]&lt;/code&gt; section, and either the Server or Client changes IP address
 while connected, &lt;a href=&quot;https://www.wireguard.com/#built-in-roaming&quot;&gt;roaming&lt;/a&gt; allows WireGuard to keep working
 and update &lt;code&gt;Endpoint&lt;/code&gt; to the new address in the config file.
 I haven&amp;#8217;t tested this, though.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;p&gt;Most importantly, we also have the &lt;code&gt;AllowedIPs&lt;/code&gt; for the server.
 Here, it&amp;#8217;s an entire subnet, and not just a single address.
 What this means is that if the Client wants to send a packet to a device on the internal network,
@@ -505,7 +509,9 @@ Here are some resources that were useful to me:&lt;/p&gt;
 	<entry>
 		<title>Note-taking with Typst and Neovim</title>
 		<content type="html">&lt;h1 id=&quot;note-taking-with-typst-and-neovim&quot;&gt;Note-taking with Typst and Neovim&lt;/h1&gt;
-&lt;p&gt;2023-08-14&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-08-14
+&lt;/div&gt;
 &lt;p&gt;A while back, I saw Gilles Castel&amp;#8217;s &lt;a href=&quot;https://castel.dev/post/lecture-notes-1/&quot;&gt;series&lt;/a&gt;
 of blog posts about his note-taking setup with LaTeX and Vim.
 I was quite inspired by the idea, and I even tried it for a while,
@@ -680,7 +686,9 @@ Hopefully, one day Typst will get wider usage, because it&amp;#8217;s a great ty
 	<entry>
 		<title>How to not abandon side projects</title>
 		<content type="html">&lt;h1 id=&quot;how-to-not-abandon-side-projects&quot;&gt;How to not abandon side projects&lt;/h1&gt;
-&lt;p&gt;2023-05-15&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-05-15
+&lt;/div&gt;
 &lt;p&gt;I don&amp;#8217;t personally have any position of authority to back up the following tips.
 However I can attest that at least for me, they were useful.&lt;/p&gt;
 &lt;h2 id=&quot;the-to-do-list&quot;&gt;The to-do list&lt;/h2&gt;
@@ -751,7 +759,9 @@ I have been avoiding lack of motivation, and forgetting what I&amp;#8217;m suppo
 	<entry>
 		<title>Reviving a digital piano with new brains</title>
 		<content type="html">&lt;h1 id=&quot;reviving-a-digital-piano-with-new-brains&quot;&gt;Reviving a digital piano with new brains&lt;/h1&gt;
-&lt;p&gt;2024-05-17&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2024-05-17
+&lt;/div&gt;
 &lt;p&gt;One day, I was playing my Roland HP-1500 digital piano,
 which is an incredibly old model.
 It suddenly started making weird electrical noises, and then it died.
@@ -817,10 +827,10 @@ However, we sacrifice a bit of speed because we scan column by column rather tha
 &lt;p&gt;In the digital piano, these switches are hooked up to the piano keys,
 allowing key-presses to be detected.
 On my piano, we have 176 key-switches (for reasons which I will explain later), which can be scanned using only 40 pins thanks to the matrix.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Note: this diagram and explanation are both simplified, so &lt;a href=&quot;http://www.openmusiclabs.com/learning/digital/input-matrix-scanning/&quot;&gt;click here&lt;/a&gt; for a more detailled explanation.
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; This diagram and explanation are both simplified, so &lt;a href=&quot;http://www.openmusiclabs.com/learning/digital/input-matrix-scanning/&quot;&gt;click here&lt;/a&gt; for a more detailled explanation.
 In practice, diodes are used to ensure power doesn&amp;#8217;t flow the wrong way.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;p&gt;So that&amp;#8217;s how a digital piano works, theoretically.
 What does that look like, under the hood?
 As it turns out, the matrix is accessible through ribbon cables (or &lt;a href=&quot;https://en.m.wikipedia.org/wiki/Flexible_flat_cable&quot;&gt;&lt;em&gt;flat flexible cable&lt;/em&gt;&lt;/a&gt;, or FFC).&lt;/p&gt;
@@ -898,8 +908,8 @@ This is important because I don&amp;#8217;t actually know which contact on the r
 Instead of reverse-engineering the circuitry with a multimeter,
 I made a &lt;a href=&quot;https://github.com/dogeystamp/geode-piano/blob/main/src/bin/pin_scanner.rs&quot;&gt;scanner&lt;/a&gt; that will try every row&amp;#47;column combination possible for each key until it finds a valid one.
 With this information, we can reconstruct the key matrix pinout.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;A few important tips I would tell past me about this chip:&lt;/p&gt;
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; A few important tips I would tell past me about this chip:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;You need &lt;a href=&quot;https://www.joshmcguigan.com/blog/internal-pull-up-resistor-i2c/&quot;&gt;pull-up resistors&lt;/a&gt;
 for I²C. I won&amp;#8217;t go into detail about it because the linked blog post sums up my experience with this.&lt;/li&gt;
@@ -910,7 +920,7 @@ Also, the overbar on the pin name in the datasheet means that pulling the pin lo
 &lt;li&gt;MCP23017 chips are known to have weird behaviour on pins GPA7 and GPB7. (Look at the most recent &lt;a href=&quot;https://ww1.microchip.com/downloads/aemDocuments/documents/APID/ProductDocuments/DataSheets/MCP23017-Data-Sheet-DS20001952.pdf&quot;&gt;datasheet&lt;/a&gt;,
 not the old one!)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;h2 id=&quot;firmware&quot;&gt;Firmware&lt;/h2&gt;
 &lt;p&gt;If you&amp;#8217;ve used microcontrollers before,
 you probably know that they&amp;#8217;re programmed using C++, C, or MicroPython,
@@ -1009,7 +1019,9 @@ This kind of hands-on learning is one of the better ways to develop problem-solv
 	<entry>
 		<title>MinRSS, a lightweight feed reader</title>
 		<content type="html">&lt;h1 id=&quot;minrss-a-lightweight-feed-reader&quot;&gt;MinRSS, a lightweight feed reader&lt;/h1&gt;
-&lt;p&gt;2023-05-14&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-05-14
+&lt;/div&gt;
 &lt;p&gt;&lt;img src=&quot;/public/img/minrss-mrss.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;h2 id=&quot;purpose&quot;&gt;Purpose&lt;/h2&gt;
 &lt;p&gt;If you want to read content online from many different websites, the best way is to subscribe to RSS or Atom feeds.
@@ -1156,7 +1168,9 @@ First, create a directory for your tag under &lt;code&gt;$MRSS_DIR&lt;/code&gt;:
 	<entry>
 		<title>Making a virtual machine from scratch (in Rust)</title>
 		<content type="html">&lt;h1 id=&quot;making-a-virtual-machine-from-scratch-in-rust&quot;&gt;Making a virtual machine from scratch (in Rust)&lt;/h1&gt;
-&lt;p&gt;2024-01-20&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2024-01-20
+&lt;/div&gt;
 &lt;p&gt;Computers are wonderful machines that can do many things.
 However, even though they are very complex, at their core they are surprisingly simple.
 In fact, with only basic programming knowledge,
@@ -1762,7 +1776,9 @@ I hope you enjoyed my journey with LC-3 as much as I did.&lt;/p&gt;</content>
 	<entry>
 		<title>Hello World (from barf.sh)</title>
 		<content type="html">&lt;h1 id=&quot;hello-world-from-barf.sh&quot;&gt;Hello World (from barf.sh)&lt;/h1&gt;
-&lt;p&gt;2023-05-14&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-05-14
+&lt;/div&gt;
 &lt;p&gt;Another year, another static site generator.&lt;/p&gt;
 &lt;p&gt;This time, for the &lt;a href=&quot;https://git.dogeystamp.com/dogeystamp/wb5&quot;&gt;5th iteration&lt;/a&gt; of the website,
 I&amp;#8217;m using &lt;a href=&quot;https://barf.bt.ht&quot;&gt;barf&lt;/a&gt; to generate it.&lt;/p&gt;
@@ -1785,7 +1801,9 @@ They both work similarly, so I just needed minor changes to port over my (admitt
 	<entry>
 		<title>Using the shell as a file picker for Qutebrowser</title>
 		<content type="html">&lt;h1 id=&quot;using-the-shell-as-a-file-picker-for-qutebrowser&quot;&gt;Using the shell as a file picker for Qutebrowser&lt;/h1&gt;
-&lt;p&gt;2023-06-28&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-06-28
+&lt;/div&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/qutebrowser/qutebrowser&quot;&gt;Qutebrowser&lt;/a&gt; is pretty great (thanks The-Compiler &amp;#60;3).
 For those who don&amp;#8217;t know about it, it&amp;#8217;s essentially a Vim-like browser:
 there&amp;#8217;s a bunch of cryptic shortcuts, but they maximize your efficiency.
@@ -1842,7 +1860,9 @@ so fish-fm can&amp;#8217;t just print the files selected.&lt;/p&gt;
 	<entry>
 		<title>Lower bound, upper bound in C++, visually explained</title>
 		<content type="html">&lt;h1 id=&quot;lower-bound-upper-bound-in-c-visually-explained&quot;&gt;Lower bound, upper bound in C++, visually explained&lt;/h1&gt;
-&lt;p&gt;2024-04-02&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2024-04-02
+&lt;/div&gt;
 &lt;p&gt;One of the most common problems programmers have to solve is retrieving specific data — finding the needle in the haystack.
 To make this simpler, languages provide standard tools to perform this task:
 in particular, this post focuses on C++&amp;#8217;s &lt;code&gt;lower_bound&lt;/code&gt; and &lt;code&gt;upper_bound&lt;/code&gt;.&lt;/p&gt;
@@ -1895,10 +1915,10 @@ Also, put simply, the functions return by default:&lt;/p&gt;
 &lt;li&gt;&lt;code&gt;lower_bound&lt;/code&gt;: the first element &lt;code&gt;e&lt;/code&gt; where &lt;code&gt;k &amp;#60;= e&lt;/code&gt;;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;upper_bound&lt;/code&gt;: the first element &lt;code&gt;e&lt;/code&gt; where &lt;code&gt;k &amp;#60; e&lt;/code&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Note: Both functions return &lt;code&gt;v.end()&lt;/code&gt; if no valid element is found.
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Both functions return &lt;code&gt;v.end()&lt;/code&gt; if no valid element is found.
 This iterator points just &lt;strong&gt;after&lt;/strong&gt; the last element of &lt;code&gt;v&lt;/code&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;/div&gt;
 &lt;p&gt;This is the technical definition; it doesn&amp;#8217;t mean much by itself.
 However, with a concrete example with real numbers, it clicked in my mind.
 For example, let &lt;code&gt;k = 3&lt;/code&gt;.
@@ -1930,9 +1950,9 @@ If we want to iterate over all elements of a vector, we&amp;#8217;d use:&lt;/p&g
 &lt;p&gt;Here, we use &lt;code&gt;!=&lt;/code&gt; instead of &lt;code&gt;&amp;#60;&lt;/code&gt; for iterators, but it does practically the same thing.
 When the iterator goes past the end of the vector, it&amp;#8217;ll hit &lt;code&gt;v.end()&lt;/code&gt; (which is one past the last element),
 and as such the loop stops.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Note: Usually, you&amp;#8217;d do &lt;code&gt;for (auto number : v)&lt;/code&gt; to iterate over the entire array.&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Usually, you&amp;#8217;d do &lt;code&gt;for (auto number : v)&lt;/code&gt; to iterate over the entire array.&lt;/p&gt;
+&lt;/div&gt;
 &lt;p&gt;So, having the upper bound be right past the end of the interval makes this possible:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;for (auto it = lb; it != ub; it++) {
     &amp;#47;&amp;#47; *it is like pointer dereference:
@@ -1955,7 +1975,9 @@ you don&amp;#8217;t want to be stuck memorizing things that don&amp;#8217;t make
 	<entry>
 		<title>Chess engine, pt. 6: Neural-net evaluation</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-6-neural-net-evaluation&quot;&gt;Chess engine, pt. 6: Neural-net evaluation&lt;/h1&gt;
-&lt;p&gt;2025-05-28&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-05-28
+&lt;/div&gt;
 &lt;link rel=&quot;contents&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;prev&quot; href=&quot;/chess5&quot; /&gt;
 &lt;div class=&quot;callout markdown-alert markdown-alert-callout&quot;&gt;
@@ -2729,7 +2751,6 @@ In the engine, the main thing we need to do is de-scale the output at the very e
 The de-scaling is the last step, because integer division loses precision;
 in other words, we round only at the end.&lt;/p&gt;
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-&lt;h3 id=&quot;results&quot;&gt;Results&lt;/h3&gt;
 &lt;p&gt;I&amp;#8217;m done explaining how my engine&amp;#8217;s NNUE works.
 Now, here&amp;#8217;s the fun part: pitting the smarter engine against the old engine, which has material counting evaluation.
 When I did this, the NNUE engine crushed the material counting engine,
@@ -2938,7 +2959,9 @@ that mentions this issue.&amp;#160;&lt;a href=&quot;#fnref2&quot; rev=&quot;foot
 	<entry>
 		<title>Chess engine, pt. 5: Quiescence search, endgames, repetition avoidance</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-5-quiescence-search-endgames-repetition-avoidance&quot;&gt;Chess engine, pt. 5: Quiescence search, endgames, repetition avoidance&lt;/h1&gt;
-&lt;p&gt;2025-04-26&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-04-26
+&lt;/div&gt;
 &lt;link rel=&quot;contents&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;prev&quot; href=&quot;/chess4&quot; /&gt;
 &lt;link rel=&quot;next&quot; href=&quot;/chess6&quot; /&gt;
@@ -3419,7 +3442,9 @@ might happen are not quiet.&amp;#160;&lt;a href=&quot;#fnref4&quot; rev=&quot;fo
 	<entry>
 		<title>Chess engine, pt. 4: α-β pruning and better search</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-4---pruning-and-better-search&quot;&gt;Chess engine, pt. 4: α-β pruning and better search&lt;/h1&gt;
-&lt;p&gt;2025-04-18&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-04-18
+&lt;/div&gt;
 &lt;link rel=&quot;contents&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;prev&quot; href=&quot;/chess3&quot; /&gt;
 &lt;link rel=&quot;next&quot; href=&quot;/chess5&quot; /&gt;
@@ -3602,7 +3627,6 @@ Do remember that each node has its own alpha and beta, which is transmitted down
 &lt;p&gt;Initially, alpha and beta should be set to negative infinity and positive infinity
 (the worst scores for us and them respectively, from our perspective.).&lt;/p&gt;
 &lt;h2 id=&quot;transposition-table&quot;&gt;Transposition table&lt;/h2&gt;
-&lt;h3 id=&quot;transpositions&quot;&gt;Transpositions&lt;/h3&gt;
 &lt;p&gt;A &lt;em&gt;transposition&lt;/em&gt; in chess is when you get to the same position
 in a different way.
 For example, look at this game tree from the starting position (&lt;a href=&quot;https://lichess.org/study/86CNdSfx/lpn4n0HN&quot;&gt;Lichess study&lt;/a&gt;):&lt;/p&gt;
@@ -3866,7 +3890,9 @@ If the hard deadline is passed, the search is aborted.&amp;#160;&lt;a href=&quot
 	<entry>
 		<title>Chess engine, pt. 3: Elo, and rigorous SPRT testing</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-3-elo-and-rigorous-sprt-testing&quot;&gt;Chess engine, pt. 3: Elo, and rigorous SPRT testing&lt;/h1&gt;
-&lt;p&gt;2025-03-15&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-03-15
+&lt;/div&gt;
 &lt;link rel=&quot;contents&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;prev&quot; href=&quot;/chess2&quot; /&gt;
 &lt;link rel=&quot;next&quot; href=&quot;/chess4&quot; /&gt;
@@ -4320,7 +4346,9 @@ could forfeit games on time, and more time takes too long for the SPRT to finish
 	<entry>
 		<title>Chess engine, pt. 2: Negamax search</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-2-negamax-search&quot;&gt;Chess engine, pt. 2: Negamax search&lt;/h1&gt;
-&lt;p&gt;2025-03-07&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-03-07
+&lt;/div&gt;
 &lt;link rel=&quot;contents&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;prev&quot; href=&quot;/chess1&quot; /&gt;
 &lt;link rel=&quot;next&quot; href=&quot;/chess3&quot; /&gt;
@@ -4775,7 +4803,9 @@ testing rigorously is a really essential good habit.&lt;/p&gt;
 	<entry>
 		<title>Chess engine, pt. 1: Getting started</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-1-getting-started&quot;&gt;Chess engine, pt. 1: Getting started&lt;/h1&gt;
-&lt;p&gt;2025-03-06&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-03-06
+&lt;/div&gt;
 &lt;link rel=&quot;contents&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;prev&quot; href=&quot;/chess0&quot; /&gt;
 &lt;link rel=&quot;next&quot; href=&quot;/chess2&quot; /&gt;
@@ -5089,7 +5119,9 @@ which talks about ways the engine can more intelligently select the next move.&l
 	<entry>
 		<title>Chess engine, pt. 0: Index</title>
 		<content type="html">&lt;h1 id=&quot;chess-engine-pt.-0-index&quot;&gt;Chess engine, pt. 0: Index&lt;/h1&gt;
-&lt;p&gt;2025-03-05&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2025-03-05
+&lt;/div&gt;
 &lt;link rel=&quot;next&quot; href=&quot;/chess1&quot; /&gt;
 &lt;p&gt;Building chess engines,
 that is, making computers play chess,
@@ -5196,7 +5228,9 @@ do more calculations in the same amount of time.&amp;#160;&lt;a href=&quot;#fnre
 	<entry>
 		<title>Box-drawing test</title>
 		<content type="html">&lt;h1 id=&quot;box-drawing-test&quot;&gt;Box-drawing test&lt;/h1&gt;
-&lt;p&gt;2024-02-03&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2024-02-03
+&lt;/div&gt;
 &lt;p&gt;In my &lt;a href=&quot;/lc3&quot;&gt;last blog post&lt;/a&gt; about the LC-3 virtual machine, I made a few diagrams with ASCII art.
 I found out recently that I didn&amp;#8217;t have to use &lt;code&gt;+&lt;/code&gt; and &lt;code&gt;-&lt;/code&gt; and &lt;code&gt;|&lt;/code&gt; symbols to make boxes; Unicode has symbols specifically for that.
 So I&amp;#8217;m going to use this blog post as a playground for box-drawing.&lt;/p&gt;
@@ -5297,7 +5331,9 @@ put newlines, and then expand the box to fit the text:&lt;/p&gt;
 	<entry>
 		<title>Making custom Arch Linux live ISOs without Arch Linux</title>
 		<content type="html">&lt;h1 id=&quot;making-custom-arch-linux-live-isos-without-arch-linux&quot;&gt;Making custom Arch Linux live ISOs without Arch Linux&lt;/h1&gt;
-&lt;p&gt;2023-06-07&lt;/p&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2023-06-07
+&lt;/div&gt;
 &lt;p&gt;If you&amp;#8217;ve ever installed any Linux distro, you probably had to do it using a live install environment.
 Once you flashed the USB drive, you could boot off it and you&amp;#8217;d be greeted with a Linux system.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve always found it fascinating that you could pack the entire OS onto a stick and bring it around with you.
