@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title></title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2025-07-28T17:11:04Z</updated>
+	<updated>2025-10-08T21:34:28Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -367,7 +367,7 @@ The &lt;code&gt;Endpoint&lt;/code&gt; field is omitted in the Server configurati
 as it is implicit:
 the Server will find out the endpoint IP when the Client reaches out to it for the first time.&lt;/p&gt;
 &lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; technically, the &lt;code&gt;Endpoint&lt;/code&gt; field not always strictly necessary.
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Technically, the &lt;code&gt;Endpoint&lt;/code&gt; field not always strictly necessary.
 If &lt;code&gt;SaveConfig&lt;/code&gt; is enabled in the &lt;code&gt;[Interface]&lt;/code&gt; section, and either the Server or Client changes IP address
 while connected, &lt;a href=&quot;https://www.wireguard.com/#built-in-roaming&quot;&gt;roaming&lt;/a&gt; allows WireGuard to keep working
 and update &lt;code&gt;Endpoint&lt;/code&gt; to the new address in the config file.

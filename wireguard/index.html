@@ -242,7 +242,7 @@ The <code>Endpoint</code> field is omitted in the Server configuration,
 as it is implicit:
 the Server will find out the endpoint IP when the Client reaches out to it for the first time.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
-<p><strong>Note:</strong> technically, the <code>Endpoint</code> field not always strictly necessary.
+<p><strong>Note:</strong> Technically, the <code>Endpoint</code> field not always strictly necessary.
 If <code>SaveConfig</code> is enabled in the <code>[Interface]</code> section, and either the Server or Client changes IP address
 while connected, <a href="https://www.wireguard.com/#built-in-roaming">roaming</a> allows WireGuard to keep working
 and update <code>Endpoint</code> to the new address in the config file.
