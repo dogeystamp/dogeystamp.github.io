@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title></title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2025-10-08T21:34:28Z</updated>
+	<updated>2025-11-10T14:28:05Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -684,77 +684,79 @@ Hopefully, one day Typst will get wider usage, because it&amp;#8217;s a great ty
 		<published>2023-08-14T10:00:00Z</published>
 	</entry>
 	<entry>
-		<title>How to not abandon side projects</title>
-		<content type="html">&lt;h1 id=&quot;how-to-not-abandon-side-projects&quot;&gt;How to not abandon side projects&lt;/h1&gt;
+		<title>Note-taking with Typst and Neovim: 2025 Update</title>
+		<content type="html">&lt;h1 id=&quot;note-taking-with-typst-and-neovim-2025-update&quot;&gt;Note-taking with Typst and Neovim: 2025 Update&lt;/h1&gt;
 &lt;div class=&quot;creation-date&quot;&gt;
-2023-05-15
+2025-10-08
 &lt;/div&gt;
-&lt;p&gt;I don&amp;#8217;t personally have any position of authority to back up the following tips.
-However I can attest that at least for me, they were useful.&lt;/p&gt;
-&lt;h2 id=&quot;the-to-do-list&quot;&gt;The to-do list&lt;/h2&gt;
-&lt;p&gt;I found that while writing larger personal projects,
-motivation was one of the issues that plagued me the most.
-Oftentimes, I&amp;#8217;d take a break from the project for a week or so, then lose the will to continue.&lt;/p&gt;
-&lt;p&gt;I would find that either I had no idea what to do next,
-or that tasks were too daunting to accomplish.
-And after that, I would let the project collect dust in an abandoned repo.&lt;/p&gt;
-&lt;p&gt;One day, while browsing &lt;a href=&quot;https://telodendria.io&quot;&gt;Telodondria&lt;/a&gt;&amp;#8217;s code, I found a curious TODO file.&lt;/p&gt;
-&lt;p&gt;It looked like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Telodendria To-Do List
-======================
-
-Key:
-
-[ ] Not Started
-[x] Done
-[~] In Progress
-[!] Won&amp;#39;t Fix
-
-Milestone: v0.3.0
------------------
-
-[~] Stream API
-    [x] Implementation
-    [x] Convert all code that deals with I&amp;#47;O
-    [!] Multi-output (proof of concept)
-    [!] Memory streams (proof of concept)
-    [ ] TLS
+&lt;p&gt;More than two years ago, I wrote an article about &lt;a href=&quot;/typst-notes&quot;&gt;taking notes with Typst in Neovim&lt;/a&gt;;
+soon after, it became the most popular post on this blog.&lt;sup id=&quot;fnref1&quot;&gt;&lt;a href=&quot;#fn1&quot; rel=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;
+Since then, however, the contents of that article have become outdated,
+so I&amp;#8217;m writing this short update post.&lt;/p&gt;
+&lt;h2 id=&quot;recap&quot;&gt;Recap&lt;/h2&gt;
+&lt;p&gt;First, let&amp;#8217;s recall the goals for my note-taking.&lt;/p&gt;
+&lt;p&gt;During lectures, I take notes in real time on my laptop,
+and I do not spend time after class to clean up my notes.
+This is an example of how my notes look like:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;TODO: ADD PICTURE&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Because of the way I write notes, it has to be fast and efficient,
+otherwise I can&amp;#8217;t keep up with the lecture.
+More precisely, the following are my criteria for a good note-taking setup:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Taking notes should be convenient.
+That is, I can open my notes and start writing almost immediately.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The syntax for writing notes should be easy to remember and to write.
+If the syntax for common things like fractions are painful to type, I&amp;#8217;d rather use plain text or handwritten notes.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I need my notes to support math, figures, and related features for my courses.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Originally, I was quite inspired by [Gilles Castel&amp;#8217;s system]((&lt;a href=&quot;https://castel.dev/post/lecture-notes-1/&quot;&gt;https:&amp;#47;&amp;#47;castel.dev&amp;#47;post&amp;#47;lecture-notes-1&amp;#47;&lt;/a&gt;)
+which uses LaTeX for note-taking.
+Unfortunately, LaTeX fails one of the criteria above;
+it has cryptic, weird syntax from decades ago.&lt;sup id=&quot;fnref2&quot;&gt;&lt;a href=&quot;#fn2&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;
+So when I tried to write LaTeX, I ended up just giving up and writing plain text documents,
+because they are simply convenient to write.&lt;/p&gt;
+&lt;p&gt;Then, I found &lt;a href=&quot;https://github.com/typst/typst&quot;&gt;Typst&lt;/a&gt;,
+which is sort of a mix between LaTeX and Markdown.
+On one hand, just like LaTeX, it&amp;#8217;s designed for writing about math and other technical subjects,
+so it supports equations and figures.
+On the other hand, like Markdown, Typst has simple syntax.
+For instance, compare these two snippets:&lt;/p&gt;
+&lt;p&gt;LaTeX:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;\begin{enumerate}
+    \item This is the first list item.
+    \item Another entry.
+    \item A last entry.
+\end{enumerate}
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I did the obvious thing to do in this situation, and stole the idea to use it in my own project.
-As it turns out, having a to-do list fixed both problems described above for me.&lt;/p&gt;
-&lt;p&gt;When creating one, you&amp;#8217;re essentially assigning future you tasks to do.
-The great thing about always having tasks laid out in front of you is that you
-never have to figure what to do next: you already did that job.
-Instead of having to plan out everything, you can focus on actually implementing things.&lt;/p&gt;
-&lt;p&gt;The to-do list also forces you to divide your project into manageable pieces.
-For me, my top-level tasks were components of a system like &lt;code&gt;Implement authentication&lt;/code&gt;.
-Every time I&amp;#8217;d get to implementing one of these components, I&amp;#8217;d then divide it into smaller, more concrete pieces, like &lt;code&gt;Implement &amp;#47;users&amp;#47;&amp;#60;id&amp;#62; PATCH&lt;/code&gt;.
-Usually, these small tasks were items I could reasonably complete in an evening.
-So basically, there never was this feeling of being overwhelmed, as I always knew that I&amp;#8217;d make decent progress on the project in one session.&lt;/p&gt;
-&lt;h2 id=&quot;docstrings&quot;&gt;Docstrings&lt;/h2&gt;
-&lt;p&gt;In the spirit of planning things out, I also wrote docstrings before writing important classes and functions.
-Most importantly, it&amp;#8217;s good to have a solid definition of what you&amp;#8217;re about to implement.
-It just so happens the Python docstring is a good way to do that:
-you have parameters, a description, and a return value in a function docstring.
-With Neovim, I&amp;#8217;d have the docstring open in a split, and actually code the function in another.
-This way, there&amp;#8217;s no confusion about what you&amp;#8217;re supposed to write.&lt;/p&gt;
-&lt;p&gt;Planning everything out ahead of time is really useful for me.
-When I come back to work-in-progress code from a week back,
-I&amp;#8217;m not in the same state of mind.
-Often, I&amp;#8217;ll have forgotten what I was trying to do in a given place:
-that&amp;#8217;s why leaving good comments and docstrings is helpful.&lt;/p&gt;
-&lt;p&gt;Of course, this &amp;#8220;standard&amp;#8221; specified by the docstring isn&amp;#8217;t formal or inflexible.
-It&amp;#8217;s not a real specification; it&amp;#8217;s a short-term plan.
-Sometimes, midway during implementation, I&amp;#8217;ll realize that the docstring describes a function that can&amp;#8217;t work.
-However, that&amp;#8217;s a good thing: if I didn&amp;#8217;t have the plan, I might not have realized my code wasn&amp;#8217;t coherent.&lt;/p&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-&lt;p&gt;To be honest, using a divide-and-conquer strategy to complete projects has been working for me.
-Thanks to planning tasks out in a high-level to-do list, and more fine-grained docstrings,
-I have been avoiding lack of motivation, and forgetting what I&amp;#8217;m supposed to be doing.&lt;/p&gt;</content>
-		<link href="https://www.dogeystamp.com/prod"/>
-		<id>https://www.dogeystamp.com/prod</id>
-		<updated>2023-05-15T10:00:00Z</updated>
-		<published>2023-05-15T10:00:00Z</published>
+&lt;p&gt;Typst:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;+ This is the first list item.
++ Another entry.
++ A last entry.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;According to my criteria for a good note-taking system,
+Typst is the best,
+so that is what I use.&lt;/p&gt;
+&lt;h2 id=&quot;compiling-typst&quot;&gt;Compiling Typst&lt;/h2&gt;
+&lt;div class=&quot;footnotes&quot;&gt;
+&lt;hr/&gt;
+&lt;ol&gt;
+
+&lt;li id=&quot;fn1&quot;&gt;
+&lt;p&gt;In fact, I moved to a new school this year,
+and some students I met there had already read my post.
+Thanks to all my readers!&amp;#160;&lt;a href=&quot;#fnref1&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn2&quot;&gt;
+&lt;p&gt;This is, of course, just my personal opinion.&amp;#160;&lt;a href=&quot;#fnref2&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;</content>
+		<link href="https://www.dogeystamp.com/typst-notes2"/>
+		<id>https://www.dogeystamp.com/typst-notes2</id>
+		<updated>2025-10-08T10:00:00Z</updated>
+		<published>2025-10-08T10:00:00Z</published>
 	</entry>
 	<entry>
 		<title>Reviving a digital piano with new brains</title>
