@@ -198,8 +198,8 @@ by playing a few unique moves in the opening before the engine starts playing.
 For my project, I used <a href="https://github.com/official-stockfish/books/raw/refs/heads/master/8moves_v3.pgn.zip">8moves_v3.pgn</a> from stockfish.</p>
 <p>Then, you can start an engine chess tournament using fastchess:</p>
 <pre><code>fastchess \
-    -engine cmd=engine_old name="The old engine" \
     -engine cmd=engine_new name="The new engine" \
+    -engine cmd=engine_old name="The old engine" \
     -pgnout file="games.pgn" \
     -openings file=8moves_v3.pgn format=pgn order=random \
     -each tc=8+0.08 \
