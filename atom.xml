@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<title></title>
+	<title>DogeyStamp</title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2025-11-12T18:16:56Z</updated>
+	<updated>2025-12-29T15:33:00Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -3987,8 +3987,8 @@ by playing a few unique moves in the opening before the engine starts playing.
 For my project, I used &lt;a href=&quot;https://github.com/official-stockfish/books/raw/refs/heads/master/8moves_v3.pgn.zip&quot;&gt;8moves_v3.pgn&lt;/a&gt; from stockfish.&lt;/p&gt;
 &lt;p&gt;Then, you can start an engine chess tournament using fastchess:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;fastchess \
-    -engine cmd=engine_old name=&quot;The old engine&quot; \
     -engine cmd=engine_new name=&quot;The new engine&quot; \
+    -engine cmd=engine_old name=&quot;The old engine&quot; \
     -pgnout file=&quot;games.pgn&quot; \
     -openings file=8moves_v3.pgn format=pgn order=random \
     -each tc=8+0.08 \
