@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title>DogeyStamp</title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2025-12-29T15:33:00Z</updated>
+	<updated>2026-01-01T12:38:07Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -512,6 +512,11 @@ Here are some resources that were useful to me:&lt;/p&gt;
 &lt;div class=&quot;creation-date&quot;&gt;
 2023-08-14
 &lt;/div&gt;
+&lt;div class=&quot;notecard warning markdown-alert markdown-alert-warning&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Warning:&lt;/strong&gt;
+&lt;strong&gt;This post is outdated!&lt;/strong&gt; Please see the &lt;a href=&quot;/typst-notes2&quot;&gt;updated 2026 version&lt;/a&gt;,
+which is a complete rewrite of this article with updated information.&lt;/p&gt;
+&lt;/div&gt;
 &lt;p&gt;A while back, I saw Gilles Castel&amp;#8217;s &lt;a href=&quot;https://castel.dev/post/lecture-notes-1/&quot;&gt;series&lt;/a&gt;
 of blog posts about his note-taking setup with LaTeX and Vim.
 I was quite inspired by the idea, and I even tried it for a while,
@@ -682,6 +687,475 @@ Hopefully, one day Typst will get wider usage, because it&amp;#8217;s a great ty
 		<id>https://www.dogeystamp.com/typst-notes</id>
 		<updated>2023-08-14T10:00:00Z</updated>
 		<published>2023-08-14T10:00:00Z</published>
+	</entry>
+	<entry>
+		<title>Note-taking with Typst and Neovim in 2026</title>
+		<content type="html">&lt;h1 id=&quot;note-taking-with-typst-and-neovim-in-2026&quot;&gt;Note-taking with Typst and Neovim in 2026&lt;/h1&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2026-01-01
+&lt;/div&gt;
+&lt;p&gt;More than two years ago, I wrote an article about the process of &lt;a href=&quot;/typst-notes&quot;&gt;taking notes
+with Typst in Neovim&lt;/a&gt;; soon after, it became the most popular
+post on this blog.&lt;sup id=&quot;fnref1&quot;&gt;&lt;a href=&quot;#fn1&quot; rel=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; Since then, however, the contents of that article have
+become outdated, so I&amp;#8217;m writing this as an updated version of that post.
+The goal of this article is to again document how I write lecture notes in Typst,
+but now with the tooling of 2026.&lt;/p&gt;
+&lt;p&gt;Now that I&amp;#8217;ve spent two years using Typst for taking notes, I can say that I&amp;#8217;m
+quite happy with it. I&amp;#8217;m at the level where I can effortlessly type notes as
+fast (sometimes faster) than instructors can write on the board, including
+mathematical notation. I also use Typst when typing up homework.&lt;/p&gt;
+&lt;h2 id=&quot;recap&quot;&gt;Recap&lt;/h2&gt;
+&lt;p&gt;First, let&amp;#8217;s recall the goals for my note-taking.&lt;/p&gt;
+&lt;p&gt;During lectures, I take notes in real time on my laptop,
+and I do not spend time after class to clean up my notes.
+This is a real example of how my notes look like (click for more detail):&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/public/img/typst-notes2/pages.png&quot;&gt;&lt;img src=&quot;/public/img/typst-notes2/pages.png&quot; alt=&quot;Image of two pages from my typed notes.&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Because of the way I write notes, it has to be fast and efficient,
+otherwise I can&amp;#8217;t keep up with the lecture.
+More precisely, the following are my criteria for a good note-taking setup:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Taking notes should be convenient.
+That is, I can open my notes and start writing almost immediately.
+The system should be fast and responsive.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The syntax for writing notes should be easy to remember and to write.
+If the syntax for common things like fractions are painful to type, I&amp;#8217;d rather use plain text or handwritten notes.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I need my notes to support math, figures, and related features for my courses.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Originally, I was quite inspired by &lt;a href=&quot;https://castel.dev/post/lecture-notes-1/&quot;&gt;Gilles Castel&amp;#8217;s
+system&lt;/a&gt; which uses LaTeX for
+note-taking. Unfortunately, LaTeX fails some of the criteria above; it compiles
+slowly, which is inconvenient, and it has cryptic, weird syntax from decades
+ago.&lt;sup id=&quot;fnref2&quot;&gt;&lt;a href=&quot;#fn2&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt; So when I tried to write LaTeX, I ended up just giving up and writing
+plain text documents, because they are simply more convenient to write.&lt;/p&gt;
+&lt;p&gt;Then, I found &lt;a href=&quot;https://github.com/typst/typst&quot;&gt;Typst&lt;/a&gt;,
+which is sort of a mix between LaTeX and Markdown.
+On one hand, just like LaTeX, it&amp;#8217;s designed for writing about math and other technical subjects,
+so it supports equations and figures.
+On the other hand, like Markdown, Typst has simple syntax.
+For instance, compare the notation for lists:&lt;/p&gt;
+&lt;p&gt;LaTeX:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;\begin{enumerate}
+    \item This is the first list item.
+    \item Another entry.
+    \item A last entry.
+\end{enumerate}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Typst:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;+ This is the first list item.
++ Another entry.
++ A last entry.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The Typst notation requires much less typing than the LaTeX notation. This is
+just one example; I would say that in general writing things in Typst is less
+wordy than writing it in LaTeX.&lt;/p&gt;
+&lt;p&gt;So, according to my criteria for a good note-taking system, Typst is the best,
+which is why I use it.&lt;/p&gt;
+&lt;h2 id=&quot;compiling-typst-in-neovim&quot;&gt;Compiling Typst in Neovim&lt;/h2&gt;
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This post focuses on local compilation, integrated with an editor (Neovim). For
+those who don&amp;#8217;t live in the terminal, Typst has a closed-source &lt;a href=&quot;https://typst.app&quot;&gt;web
+app&lt;/a&gt;, which is equivalent to Overleaf for LaTeX.
+The web app does have basic Vim binds, if that is what you need.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Let&amp;#8217;s get started writing Typst.&lt;/p&gt;
+&lt;p&gt;Once you have Typst installed,
+you can already start writing in a &lt;code&gt;.typ&lt;/code&gt; document with your favourite text editor.
+Run &lt;code&gt;typst watch document.typ&lt;/code&gt;, and Typst will compile to &lt;code&gt;document.pdf&lt;/code&gt;.
+There is no boilerplate required; just start writing text.&lt;/p&gt;
+&lt;p&gt;In this section, I&amp;#8217;ll show you how to better integrate this process with your
+editor.&lt;/p&gt;
+&lt;h3 id=&quot;tinymist&quot;&gt;Tinymist&lt;/h3&gt;
+&lt;p&gt;Since 2023, many things have changed in the Typst ecosystem. We now have proper
+Language Server Protocol (LSP) server support for Typst, which helps editors
+understand and manipulate Typst code. You can install the
+&lt;a href=&quot;https://github.com/Myriad-Dreamin/tinymist&quot;&gt;Tinymist&lt;/a&gt; language server, which
+has many features, like autocomplete, error detection, code formatting, and
+notably instant preview in a browser window. Every time you edit the document,
+Tinymist automatically compiles it and shows you a preview. You can even click
+in the preview, and have it sync position with the editor window:&lt;/p&gt;
+&lt;p&gt;&lt;video width=&quot;640&quot; height=&quot;360&quot; controls&gt;
+  &lt;source src=&quot;/public/img/typst-notes2/preview.mp4&quot; type=&quot;video/mp4&quot;&gt;
+Your browser does not support the video tag.
+&lt;/video&gt;&lt;/p&gt;
+&lt;p&gt;To keep this post brief though, I&amp;#8217;ll avoid specifying too many details about
+how to set up language servers in Neovim; there is plenty of information out
+there already, and the configuration depends on how your specific setup works.&lt;/p&gt;
+&lt;p&gt;One thing I will add here is that once you have Tinymist running, you can
+start the preview with the following Lua command (which you should bind to a key):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vim.lsp.get_clients({ name = &quot;tinymist&quot; })[1]:exec_cmd({ command = &quot;tinymist.startDefaultPreview&quot;, title = &quot;Preview&quot; })
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt;
+If you hate having to configure everything but still like Vim-style editing,
+try the &lt;a href=&quot;https://github.com/helix-editor/helix&quot;&gt;Helix&lt;/a&gt; editor, which automatically
+configures language servers (and many other features) for you. Once you have
+Tinymist running, use this command to start the preview:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;:lsp-workspace-command tinymist.startDefaultPreview
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I am looking to switch to Helix, but as of now the snippet support isn&amp;#8217;t good enough.&lt;/p&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;typst-watch&quot;&gt;Typst watch&lt;/h3&gt;
+&lt;p&gt;The one issue I have with Tinymist is that using it drains battery on my laptop.
+which is a big disadvantage when typing notes in class.
+Because it consumes more power, I actually don&amp;#8217;t use Tinymist that often.&lt;/p&gt;
+&lt;p&gt;Instead, I still use the same setup as I did in 2023: I have VimScript binds that open
+&lt;code&gt;typst watch&lt;/code&gt; in a tiny side pane, and open a PDF reader (Zathura) to view the
+output besides the editor.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function GitRoot()
+    return fnamemodify(finddir(&amp;#39;.git&amp;#39;, &quot;;&quot;), &quot;:h&quot;)
+endfunc
+
+&quot; compile typst doc on write
+function TypstWatch()
+       vsp
+       vertical resize 20
+       exec &amp;#39;terminal &amp;#39; .. &amp;#39;typst watch --root &amp;#39; .. GitRoot() .. &quot; &quot; .. expand(&quot;%:&quot;)
+       exec &quot;norm \&amp;#60;c-w&amp;#62;h&quot;
+endfunc
+
+nnoremap &amp;#60;silent&amp;#62; &amp;#60;leader&amp;#62;fc :call TypstWatch()&amp;#60;cr&amp;#62;
+
+nnoremap &amp;#60;silent&amp;#62;&amp;#60;leader&amp;#62;fr :silent exec &quot;!zathura --fork &quot; . expand(&quot;%:p:r&quot;) . &quot;.pdf &amp;#38;&quot;&amp;#60;cr&amp;#62;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Every time I save the Typst source file, it compiles
+and shows the result in the Zathura window:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/zathura.png&quot; alt=&quot;Screenshot with the Neovim window on the left showing an error from typst output, and Zathura on the right.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;As you can see, errors are also displayed in the side pane. Based on personal
+experience, this setup consumes noticeably less battery than running Tinymist.
+I assume Tinymist consumes more resources because it is constantly compiling
+your code after each keystroke, rather than when you save.&lt;/p&gt;
+&lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt;
+A difference from the original code is that we now have to set a compilation root for Typst.
+If your file accesses external data (e.g. images on disk), the data needs to be within the compilation root.
+(This feature prevents Typst files from reading your SSH private keys.)
+For my setup, I set the root of my notes Git repository as the compilation root.&lt;/p&gt;
+&lt;/div&gt;
+&lt;h2 id=&quot;math-code&quot;&gt;Math &amp;#38; code&lt;/h2&gt;
+&lt;p&gt;I often need to include math, and sometimes code in my notes.
+Typst is good at handling either of these.&lt;/p&gt;
+&lt;h3 id=&quot;math&quot;&gt;Math&lt;/h3&gt;
+&lt;p&gt;To write inline math, write &lt;code&gt;$1 + 1 = 2$&lt;/code&gt; (no spaces),
+and to write display math, write&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$
+1 + 1 = 2.
+$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(Configure your auto-pairs plugin to recognize &lt;code&gt;$&lt;/code&gt; in Typst files.)
+You can write multiline equations with &lt;code&gt;\&lt;/code&gt;, and align them with &lt;code&gt;&amp;#38;&lt;/code&gt;, for instance&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$
+2 &amp;#38;= 1 + 1 \
+  &amp;#38;= 1 + 1 - 1 + 1
+$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;gives this output:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/multiline.svg&quot; alt=&quot;The output of the above Typst code.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;As I mentioned above, the best part of Typst is how concise it is compared to LaTeX.
+Instead of &lt;code&gt;\frac{3}{2}&lt;/code&gt;, you can write &lt;code&gt;3&amp;#47;2&lt;/code&gt;,
+and instead of &lt;code&gt;\mathbb{R}&lt;/code&gt;, it&amp;#8217;s just &lt;code&gt;RR&lt;/code&gt;.
+This conciseness is especially good for people like me who are typing lecture notes in real time in class.
+At this point, I can sometimes type math faster than teachers can write it on the board.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&quot;https://github.com/johanvx/typst-undergradmath/releases/download/v1.5.1/undergradmath.pdf&quot;&gt;typst-undergradmath&lt;/a&gt;
+for a long list of examples of typesetting math in Typst.&lt;/p&gt;
+&lt;p&gt;Some things are still a bit tedious to write, though.
+For instance, to type a sigma sum, you need to type &lt;code&gt;sum_(i=1)^n&lt;/code&gt;.
+While typing this expression, I mainly don&amp;#8217;t like reaching my fingers off the home-row to reach the &lt;code&gt;^&lt;/code&gt; key.
+A similar issue occurs with definite integrals, which are written &lt;code&gt;integral_a^b&lt;/code&gt;.
+To optimize typing math, I use snippets in Neovim, specifically using the &lt;a href=&quot;https://github.com/L3MON4D3/LuaSnip&quot;&gt;LuaSnip&lt;/a&gt; plugin.&lt;sup id=&quot;fnref3&quot;&gt;&lt;a href=&quot;#fn3&quot; rel=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt;
+Snippets are like textual templates that let you fill in the blanks.
+When I type &lt;code&gt;sum&lt;/code&gt; and then press Tab, it autocompletes the sum notation &lt;code&gt;sum_()^()&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;video width=&quot;640&quot; height=&quot;360&quot; controls&gt;
+  &lt;source src=&quot;/public/img/typst-notes2/snippet.mp4&quot; type=&quot;video/mp4&quot;&gt;
+Your browser does not support the video tag.
+&lt;/video&gt;&lt;/p&gt;
+&lt;p&gt;Unlike in LaTeX though, snippets are more a convenience rather than a necessity
+for typing fast, since Typst syntax is already short by itself. I would say
+that even without snippets, as long as you type fast, you can write Typst
+markup as fast as a lecturer writes on the board.&lt;/p&gt;
+&lt;p&gt;Snippets are also nice to use in other contexts,
+like completing &lt;code&gt;today&lt;/code&gt; to &lt;code&gt;2026-01-01&lt;/code&gt; in a journal file.&lt;/p&gt;
+&lt;h3 id=&quot;code&quot;&gt;Code&lt;/h3&gt;
+&lt;p&gt;Other than math, you might also want to write code blocks in Typst.
+Doing this is easy, and it uses the exact same notation as in Markdown, i.e. single ticks for inline code,
+and three backticks for code blocks:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;This is `code`.
+
+```python
+print(&quot;this is code&quot;)
+```&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/code.svg&quot; alt=&quot;The output of the above Typst code.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s just like typing code on Discord,
+and it even has syntax highlighting out of the box.&lt;/p&gt;
+&lt;h2 id=&quot;figures&quot;&gt;Figures&lt;/h2&gt;
+&lt;p&gt;Another essential feature for writing lecture notes is drawing figures.
+The system I use is still generally the same as Gilles Castel&amp;#8217;s method:
+draw figures in Inkscape, and include them in the Typst document.
+However, compared to 2023, my setup is a bit different.
+This is what the workflow looks like:&lt;/p&gt;
+&lt;p&gt;&lt;video width=&quot;640&quot; height=&quot;360&quot; controls&gt;
+  &lt;source src=&quot;/public/img/typst-notes2/figure.mp4&quot; type=&quot;video/mp4&quot;&gt;
+Your browser does not support the video tag.
+&lt;/video&gt;&lt;/p&gt;
+&lt;p&gt;When writing notes, whenever I want to insert a figure, I use a &lt;code&gt;fig&lt;/code&gt; snippet,
+which inserts code like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#figure(
+  image(&quot;fig&amp;#47;test2&amp;#47;label.svg&quot;),
+  caption: [Caption],
+) &amp;#60;label&amp;#62;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The &lt;code&gt;label&lt;/code&gt; and &lt;code&gt;Caption&lt;/code&gt; bits are blanks in the snippet that I fill in, and
+&lt;code&gt;test2&lt;/code&gt; is the filename of the document.) Then, after naming the figure, I
+hover over the filename and press a keybind to edit the snippet. The keybind triggers a &lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_local/bin/executable_typst-figure&quot;&gt;script&lt;/a&gt; (&lt;code&gt;typst-figure&lt;/code&gt;)
+which creates the file if it doesn&amp;#8217;t exist, and then opens Inkscape.&lt;/p&gt;
+&lt;p&gt;One important difference from my old setup is that I now use the
+&lt;a href=&quot;https://textext.github.io/textext/&quot;&gt;TexText&lt;/a&gt; plugin to insert Typst math expressions
+in my figures. I edited the source code in my version of TexText so that the &amp;#8220;save text&amp;#8221;
+bind is &lt;code&gt;Ctrl-s&lt;/code&gt;, which can be pressed by the left hand while my right hand
+draws with the mouse.
+Another difference is that I no longer use Gilles Castel&amp;#8217;s Inkscape Shortcut Manager,
+and instead just use the default Inkscape binds (which aren&amp;#8217;t too bad actually).&lt;sup id=&quot;fnref4&quot;&gt;&lt;a href=&quot;#fn4&quot; rel=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Something I did keep from Castel&amp;#8217;s setup is the quick style changer. He had
+&amp;#8220;chorded&amp;#8221; style keybinds:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Space + A: arrow&lt;/li&gt;
+&lt;li&gt;Space + A + G: bold&lt;sup id=&quot;fnref5&quot;&gt;&lt;a href=&quot;#fn5&quot; rel=&quot;footnote&quot;&gt;5&lt;/a&gt;&lt;/sup&gt; arrow&lt;/li&gt;
+&lt;li&gt;Space + S: stroke&lt;/li&gt;
+&lt;li&gt;Space + S + G: bold stroke&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;and so on for a bunch of different styles. This lets you switch styles much
+faster than Inkscape&amp;#8217;s default binds. One issue I ran into using the style
+switcher is that it needs a hacky X11 key event interceptor to make the binds
+work. Since I switched to Wayland, that doesn&amp;#8217;t work anymore. Now, I have
+extracted Gilles&amp;#8217; style code to a &lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_local/bin/executable_stylinator.py&quot;&gt;Python
+script&lt;/a&gt;,
+and I connect it to &lt;code&gt;fuzzel&lt;/code&gt; (which is like &lt;code&gt;rofi&lt;/code&gt; for Wayland) in a &lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_local/bin/executable_style.sh&quot;&gt;style
+switcher shell
+script&lt;/a&gt;.
+Then, I use my window manager&amp;#8217;s binds to trigger this style script. So the
+process in Inkscape to switch styles becomes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Press Mod+A (calls style switcher).&lt;/li&gt;
+&lt;li&gt;Type the bind (e.g. &lt;code&gt;ag&lt;/code&gt; for bold arrow) and press Enter&lt;sup id=&quot;fnref6&quot;&gt;&lt;a href=&quot;#fn6&quot; rel=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt;; this copies the style to clipboard.&lt;/li&gt;
+&lt;li&gt;Select an object in Inkscape and Ctrl+Shift+V to paste the style on it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Admittedly, this method is slower, but it is more robust and will not break the moment I switch window managers.
+It even has the potential to work on Windows, provided you have a replacement for &lt;code&gt;fuzzel&lt;/code&gt; and the clipboard tools.&lt;/p&gt;
+&lt;p&gt;Castel claimed to be able to draw figures with his tools as fast as the
+instructors could draw them on the board, but I still don&amp;#8217;t have enough
+experience after two years to do that yet. Perhaps I just don&amp;#8217;t draw that many
+figures in my lecture notes. Or maybe, my tooling is just not on his level.&lt;/p&gt;
+&lt;h2 id=&quot;scripting&quot;&gt;Scripting&lt;/h2&gt;
+&lt;p&gt;Typst is great not only because it&amp;#8217;s nice to typeset with,
+but also because it has a sane scripting language built in.
+Typst is divided into a markup mode (i.e. normal, formatted text),
+and code mode, where you can write scripts.
+You enter code mode by typing &lt;code&gt;#&lt;/code&gt;, and in code mode you can introduce markup with &lt;code&gt;[]&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Here are a few examples.
+If you need a small function that makes text bold and italic and smallcaps, Typst has got you:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;This is *markup* mode text
+
+#let very-emph = (content) =&amp;#62; strong(emph(smallcaps(content)))
+
+#very-emph[
+  This is highly emphasized _markup._
+]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/script.svg&quot; alt=&quot;The output of the above Typst code.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;(&lt;code&gt;#very-emph[...]&lt;/code&gt; is shorthand for &lt;code&gt;#very-emph([...])&lt;/code&gt; which is calling the function &lt;code&gt;very-emph&lt;/code&gt; on content.)
+If you want to make something render conditionally, Typst can also do that:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#if 1 + 1 == 2 [
+    We have $1 + 1 = 2$.
+] else [
+    We have $1 + 1 != 2$??
+]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/script2.svg&quot; alt=&quot;The output of the above Typst code.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Generally, I&amp;#8217;d say that if you are used to regular programming languages like
+JavaScript, Typst&amp;#8217;s scripting syntax will feel intuitive for you. See the later
+chapters of the &lt;a href=&quot;https://typst.app/docs/tutorial/&quot;&gt;Typst tutorial&lt;/a&gt; for more
+details.&lt;/p&gt;
+&lt;p&gt;I often use Typst&amp;#8217;s scripting system for little things like
+making my own shorthands in math mode.
+For instance, when I want to write a L&amp;#8217;Hôpital&amp;#8217;s rule symbol, I use this code:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#let hop = &quot;(H)&quot;
+
+$
+&amp;#38;lim_(x-&amp;#62;0) (sin x)&amp;#47;x \
+&amp;#38;=_hop lim_(x-&amp;#62;0) (cos x)&amp;#47;1 \
+&amp;#38;=1
+$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/script3.svg&quot; alt=&quot;The output of the above Typst code.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;These are simple examples, and Typst&amp;#8217;s scripting language can do much more than that.
+For instance, I made a &lt;a href=&quot;https://github.com/dogeystamp/kindle_schedule&quot;&gt;&amp;#8220;smart&amp;#8221; calendar&lt;/a&gt;
+powered by Typst&amp;#8217;s scripting system.&lt;/p&gt;
+&lt;h2 id=&quot;templates&quot;&gt;Templates&lt;/h2&gt;
+&lt;p&gt;Writing in LaTeX or in Typst, users often have certain settings they want to
+apply, like paper size, font, layout, and so on. Normally, we put these options
+into a template file, and then reuse that template for every new document we
+make.&lt;/p&gt;
+&lt;p&gt;In 2023, I rolled my own system for templates; I included all my
+template code in a &lt;code&gt;.typ&lt;/code&gt; file and imported it in each new document I made.
+This was painful to use because there was no standard file path to import
+templates from; I had to place documents next to the template, and import
+by relative path, like &lt;code&gt;..&amp;#47;..&amp;#47;template.typ&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Soon after I wrote that article, Typst made their own official packaging system
+to easily distribute files like templates. Now, template authors publish
+packages to the &lt;a href=&quot;https://typst.app/universe&quot;&gt;Typst Universe&lt;/a&gt;
+registry.&lt;sup id=&quot;fnref7&quot;&gt;&lt;a href=&quot;#fn7&quot; rel=&quot;footnote&quot;&gt;7&lt;/a&gt;&lt;/sup&gt; This way, documents are self-contained: rather than
+importing &lt;code&gt;..&amp;#47;..&amp;#47;template.typ&lt;/code&gt;, which might only exist on your computer, you
+import the standard package &lt;code&gt;@preview&amp;#47;my-great-template:1.2.3&lt;/code&gt;. You can send a
+single &lt;code&gt;.typ&lt;/code&gt; document to other people, or edit it on the Typst web app, and it
+will work just fine.&lt;/p&gt;
+&lt;p&gt;Now, whenever I want to start a new document, I can create a new &lt;code&gt;.typ&lt;/code&gt; file
+anywhere, and import my template with this code snippet:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#import &quot;@preview&amp;#47;mousse-notes:1.0.0&quot;: *
+#set page(paper: &quot;us-letter&quot;)
+#show: book.with(
+  title: [WUNK 101],
+  subtitle: [Introduction to Wunkematics],
+  subsubtitle: [Lecture notes, Fall 2023],
+  subsubsubtitle: [Professor #smallcaps[Jonathan Bingus], University of Ipsum.],
+  author: &quot;John S. Student&quot;,
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/public/img/typst-notes2/template.png&quot; alt=&quot;The output of the above Typst code.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;My template is available at its &lt;a href=&quot;https://github.com/dogeystamp/mousse-notes&quot;&gt;GitHub
+repo&lt;/a&gt;, but at the time of writing
+it&amp;#8217;s not uploaded to Typst Universe yet. Once it is up, you will also be able
+to easily import it in your own documents.&lt;/p&gt;
+&lt;p&gt;Another thing I do differently than in 2023 is the organization of my notes.
+In the past, I would make a new document for each chapter of a course;
+now, each course&amp;#8217;s notes are contained in a &amp;#8220;book&amp;#8221; compiled from a single Typst document.
+This method reduces the amount of boilerplate you have to write,
+and lets you start a new chapter by typing a new heading (which is just typing &lt;code&gt;= Heading name&lt;/code&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;plugins&quot;&gt;Plugins&lt;/h2&gt;
+&lt;p&gt;Typst Universe doesn&amp;#8217;t just host templates; it also hosts plugins, which are also &lt;code&gt;.typ&lt;/code&gt; scripts.
+A lot of these are useful, for example &lt;a href=&quot;https://typst.app/universe/package/whalogen/&quot;&gt;whalogen&lt;/a&gt;
+provides shortcuts to type chemical equations,
+and &lt;a href=&quot;https://typst.app/universe/package/metro&quot;&gt;metro&lt;/a&gt; lets you type units.
+It is even possible to &lt;a href=&quot;https://typst.app/universe/package/pyrunner/&quot;&gt;run Python in Typst&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For many tasks though, plugins aren&amp;#8217;t strictly necessary.
+With &lt;code&gt;whalogen&lt;/code&gt;, you can type &lt;code&gt;#ce(&quot;HCl + H2O -&amp;#62; H3O+ + Cl-&quot;)&lt;/code&gt;,
+and without the plugin, it&amp;#8217;s just longer: &lt;code&gt;$&quot;HCl&quot; + &quot;H&quot;_2&quot;O&quot; -&amp;#62; &quot;H&quot;_3&quot;O&quot;^+ + &quot;Cl&quot;^-$&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;I personally dislike having extra dependencies, because it creates more
+maintenance burden. Oftentimes, the Typst compiler will have a breaking change
+(a downside of using software that is in its growth phase), and one
+of the plugins I use will break, or have annoying deprecation warnings.&lt;/p&gt;
+&lt;p&gt;Nowadays, I don&amp;#8217;t use external plugins anymore: my template includes my own
+implementations of &lt;code&gt;#theorem&lt;/code&gt;, &lt;code&gt;#definition&lt;/code&gt;, &lt;code&gt;#example&lt;/code&gt;, and so on. If it
+breaks, it&amp;#8217;s my fault solely, which is good because then I can fix the issue
+myself.&lt;/p&gt;
+&lt;h2 id=&quot;synchronizing-notes&quot;&gt;Synchronizing notes&lt;/h2&gt;
+&lt;p&gt;You may want to synchronize your Typst files so you can write on multiple
+devices. There are a few ways to do this.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Personally, I use &lt;a href=&quot;https://git-scm.com/&quot;&gt;Git&lt;/a&gt; to manage my notes. The main
+advantage of Git is that it is the industry standard for working with source
+code, and it is a highly reliable tool. The disadvantage is that you need to
+commit and push changes manually, which you might forget to do.
+(I mainly write on a single device, so this is fine.)&lt;/li&gt;
+&lt;li&gt;You could use &lt;a href=&quot;https://syncthing.net/&quot;&gt;Syncthing&lt;/a&gt;, which automatically syncs
+files across your devices. It just works. One annoying thing is that when
+there are sync conflicts, Syncthing will not notify you and it will instead
+create a &amp;#8220;sync-conflict&amp;#8221; file.&lt;/li&gt;
+&lt;li&gt;The most practical option (but one that goes against the idea of using
+local open-source tools) is to use the official closed-source &lt;a href=&quot;https://typst.app&quot;&gt;web
+app&lt;/a&gt; for Typst. Unlike the two other options, you need to
+be online to access the web app. However, the web app synchronizes documents
+perfectly and lets you collaborate in real time with other people.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For the first two options, make sure that you exclude &lt;code&gt;.pdf&lt;/code&gt; outputs in &lt;code&gt;.gitignore&lt;/code&gt; or &lt;code&gt;.stignore&lt;/code&gt;
+to save storage and bandwidth.&lt;/p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;That&amp;#8217;s all for how my current note-taking setup works. A general theme
+comparing the 2026 setup to the 2023 setup is that I&amp;#8217;ve aimed for more
+minimalism and simplicity: a system with less moving parts is more reliable,
+and easier to maintain.&lt;/p&gt;
+&lt;p&gt;Notably, all my documents are now fully self-contained: they import my template
+from the standardized package registry rather than from a relative path, and
+they do not have external links. If you&amp;#8217;ve read the 2023 version of this post,
+you&amp;#8217;ll see that I created a convoluted setup to link between different PDF
+files. I spent much effort building the link system, only to never use it. Now,
+my documents are formatted as books that comprehensively cover one
+subject, so that I only need to link within documents (which is a
+feature Typst and PDF readers have good support for).&lt;sup id=&quot;fnref8&quot;&gt;&lt;a href=&quot;#fn8&quot; rel=&quot;footnote&quot;&gt;8&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Another way I&amp;#8217;ve simplified the note-taking system is to trim out a lot of
+brittle external code and dependencies. I&amp;#8217;ve trimmed down Castel&amp;#8217;s Inkscape tools to
+the bare minimum, leaving only the style code itself, and as mentioned above,
+I&amp;#8217;ve stopped using external Typst plugins. The projects I do rely on are
+generally well-maintained, like the Neovim editor, the Typst compiler itself,
+and TexText.&lt;/p&gt;
+&lt;p&gt;Looking forward to the future, I mainly wish I could reduce the complexity in
+my Neovim configuration. That is, I want to stop using as many third party
+plugins. The &lt;a href=&quot;https://github.com/helix-editor/helix&quot;&gt;Helix&lt;/a&gt; editor (mentioned
+above) is quite promising in that a lot of the functionality in Neovim plugins
+(surround, Git gutter, telescope, lspconfig, tree-sitter, &amp;#8230;) is available out
+of the box in Helix and maintained by their team. Once they have solid snippet
+support, I&amp;#8217;ll switch fully to Helix and I&amp;#8217;ll never again have to think about my
+huge Neovim configuration file, and the headache of configuring a dozen
+plugins.&lt;/p&gt;
+&lt;p&gt;Thanks for reading this far. If you have any questions or comments regarding
+this post, please do write to me, and I&amp;#8217;ll be happy to reply to you.&lt;/p&gt;
+&lt;h3 id=&quot;appendix-configuration-files&quot;&gt;Appendix: Configuration files&lt;/h3&gt;
+&lt;p&gt;To keep this post brief, I did not include most of my configuration code.
+If you want to replicate my setup, here are the relevant configuration files on GitHub:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_config/nvim/ftplugin/typst.vim&quot;&gt;&lt;code&gt;ftplugin&amp;#47;typst.vim&lt;/code&gt;&lt;/a&gt; (bind for &lt;code&gt;typst watch&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_config/nvim/ftplugin/typst.lua&quot;&gt;&lt;code&gt;ftplugin&amp;#47;typst.lua&lt;/code&gt;&lt;/a&gt; (tinymist)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_config/nvim/snippets/typst.lua&quot;&gt;&lt;code&gt;snippets&amp;#47;typst.lua&lt;/code&gt;&lt;/a&gt; (snippets)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_local/bin/executable_typst-figure&quot;&gt;&lt;code&gt;typst-figure&lt;/code&gt;&lt;/a&gt; (shell script to create figures)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_local/bin/executable_stylinator.py&quot;&gt;&lt;code&gt;stylinator.py&lt;/code&gt;&lt;/a&gt; (Inkscape quick style script)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/dogeystamp/dots/blob/8299e0b2c0db4d287640e588d075985385fba81e/src/dot_local/bin/executable_style.sh&quot;&gt;&lt;code&gt;style.sh&lt;/code&gt;&lt;/a&gt; (frontend to &lt;code&gt;stylinator.py&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;footnotes&quot;&gt;
+&lt;hr/&gt;
+&lt;ol&gt;
+
+&lt;li id=&quot;fn1&quot;&gt;
+&lt;p&gt;In fact, I moved to a new school a while ago,
+and some students I met there had already read my post.
+Hi :)&amp;#160;&lt;a href=&quot;#fnref1&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn2&quot;&gt;
+&lt;p&gt;This is, of course, just my personal opinion.&amp;#160;&lt;a href=&quot;#fnref2&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn3&quot;&gt;
+&lt;p&gt;In 2023, I used UltiSnips, but I got tired of it complaining about pynvim being missing on all my devices.&amp;#160;&lt;a href=&quot;#fnref3&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn4&quot;&gt;
+&lt;p&gt;Some of the binds I use are &amp;#8220;toggle snap to grid&amp;#8221; (%),
+&amp;#8220;toggle grid&amp;#8221; (#), the curve drawing tool (b), rectangle and circle (F4, F5).&amp;#160;&lt;a href=&quot;#fnref4&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn5&quot;&gt;
+&lt;p&gt;I think G stands for &lt;a href=&quot;https://en.wiktionary.org/wiki/gras#French&quot;&gt;gras&lt;/a&gt;, &amp;#8220;bold&amp;#8221;?&amp;#160;&lt;a href=&quot;#fnref5&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn6&quot;&gt;
+&lt;p&gt;I bound Shift + V as Enter in fuzzel, so that my left hand can reach better.&amp;#160;&lt;a href=&quot;#fnref6&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn7&quot;&gt;
+&lt;p&gt;Or you can &amp;#8220;publish&amp;#8221; packages to a standard local folder on your computer.&amp;#160;&lt;a href=&quot;#fnref7&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn8&quot;&gt;
+&lt;p&gt;Removing inter-document links and enforcing a rule of &amp;#8220;one subject,
+one document&amp;#8221; is perhaps not ideal for those who want a personal knowledge
+management system, but it is good for writing course notes.&amp;#160;&lt;a href=&quot;#fnref8&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;</content>
+		<link href="https://www.dogeystamp.com/typst-notes2"/>
+		<id>https://www.dogeystamp.com/typst-notes2</id>
+		<updated>2026-01-01T10:00:00Z</updated>
+		<published>2026-01-01T10:00:00Z</published>
 	</entry>
 	<entry>
 		<title>Reviving a digital piano with new brains</title>
@@ -3900,7 +4374,7 @@ or any other rating.&lt;/p&gt;
 let&amp;#8217;s return to the main topic of the &lt;a href=&quot;https://en.m.wikipedia.org/wiki/Sequential_probability_ratio_test&quot;&gt;sequential probabilility ratio test&lt;/a&gt;.&lt;/p&gt;
 &lt;h3 id=&quot;what-is-an-sprt&quot;&gt;What is an SPRT?&lt;/h3&gt;
 &lt;div class=&quot;notecard note markdown-alert markdown-alert-note&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: This section is more mathematical in nature, and is not absolutely essential to using SPRT in engine development.
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; This section is more mathematical in nature, and is not absolutely essential to using SPRT in engine development.
 However, I wrote this because having a base level understanding of what you&amp;#8217;re doing is helpful.
 Skip this if you&amp;#8217;re allergic to maths.
 Practically, this process is handled entirely by existing tools, so you don&amp;#8217;t &lt;em&gt;need&lt;/em&gt; to understand it.&lt;/p&gt;
