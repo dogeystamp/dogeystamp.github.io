@@ -1,39 +1,14 @@
-/*
-MIT License
-
-Copyright (c) 2023 Bradley Taunt
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
-
-I stole a decent amount of code from the stylesheet of https://barf.bt.ht/
-so here's the license
-*/
-
 body {
-	font-family: "Helvetica Neue", Helvetica, "Nimbus Sans", Arial, sans-serif;
+	font-family: "InterDisplay", sans-serif;
 	max-width: 50em;
 	margin: auto;
 	font-size: 1.05rem;
 	background: white;
 	color: black;
+}
+
+html {
+	scroll-behavior: smooth;
 }
 
 footer {
@@ -76,6 +51,18 @@ h1 {
 
 h2 {
 	font-size: 160%;
+	/* add lines after h2 */
+	/* https://stackoverflow.com/a/39202026 */
+	display: flex;
+	align-items: baseline;
+}
+
+h2:not(h2[id="hi-im-dogeystamp."]):not(h2:has(a))::after {
+	content: '';
+	flex: 1 1 auto;
+	margin-left: 1rem;
+	border-top: 0.2rem solid black;
+	height: 0.45ex;
 }
 
 h1,
@@ -88,7 +75,7 @@ h4 {
 .creation-date {
 	font-size: 105%;
 	color: #444;
-	font-weight: 800;
+	font-weight: 700;
 	margin: 0.5em 0 1.25em 0;
 	line-height: 1;
 }
@@ -106,7 +93,7 @@ ul {
 img,
 video,
 iframe {
-	max-height: 25em;
+	max-height: 40em;
 	max-width: 100%;
 	width: auto;
 	display: block;
@@ -116,8 +103,9 @@ iframe {
 }
 
 iframe {
-	width: 80%;
-	height: 35em;
+	width: 80vw;
+	height: 50vw;
+	max-height: 35em;
 }
 
 .logo {
@@ -204,7 +192,6 @@ footer {
 a {
 	display: inline-flex;
 	border-radius: 0.1em;
-	font-weight: 500;
 }
 
 a:link {
@@ -246,7 +233,7 @@ nav {
 
 nav a {
 	margin: 0 0.35em;
-	font-weight: 600;
+	font-weight: 700;
 	font-size: 2.9ex;
 	text-decoration: none;
 }
@@ -280,6 +267,24 @@ nav a:hover {
 	margin-right: 1.5rem;
 }
 
+/* "Back to top" */
+.backtotop a {
+	text-decoration: none;
+	border: 0.125em solid gray;
+	padding: 0.5em;
+	border-radius: 0.1em;
+	font-weight: 700;
+}
+
+.backtotop a:link {
+	color: gray;
+}
+
+.backtotop a:hover {
+	border: 0.125em solid #99aabb;
+	color: #99aabb;
+}
+
 /* Blog article links on index page */
 span.created {
 	display: block;
@@ -288,11 +293,13 @@ span.created {
 }
 
 span.created a:link {
-	color: gray;
+	color: black;
+	font-weight: 700;
+	text-decoration: none;
 }
 
 span.created a:hover {
-	color: black;
+	color: gray;
 }
 
 /* Footnotes */
@@ -307,6 +314,43 @@ sub {
 
 sup {
 	bottom: 0.75ex;
+}
+
+@keyframes flash {
+	0% {
+		background: none;
+	}
+
+	2% {
+		background: #eeeeee;
+	}
+
+	4% {
+		background: none;
+	}
+
+	6% {
+		background: #eeeeee;
+	}
+
+	8% {
+		background: none;
+	}
+
+	10% {
+		background: #eeeeee;
+	}
+
+	100% {
+		background: none;
+	}
+}
+
+:target,
+p:has(:target) {
+	animation-name: flash;
+	animation-duration: 20s;
+	animation-iteration-count: 1;
 }
 
 /*
@@ -359,5 +403,10 @@ sup {
 	table,
 	blockquote {
 		text-align: left;
+	}
+
+	iframe {
+		width: 50vh;
+		height: 80vh;
 	}
 }
