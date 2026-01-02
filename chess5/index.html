@@ -2,39 +2,37 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Chess engine, pt. 5: Quiescence search, endgames, repetition avoidance</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Chess engine, pt. 5: Quiescence search, endgames, repetition avoidance</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="chess-engine-pt.-5-quiescence-search-endgames-repetition-avoidance">Chess engine, pt. 5: Quiescence search, endgames, repetition avoidance</h1>
 <div class="creation-date">
 2025-04-26
 </div>
-<link rel="contents" href="/chess0" />
-<link rel="prev" href="/chess4" />
-<link rel="next" href="/chess6" />
+<link href="/chess0" rel="contents">
+<link href="/chess4" rel="prev">
+<link href="/chess6" rel="next">
 <div class="callout markdown-alert markdown-alert-callout">
 <p>This post is part of a series about building a chess-playing engine.</p>
 <p><a href="/chess0">Introduction (0)</a>
@@ -46,17 +44,17 @@ our DIY chess engine has an okay skill level,
 but it actually has a few major flaws.</p>
 <p>If you observe the games it plays,
 it occasionally makes really obvious (to a human) mistakes,
-it can&#8217;t checkmate with just a king and a queen,
+it can’t checkmate with just a king and a queen,
 and it will draw by threefold repetition instead of easily winning the game.</p>
 <p>These are really annoying issues
-if you don&#8217;t know what causes them,
+if you don’t know what causes them,
 or how to fix them.
 The obvious blunders are especially annoying,
 because it seems like a logic error in your code,
 but it is actually a fundamental problem in our heuristic negamax algorithm.</p>
-<p>In this post, I&#8217;ll therefore be examining each of these problems,
+<p>In this post, I’ll therefore be examining each of these problems,
 what causes them, and how they can be fixed.
-In other words, this part of the series is a &#8220;fixing annoying issues&#8221; post.</p>
+In other words, this part of the series is a “fixing annoying issues” post.</p>
 <h2 id="horizon-effect">Horizon effect</h2>
 <p>The <strong>horizon effect</strong> (<a href="https://en.m.wikipedia.org/wiki/Horizon_effect">Wikipedia</a>)
 is a problem that affects most programs that deal with a game tree,
@@ -66,10 +64,10 @@ and it immediately stops without considering what happens at the 5th half-move.<
 <h3 id="an-example-position">An example position</h3>
 <p>An example is the best way to demonstrate the horizon effect.
 Consider this chess position:</p>
-<p><img src="../public/img/chess5/blunder1.gif" alt="A chess position diagram. The FEN for this position is rn1qkb1r/pp2ppp1/2pp1n1p/1B6/3PP1b1/2N2Q2/PPP2PPP/R1B1K1NR w KQkq - 0 6" /></p>
+<p><img alt="A chess position diagram. The FEN for this position is rn1qkb1r/pp2ppp1/2pp1n1p/1B6/3PP1b1/2N2Q2/PPP2PPP/R1B1K1NR w KQkq - 0 6" src="../public/img/chess5/blunder1.gif"/></p>
 <p>In earlier versions of my chess engine,
 it would play Bb5+:</p>
-<p><img src="../public/img/chess5/blunder2.gif" alt="A chess position diagram. The FEN for this position is rn1qkb1r/pp2ppp1/2Bp1n1p/8/3PP1b1/2N2Q2/PPP2PPP/R1B1K1NR b KQkq - 0 6" /></p>
+<p><img alt="A chess position diagram. The FEN for this position is rn1qkb1r/pp2ppp1/2Bp1n1p/8/3PP1b1/2N2Q2/PPP2PPP/R1B1K1NR b KQkq - 0 6" src="../public/img/chess5/blunder2.gif"/></p>
 <p>This is a bad move:
 White is leaving their queen under attack,
 eventually losing the bishop.
@@ -80,19 +78,19 @@ would make a move that loses material.</p>
 we can construct the <a href="https://www.chessprogramming.org/Principal_Variation">Principal Variation</a> (PV) line
 of the negamax search.
 The PV is the series of best moves from a position, according to the chess engine.
-The first PV move is White&#8217;s best move,
-then the second PV move is Black&#8217;s best reply,
-then White&#8217;s best reply, and so on.</p>
-<p>In other words, the PV is the &#8220;thought process&#8221; of the chess engine
+The first PV move is White’s best move,
+then the second PV move is Black’s best reply,
+then White’s best reply, and so on.</p>
+<p>In other words, the PV is the “thought process” of the chess engine
 that shows what it expects to happen in the future.</p>
 <p>To construct the PV, an easy (but inefficient) method is to return a list of moves
 instead of just the best move from the negamax function.
 A more efficient way is to use the transposition table (from <a href="/chess4">last post</a>)
 repeatedly to get the best moves,
 but this is not guaranteed to get the full PV.</p>
-<p>Now, here&#8217;s the PV line of the above position, annotated by me:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/6o65Tt6s" frameborder=0></iframe>
-<p>The engine&#8217;s PV is <code>Bb5+ c6 Bxc6+ Nxc6 Qxf6</code>.
+<p>Now, here’s the PV line of the above position, annotated by me:</p>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/6o65Tt6s"></iframe>
+<p>The engine’s PV is <code>Bb5+ c6 Bxc6+ Nxc6 Qxf6</code>.
 White takes a pawn with a bishop,
 then takes a knight with the queen.
 With a depth of 5 half-moves, White thus gains a pawn (+100 centipawns) in material value.</p>
@@ -102,15 +100,15 @@ i.e. it is a huge mistake.</p>
 <p>Presumably, the chess engine searched at a depth of 5 half-moves and found that
 this exchange was advantageous, not seeing the big loss that happens at 6 half-moves.</p>
 <h3 id="quiescence-search">Quiescence search</h3>
-<p>Let&#8217;s now try to mitigate this horizon effect.</p>
+<p>Let’s now try to mitigate this horizon effect.</p>
 <p>Our chess engine evaluates this position as a +100cp advantage for White:</p>
-<p><img src="../public/img/chess5/blunder3.gif" alt="A chess position diagram. The FEN for this position is r2qkb1r/pp2ppp1/2np1Q1p/8/3PP1b1/2N5/PPP2PPP/R1B1K1NR b KQkq - 0 7" /></p>
-<p>However, a human player, seeing this, would understand that White&#8217;s queen will immediately be captured on the next move,
+<p><img alt="A chess position diagram. The FEN for this position is r2qkb1r/pp2ppp1/2np1Q1p/8/3PP1b1/2N5/PPP2PPP/R1B1K1NR b KQkq - 0 7" src="../public/img/chess5/blunder3.gif"/></p>
+<p>However, a human player, seeing this, would understand that White’s queen will immediately be captured on the next move,
 so this is actually a -800cp position.
 Therefore, if there are any pending captures in a position, our evaluation function can be misleading.</p>
-<p>Let&#8217;s call any position <em>without</em> such pending captures a <strong>quiescent position</strong>, or quiet position.<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>
+<p>Let’s call any position <em>without</em> such pending captures a <strong>quiescent position</strong>, or quiet position.<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>
 (The above position where the queen is about to be taken is a non-quiescent position.)
-Then, notice how our engine&#8217;s evaluation function breaks on most non-quiet positions.</p>
+Then, notice how our engine’s evaluation function breaks on most non-quiet positions.</p>
 <p>To avoid the horizon effect, all we need to do is to only run our evaluation function on quiescent positions.</p>
 <p><strong>Quiescence search</strong>
 (<a href="https://en.m.wikipedia.org/wiki/Quiescence_search">Wikipedia</a>) accomplishes
@@ -118,7 +116,7 @@ this by always searching more moves into the future until a quiescent position
 is found, and only then running the evaluation function.</p>
 <p>In other words, we only evaluate positions after all the captures are done;
 we never use the evaluation function on positions where pieces are hanging (i.e. non-quiet positions).</p>
-<p>Our negamax search will thus be divided into two parts: regular search, and quiescence search (&#8220;q-search&#8221;).
+<p>Our negamax search will thus be divided into two parts: regular search, and quiescence search (“q-search”).
 For example, for a depth 5 search, negamax would search 5 half-moves ahead,
 then, if the leaf node is not a quiet position, quiescence search might look an
 extra 2 half-moves further until the position is quiet.
@@ -127,7 +125,7 @@ it runs until it finds a quiet position.<sup id="fnref2"><a href="#fn2" rel="foo
 <p>Quiescence search is different from regular search in that it does not search
 all possible moves. While regular search will search every move, quiescence search will
 only examine obvious captures, like pawn takes queen in the above example.</p>
-<p>What makes a capture &#8220;obvious&#8221;, though?
+<p>What makes a capture “obvious”, though?
 Chess players know when a capture is good because they run a quick mental
 calculation of the exchange.
 They look at which pieces are attacking, and which pieces are defending,
@@ -141,12 +139,12 @@ in any exchange, there are two choices for the player to move.
 They can:</p>
 <ul>
 <li><em>capture</em> and keep the exchange going; or</li>
-<li><em>stop</em> the exchange if it&#8217;s not worth it to continue.</li>
+<li><em>stop</em> the exchange if it’s not worth it to continue.</li>
 </ul>
 <p>SEE is based on this dichotomy;
 both players always pick the choice that ends up giving the maximal score for them.</p>
 <p>Take this position as an example:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/cwswEJeh" frameborder=0></iframe>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/cwswEJeh"></iframe>
 <ol>
 <li>White first <em>captures</em> with Rxd5, giving them a 900cp score.</li>
 <li>Black <em>captures</em> with Bxd5, giving a 400cp (for White) score.</li>
@@ -154,36 +152,36 @@ both players always pick the choice that ends up giving the maximal score for th
 </ol>
 <p>In each step, the moves either side plays are advantageous for them
 (that is, any other move would be worse).
-It is worthwhile for White to trade their rook for Black&#8217;s queen,
+It is worthwhile for White to trade their rook for Black’s queen,
 and it is worthwhile for Black to take back with a bishop.
 However, White does not want to trade their queen for the bishop.</p>
 <p>Here is an example implementation of SEE in pseudo-code:</p>
-<pre><code class="language-python">def eval_see(board, dest_square, our_color) -&#62; int:
-    """Simulate an exchange on a given square, and return its material gain for a given side."""
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval_see</span><span class="p">(</span><span class="n">board</span><span class="p">,</span> <span class="n">dest_square</span><span class="p">,</span> <span class="n">our_color</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Simulate an exchange on a given square, and return its material gain for a given side."""</span>
 
-    # attacker piece of our color with the minimal material value
-    least_attacker = board.get_least_attacker(dest_square, our_color)
-    defender = board.get_piece_on(dest_square)
+    <span class="c1"># attacker piece of our color with the minimal material value</span>
+    <span class="n">least_attacker</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">get_least_attacker</span><span class="p">(</span><span class="n">dest_square</span><span class="p">,</span> <span class="n">our_color</span><span class="p">)</span>
+    <span class="n">defender</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">get_piece_on</span><span class="p">(</span><span class="n">dest_square</span><span class="p">)</span>
 
-    eval = 0
+    <span class="nb">eval</span> <span class="o">=</span> <span class="mi">0</span>
 
-    if defender is not None:
-        least_attacker.capture(dest_square)
+    <span class="k">if</span> <span class="n">defender</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">least_attacker</span><span class="o">.</span><span class="n">capture</span><span class="p">(</span><span class="n">dest_square</span><span class="p">)</span>
 
-        opponent_gain: int = eval_see(board, dest_square, our_color.flip())
+        <span class="n">opponent_gain</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">eval_see</span><span class="p">(</span><span class="n">board</span><span class="p">,</span> <span class="n">dest_square</span><span class="p">,</span> <span class="n">our_color</span><span class="o">.</span><span class="n">flip</span><span class="p">())</span>
 
-        # this represents the two choices of _stop_ and _capture_.
-        # if capture has a negative eval, stop the exchange and get 0 material gain.
-        eval = max(0, defender.value - opponent_gain)
+        <span class="c1"># this represents the two choices of _stop_ and _capture_.</span>
+        <span class="c1"># if capture has a negative eval, stop the exchange and get 0 material gain.</span>
+        <span class="nb">eval</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">defender</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">opponent_gain</span><span class="p">)</span>
 
-        least_attacker.undo_capture(dest_square)
+        <span class="n">least_attacker</span><span class="o">.</span><span class="n">undo_capture</span><span class="p">(</span><span class="n">dest_square</span><span class="p">)</span>
 
-    return eval
+    <span class="k">return</span> <span class="nb">eval</span>
 </code></pre>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> In the above code, I used a <code>get_least_attacker(dest_square, our_color)</code> method without explaining how to implement it.
 Recall the
-<a href="/chess1/#:~:text=A%20common%20method%20to%20determine%20if%20the%20king%20is%20in%20check%20is%20the%20%E2%80%9CI%20see%20you%2C%20you%20see%20me%E2%80%9D%20method.%20Let%E2%80%99s%20say%20we%20want%20to%20detect%20checks%20from%20rooks.%20Pretend%20the%20king%20can%20move%20like%20a%20rook.%20If%20the%20king%2C%20with%20rook%20movement%2C%20could%20capture%20an%20enemy%20rook%2C%20then%20that%20means%20the%20enemy%20rook%20can%20capture%20the%20king.">&#8220;I see you, you see me&#8221; check detection</a>
+<a href="/chess1/#:~:text=A%20common%20method%20to%20determine%20if%20the%20king%20is%20in%20check%20is%20the%20%E2%80%9CI%20see%20you%2C%20you%20see%20me%E2%80%9D%20method.%20Let%E2%80%99s%20say%20we%20want%20to%20detect%20checks%20from%20rooks.%20Pretend%20the%20king%20can%20move%20like%20a%20rook.%20If%20the%20king%2C%20with%20rook%20movement%2C%20could%20capture%20an%20enemy%20rook%2C%20then%20that%20means%20the%20enemy%20rook%20can%20capture%20the%20king.">“I see you, you see me” check detection</a>
 method from the first chapter.
 Suppose the king can move like a rook, and that the king-rook can capture an enemy rook.
 Then, we know that this enemy rook is attacking the king
@@ -194,13 +192,13 @@ We can generalize this method to any square to detect attackers for SEE.</p>
 whenever we want to score a capture move,
 we can call SEE and check if it seems like a good capture or a bad capture.<sup id="fnref3"><a href="#fn3" rel="footnote">3</a></sup>
 This is of course only a heuristic, because
-our static evaluation doesn&#8217;t take into account pins, promotions
+our static evaluation doesn’t take into account pins, promotions
 and other edge cases.
 SEE works most of the time, though.
 Remember that we mostly use SEE in quiescence search;
 regular search does take into account pins and promotions.</p>
 <h3 id="quiescence-search-continued">Quiescence search, continued</h3>
-<p>Having discussed SEE, let&#8217;s return to quiescence search. Our goal is, before
+<p>Having discussed SEE, let’s return to quiescence search. Our goal is, before
 calling the evaluation function, to get to a quiet position. That is, as long
 as there are <em>good capture moves</em>, or in other words pending captures, we
 should not evaluate the position.</p>
@@ -211,7 +209,7 @@ evaluate the position.</p>
 the list by discarding captures with negative SEE score.
 If there are no captures, that means the position is quiet.</p>
 <p>However, if the player is in check,
-we can&#8217;t just generate captures;
+we can’t just generate captures;
 we should generate all possible moves
 that could evade the check.
 A position with check can not be quiet,
@@ -220,8 +218,8 @@ since there is a risk of checkmate.<sup id="fnref4"><a href="#fn4" rel="footnote
 a move as in normal chess. That is, if all the captures with positive SEE
 worsen the current score of the position (given by the evaluation function), you are allowed to use this current score,
 known as the <strong>stand pat</strong> evaluation.
-When the stand pat evaluation is better than any capture move&#8217;s score, it&#8217;s a
-sign that the best move in that position is a non-capture move, which we don&#8217;t
+When the stand pat evaluation is better than any capture move’s score, it’s a
+sign that the best move in that position is a non-capture move, which we don’t
 care about in quiescence search.
 If the player is in check though, we are not allowed to use stand-pat,
 since we might be ignoring checkmate.</p>
@@ -231,64 +229,64 @@ while I integrated it into negamax to reuse some logic.</p>
 <p>Now, here is my pseudo-code for quiescence search within negamax. I have
 removed the alpha-beta portions to make the function simpler; for a further
 explanation of the code this is based on, see the end of <a href="/chess2#heuristic-negamax-pseudocode">part 2</a>.</p>
-<pre><code class="language-python">QSEARCH_DEPTH_LIMIT = 8
+<pre><code class="language-python"><span></span><span class="n">QSEARCH_DEPTH_LIMIT</span> <span class="o">=</span> <span class="mi">8</span>
 
-def negamax(position, depth: int, is_qsearch: bool) -&#62; (Move, int):
-    """
-    Return the best move and evaluation of a chess position.
+<span class="k">def</span><span class="w"> </span><span class="nf">negamax</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">is_qsearch</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Move</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return the best move and evaluation of a chess position.</span>
 
-    Will only think `depth` half-moves ahead.
-    """
+<span class="sd">    Will only think `depth` half-moves ahead.</span>
+<span class="sd">    """</span>
 
-    if depth == 0:
-        if is_qsearch:
-            # hit depth limit (in quiescence search).
-            # note that eval is score from our perspective
-            return None, eval(position)
-        else:
-            # enter quiescence search
-            return negamax(position, QSEARCH_DEPTH_LIMIT, True)
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_qsearch</span><span class="p">:</span>
+            <span class="c1"># hit depth limit (in quiescence search).</span>
+            <span class="c1"># note that eval is score from our perspective</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">eval</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># enter quiescence search</span>
+            <span class="k">return</span> <span class="n">negamax</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">QSEARCH_DEPTH_LIMIT</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-    best_score = -infinity
+    <span class="n">best_score</span> <span class="o">=</span> <span class="o">-</span><span class="n">infinity</span>
 
-    if is_qsearch and not position.is_check():
-        # stand pat score
-        best_score = eval(position)
+    <span class="k">if</span> <span class="n">is_qsearch</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">position</span><span class="o">.</span><span class="n">is_check</span><span class="p">():</span>
+        <span class="c1"># stand pat score</span>
+        <span class="n">best_score</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
-        # keep only captures with positive (good) SEE
-        possible_moves = [move for move in generate_captures(position) if eval_see(position, move.destination, position.turn) &#62;= 0]
-    else:
-        possible_moves = generate_moves(position)
-        if possible_moves.empty():
-            # checkmate or stalemate
-            return None, eval(position)
+        <span class="c1"># keep only captures with positive (good) SEE</span>
+        <span class="n">possible_moves</span> <span class="o">=</span> <span class="p">[</span><span class="n">move</span> <span class="k">for</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">generate_captures</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="k">if</span> <span class="n">eval_see</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">move</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">position</span><span class="o">.</span><span class="n">turn</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">possible_moves</span> <span class="o">=</span> <span class="n">generate_moves</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">possible_moves</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="c1"># checkmate or stalemate</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">eval</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
-    best_move = None
+    <span class="n">best_move</span> <span class="o">=</span> <span class="kc">None</span>
 
-    for each move in possible_moves:
-        updated_position = apply_move_to_position(position, move)
-        opponent_move, opponent_score = negamax(updated_position, depth - 1, is_qsearch)
-        our_score = negate_score(opponent_score)
+    <span class="k">for</span> <span class="n">each</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">possible_moves</span><span class="p">:</span>
+        <span class="n">updated_position</span> <span class="o">=</span> <span class="n">apply_move_to_position</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">move</span><span class="p">)</span>
+        <span class="n">opponent_move</span><span class="p">,</span> <span class="n">opponent_score</span> <span class="o">=</span> <span class="n">negamax</span><span class="p">(</span><span class="n">updated_position</span><span class="p">,</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">is_qsearch</span><span class="p">)</span>
+        <span class="n">our_score</span> <span class="o">=</span> <span class="n">negate_score</span><span class="p">(</span><span class="n">opponent_score</span><span class="p">)</span>
 
-        if our_score &#62; best_score:
-            best_score = our_score
-            best_move = move
+        <span class="k">if</span> <span class="n">our_score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+            <span class="n">best_score</span> <span class="o">=</span> <span class="n">our_score</span>
+            <span class="n">best_move</span> <span class="o">=</span> <span class="n">move</span>
 
-    return best_move, best_score
+    <span class="k">return</span> <span class="n">best_move</span><span class="p">,</span> <span class="n">best_score</span>
 </code></pre>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> Make sure that you have a move generator that <em>specifically generates captures</em>,
 instead of taking a regular move generator and filtering its output.
 Move generation is an expensive operation because it checks the legality of moves,
-and you don&#8217;t want to check the legality of moves that you immediately discard.
-My engine&#8217;s quiescence search took a long while to work because I made this mistake.</p>
+and you don’t want to check the legality of moves that you immediately discard.
+My engine’s quiescence search took a long while to work because I made this mistake.</p>
 </div>
 <h2 id="checkmate-heuristics">Checkmate heuristics</h2>
 <p>An essential skill in chess is delivering checkmate with few pieces.
-In this section, I&#8217;ll focus on the KQ vs. K (king + queen vs. king)
+In this section, I’ll focus on the KQ vs. K (king + queen vs. king)
 and KR vs. K (king + rook vs. king) endgames.</p>
-<p>Here&#8217;s an example of how an early version of my engine performs in a K-Q vs. K endgame:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/fhXPa7vP" frameborder=0></iframe>
+<p>Here’s an example of how an early version of my engine performs in a K-Q vs. K endgame:</p>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/fhXPa7vP"></iframe>
 <p>The engine draws by repetition,
 even though KQ vs. K is supposed to be an easy win for the player with the queen.</p>
 <p>The typical strategy in the KQ vs K endgame and the KR vs K endgame is as follows:</p>
@@ -298,13 +296,13 @@ even though KQ vs. K is supposed to be an easy win for the player with the queen
 <li>Checkmate with your king supporting the queen or rook.</li>
 </ol>
 <p>The first two steps are essentially the preparation required to give checkmate;
-they set up all the pieces so they&#8217;re in the right place.
+they set up all the pieces so they’re in the right place.
 Once we get to step 3, the engine should be able to see checkmate.
 Therefore, our goal is to help the engine do steps 1 and 2.</p>
 <h3 id="cornering-the-enemy">Cornering the enemy</h3>
-<p>Let&#8217;s first do step 1, bringing the enemy king to the edge of the board.
+<p>Let’s first do step 1, bringing the enemy king to the edge of the board.
 In the code, we can do this by using <em>piece-square tables</em>.</p>
-<p>To keep this article short, I&#8217;m only going to fully explain piece square tables <a href="/chess6#piece-square-tables">in the next post</a>.
+<p>To keep this article short, I’m only going to fully explain piece square tables <a href="/chess6#piece-square-tables">in the next post</a>.
 Essentially, in the evaluation function, a bonus or penalty is given to the
 score of a position depending on which square the king is on.
 In the endgame, we want the king to be at the center, so that can be a slight bonus.
@@ -312,63 +310,63 @@ Meanwhile, a king at the edge of the board is vulnerable,
 so when the king is on the edge squares it gives a significant penalty.</p>
 <p>Once we have this penalty, the engine will seek to gain advantage by cornering the enemy king,
 because it now knows that a king on the edge of the board is vulnerable.</p>
-<p>We only want this piece-square table bonus&#47;penalty to apply during the endgame,
+<p>We only want this piece-square table bonus/penalty to apply during the endgame,
 since in the opening of the game, we actually do want the king to stay at the edge.
-To concretely determine when it&#8217;s the endgame, we can count the pieces still remaining on the board,
-and if it&#8217;s under a certain threshold we say it&#8217;s the endgame.</p>
+To concretely determine when it’s the endgame, we can count the pieces still remaining on the board,
+and if it’s under a certain threshold we say it’s the endgame.</p>
 <p>Again, this is just a brief summary; see the next post for details about piece-square tables and
 determining when is the endgame.</p>
 <p>Here is an example implementation in pseudo-code:</p>
-<pre><code class="language-python">def eval_with_endgame_pst():
-    score = count_material()  # this returns a score from our side&#39;s perspective.
-                              # see prior posts for more information.
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval_with_endgame_pst</span><span class="p">():</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">count_material</span><span class="p">()</span>  <span class="c1"># this returns a score from our side's perspective.</span>
+                              <span class="c1"># see prior posts for more information.</span>
 
-    if is_endgame:
-        # 64 elements, one score per square the king could be on.
-        # positive is a bonus, negative is a penalty.
-        square_scores = {a1: -100, b1: -100, ..., e4: 10, ..., h8: -100}
+    <span class="k">if</span> <span class="n">is_endgame</span><span class="p">:</span>
+        <span class="c1"># 64 elements, one score per square the king could be on.</span>
+        <span class="c1"># positive is a bonus, negative is a penalty.</span>
+        <span class="n">square_scores</span> <span class="o">=</span> <span class="p">{</span><span class="n">a1</span><span class="p">:</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="n">b1</span><span class="p">:</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">e4</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">h8</span><span class="p">:</span> <span class="o">-</span><span class="mi">100</span><span class="p">}</span>
 
-        score += square_scores[board.get_square_of(our_king)]
-        score -= square_scores[board.get_square_of(their_king)]
+        <span class="n">score</span> <span class="o">+=</span> <span class="n">square_scores</span><span class="p">[</span><span class="n">board</span><span class="o">.</span><span class="n">get_square_of</span><span class="p">(</span><span class="n">our_king</span><span class="p">)]</span>
+        <span class="n">score</span> <span class="o">-=</span> <span class="n">square_scores</span><span class="p">[</span><span class="n">board</span><span class="o">.</span><span class="n">get_square_of</span><span class="p">(</span><span class="n">their_king</span><span class="p">)]</span>
 
-    return score
+    <span class="k">return</span> <span class="n">score</span>
 </code></pre>
 <p>Note that in a real engine you would not implement a piece-square table just for the king:
-this code is specifically for demonstrating this section&#8217;s key ideas.
-Also, don&#8217;t use a dictionary for a piece square table.</p>
+this code is specifically for demonstrating this section’s key ideas.
+Also, don’t use a dictionary for a piece square table.</p>
 <h3 id="king-distance">King distance</h3>
 <p>Now, after we bring the enemy king to the edge of the board (first step),
 we continue with the second step: bringing our own king over to help with the checkmate.</p>
 <p>In the above example KQ-K endgame,
-White&#8217;s king was on the wrong side of the board.
+White’s king was on the wrong side of the board.
 It would take multiple steps to move the king across the board,
-but the engine&#8217;s search depth limit prevents it from seeing that.
+but the engine’s search depth limit prevents it from seeing that.
 Thus, the engine could not deliver checkmate,
 and kept shuffling the queen until it got a threefold repetition draw.</p>
 <p>To fix this issue, we tweak the evaluation function so that, in king + piece
-vs. king endgames, there is a bonus to a position&#8217;s score if the kings are
+vs. king endgames, there is a bonus to a position’s score if the kings are
 closer.
 Or, equivalently, there is a penalty if the kings are far away.</p>
 <p>Here is pseudo-code implementing this penalty:</p>
-<pre><code class="language-python">def king_dist_eval():
-    score = eval_with_endgame_pst()
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">king_dist_eval</span><span class="p">():</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">eval_with_endgame_pst</span><span class="p">()</span>
 
-    if (number of non-king pieces == 1) and (the piece is not a pawn):
-        distance = (manhattan distance between kings)
+    <span class="k">if</span> <span class="p">(</span><span class="n">number</span> <span class="n">of</span> <span class="n">non</span><span class="o">-</span><span class="n">king</span> <span class="n">pieces</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">the</span> <span class="n">piece</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a</span> <span class="n">pawn</span><span class="p">):</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">manhattan</span> <span class="n">distance</span> <span class="n">between</span> <span class="n">kings</span><span class="p">)</span>
 
-        # this factor specifies which side is winning (i.e. doing the checkmate)
-        advantage = 1 if (our side has the extra piece) else -1
+        <span class="c1"># this factor specifies which side is winning (i.e. doing the checkmate)</span>
+        <span class="n">advantage</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="n">our</span> <span class="n">side</span> <span class="n">has</span> <span class="n">the</span> <span class="n">extra</span> <span class="n">piece</span><span class="p">)</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
 
-        # this might have to be tweaked
-        KING_PENALTY_FACTOR = 70
+        <span class="c1"># this might have to be tweaked</span>
+        <span class="n">KING_PENALTY_FACTOR</span> <span class="o">=</span> <span class="mi">70</span>
 
-        king_penalty = -distance * advantage * KING_PENALTY_FACTOR
+        <span class="n">king_penalty</span> <span class="o">=</span> <span class="o">-</span><span class="n">distance</span> <span class="o">*</span> <span class="n">advantage</span> <span class="o">*</span> <span class="n">KING_PENALTY_FACTOR</span>
 
-        score += king_penalty
+        <span class="n">score</span> <span class="o">+=</span> <span class="n">king_penalty</span>
 
-    return score
+    <span class="k">return</span> <span class="n">score</span>
 </code></pre>
-<p>The king distance penalty kicks in when the engine detects that it&#8217;s in a KR-K or KQ-K endgame.
+<p>The king distance penalty kicks in when the engine detects that it’s in a KR-K or KQ-K endgame.
 Notably, the code excludes a pawn endgame, which has a different strategy.</p>
 <p>Then, we calculate the <a href="https://simple.m.wikipedia.org/wiki/Manhattan_Distance">Manhattan distance</a>
 between the kings.
@@ -379,22 +377,22 @@ Essentially, Manhattan distance is the distance to get from one point to another
 instead, since it corresponds exactly to the number of moves it takes for a king to move between two points.)</p>
 <p>Next, a negative sign is added to the distance;
 recall that a larger distance between kings is worse (negative) for the player trying to do checkmate.</p>
-<p>An &#8220;advantage&#8221; factor is also used to make the sign of the penalty correct (since
+<p>An “advantage” factor is also used to make the sign of the penalty correct (since
 negative evaluation is good for the opponent, and positive is good for our side).</p>
 <p>Before we get a final number, we multiply the penalty by <code>KING_PENALTY_FACTOR</code>.
 Once there are other bonuses or penalties in the evaluation function,
-this factor sets the weight of the &#8220;king distance&#8221; penalty compared to others.</p>
+this factor sets the weight of the “king distance” penalty compared to others.</p>
 <p>Once we have these two heuristics, 
 bringing the enemy king to the edge,
 and bringing our own king over,
 the chess engine is fully able to win in a KQ-K endgame:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/4PNoVKj8" frameborder=0></iframe>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/4PNoVKj8"></iframe>
 <p>The engine can also win a KR-K endgame:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/xlJtuHJY" frameborder=0></iframe>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/xlJtuHJY"></iframe>
 <p>With the heuristics, the engine took 30 half-moves to mate,
-while under optimal conditions (according to Lichess&#8217;s tablebase)
+while under optimal conditions (according to Lichess’s tablebase)
 this position is mate in 27 half-moves.</p>
-<p>We&#8217;ve thus successfully taught the engine how to mate with just a rook, or just a queen.</p>
+<p>We’ve thus successfully taught the engine how to mate with just a rook, or just a queen.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> <a href="/chess4/#iterative-deepening">Iterative deepening</a> is really helpful in endgame situations like this;
 since there are less pieces on the board, the engine can usually search deeper in the same amount of time.
@@ -406,21 +404,21 @@ with iterative deepening, the engine might attempt a depth 7 or higher search wi
 this is called a <a href="https://en.m.wikipedia.org/wiki/Threefold_repetition">threefold repetition</a>,
 and the players may claim a draw.</p>
 <p>In computer chess, threefold repetition is usually automatically declared a draw by the UCI server,
-so you technically don&#8217;t have to handle it.
+so you technically don’t have to handle it.
 However, threefold repetition leads to really annoying outcomes, like in this real game:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/radOq8gd#29" frameborder=0></iframe>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/radOq8gd#29"></iframe>
 <p>Though Black (my engine) has the advantage, it fails to win because it enters a loop and draws by repetition.</p>
-<p>I&#8217;m not exactly sure what the engine&#8217;s thought process is in this situation;
-I assume it&#8217;s thinking &#8220;I can always capture the queen one move later&#8221;
+<p>I’m not exactly sure what the engine’s thought process is in this situation;
+I assume it’s thinking “I can always capture the queen one move later”
 before playing Ne4+.</p>
-<p>Regardless, we don&#8217;t want the engine to draw by threefold repetition when it&#8217;s obviously winning.
+<p>Regardless, we don’t want the engine to draw by threefold repetition when it’s obviously winning.
 We need to implement a system that detects threefold repetition ahead of time,
 and assigns that position a draw (zero) score.
 Then, the engine will prioritize winning over drawing, and avoid repetitions.</p>
-<p>First, we need to precisely define what a position being &#8220;repeated&#8221; means.
+<p>First, we need to precisely define what a position being “repeated” means.
 Wikipedia says (emphasis mine):</p>
 <blockquote>
-<p>Two positions are by definition &#8216;the same&#8217; if pieces of the same <strong>type</strong> and <strong>color</strong> occupy the same <strong>squares</strong>, the same <strong>player has the move,</strong> the remaining <strong>castling rights</strong> are the same and the possibility to capture <strong>en passant</strong> is the same.</p>
+<p>Two positions are by definition ‘the same’ if pieces of the same <strong>type</strong> and <strong>color</strong> occupy the same <strong>squares</strong>, the same <strong>player has the move,</strong> the remaining <strong>castling rights</strong> are the same and the possibility to capture <strong>en passant</strong> is the same.</p>
 </blockquote>
 <p>Recall from last post that we already implemented a system that detects repeated positions:
 the <a href="/chess4/#hashing">Zobrist hash</a> is a unique number assigned to each position such that
@@ -435,21 +433,21 @@ so we can assign a draw score to the position.
 Every time we make a move in negamax, add the new position to the top of the stack,
 and every time we undo a move, remove the position from the stack.</p>
 <p>You may think that comparing the hash of new positions to every single hash in the list is computationally expensive.
-One thing that makes it less inefficient is that we don&#8217;t actually have to look at the entire list.
+One thing that makes it less inefficient is that we don’t actually have to look at the entire list.
 Moves like captures and pawn moves are irreversible, so once they happen,
-it&#8217;s impossible to see the previous position again.
-The engine already keeps a counter of &#8220;how many half-moves has it been since the last irreversible move,&#8221;
-since that&#8217;s <a href="https://en.m.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation#:~:text=%5B8%5D-,Halfmove%20clock,-%3A%20The%20number%20of">part of the Forsyth-Edwards Notation (FEN) string</a>.
+it’s impossible to see the previous position again.
+The engine already keeps a counter of “how many half-moves has it been since the last irreversible move,”
+since that’s <a href="https://en.m.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation#:~:text=%5B8%5D-,Halfmove%20clock,-%3A%20The%20number%20of">part of the Forsyth-Edwards Notation (FEN) string</a>.
 Therefore, we only need to search that amount of positions backwards in the list.
 Usually, this is some small number.</p>
-<p>Note that some chess engines don&#8217;t actually implement <em>threefold</em> repetition specifically.
+<p>Note that some chess engines don’t actually implement <em>threefold</em> repetition specifically.
 Instead, twofold repetitions are already considered a draw,
-since it&#8217;s a waste of time to re-run negamax on a position the engine has already seen.
+since it’s a waste of time to re-run negamax on a position the engine has already seen.
 There are some exceptions, though.
 Specifically, this is the strategy my own engine uses:</p>
 <ol>
 <li><strong>Three-fold repetition (i.e. the position is repeated twice) is an automatic draw.</strong> This follows the rule in chess.</li>
-<li><strong>Two-fold repetition (position repeated once) is a draw if the position being repeated is part of the negamax search tree,</strong> and hasn&#8217;t actually happened on the real board yet. This means that we&#8217;re already running negamax on this position, so we avoid re-doing the computation.</li>
+<li><strong>Two-fold repetition (position repeated once) is a draw if the position being repeated is part of the negamax search tree,</strong> and hasn’t actually happened on the real board yet. This means that we’re already running negamax on this position, so we avoid re-doing the computation.</li>
 <li><strong>Two-fold repetition is not a draw if the position being repeated is in the history of the game,</strong> and actually already happened on the board. Two-fold repetition is not legally a draw in chess, and we still need to run negamax on the position for the first time.</li>
 </ol>
 <p>If this strategy is too complicated, just ignore it and always score two-fold repetitions as draws.
@@ -459,51 +457,47 @@ if it helps.)</p>
 the chess engine will only go for repetition draws when the alternative is losing.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Once all the above features have been implemented, here is an example game between the upgraded engine and itself:</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/jYNVh615" frameborder=0></iframe>
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/jYNVh615"></iframe>
 <p>As you can see, the game does not end in a repetition draw,
 and quiescence search makes it so there are no horrible tactical blunders being played.
 This is definitely an improvement over prior versions of the engine.</p>
 <p>At this point, a major issue still remains:
-human chess players often say my engine plays &#8220;weird&#8221;.
+human chess players often say my engine plays “weird”.
 I think this is because the engine has basic tactical (short-term) knowledge,
 but zero positional (long-term strategy) knowledge in chess.
-You may notice that in the game above, pawn promotion was the decisive factor in White&#8217;s win.
+You may notice that in the game above, pawn promotion was the decisive factor in White’s win.
 Since pawns need many moves to get to the top of the board,
-the engine can&#8217;t see pawn promotion in negamax;
+the engine can’t see pawn promotion in negamax;
 pawn promotion is more positional than tactical.
 Clearly, positional chess skills can make or break a game.</p>
-<p>In the next post, I&#8217;ll be explaining how the evaluation function of a chess engine can be improved
+<p>In the next post, I’ll be explaining how the evaluation function of a chess engine can be improved
 (this component of the engine is where positional knowledge is encoded.)
-By the end of it, I&#8217;ll introduce neural networks to the chess engine,
-so that it plays better (and hopefully less &#8220;weird&#8221;).</p>
+By the end of it, I’ll introduce neural networks to the chess engine,
+so that it plays better (and hopefully less “weird”).</p>
 <p><a href="/chess6">Next part →</a></p>
 <div class="footnotes">
 <hr/>
 <ol>
-
 <li id="fn1">
 <p>More precisely, we can define a quiescent position is a position
 where there are no good moves that significantly change the evaluation
-function&#8217;s result; the position is thus stable, or &#8220;quiet&#8221;.&#160;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+function’s result; the position is thus stable, or “quiet”. <a href="#fnref1" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn2">
 <p>Empirically, I found that limiting quiescence to an amount like 8 half-moves produces performs well
-(but I do not know why).&#160;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+(but I do not know why). <a href="#fnref2" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn3">
-<p>See <a href="https://www.chessprogramming.org/Static_Exchange_Evaluation#Seeing_a_Capture">this section</a> of the relevant Chess Programming Wiki article.&#160;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+<p>See <a href="https://www.chessprogramming.org/Static_Exchange_Evaluation#Seeing_a_Capture">this section</a> of the relevant Chess Programming Wiki article. <a href="#fnref3" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn4">
 <p>Recall that a quiet position can be defined as a position where the static evaluation
 is stable. A checkmate instantly destabilizes the static evaluation, so positions where that
-might happen are not quiet.&#160;<a href="#fnref4" rev="footnote">&#8617;</a></p>
+might happen are not quiet. <a href="#fnref4" rev="footnote">↩</a></p>
 </li>
-
 </ol>
 </div>
+</link></link></link></article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

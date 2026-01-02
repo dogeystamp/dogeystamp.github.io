@@ -2,31 +2,29 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Lower bound, upper bound in C++, visually explained</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Lower bound, upper bound in C++, visually explained</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="lower-bound-upper-bound-in-c-visually-explained">Lower bound, upper bound in C++, visually explained</h1>
 <div class="creation-date">
@@ -34,7 +32,7 @@
 </div>
 <p>One of the most common problems programmers have to solve is retrieving specific data — finding the needle in the haystack.
 To make this simpler, languages provide standard tools to perform this task:
-in particular, this post focuses on C++&#8217;s <code>lower_bound</code> and <code>upper_bound</code>.</p>
+in particular, this post focuses on C++’s <code>lower_bound</code> and <code>upper_bound</code>.</p>
 <p>Personally, I find that the documentation for these functions is quite unclear and verbose.
 For example, <a href="https://en.cppreference.com/w/cpp/algorithm/lower_bound">cppreference.com</a>
 describes <code>lower_bound</code> like this:</p>
@@ -42,53 +40,53 @@ describes <code>lower_bound</code> like this:</p>
 **not** ordered before value.
 </code></pre>
 <p>That sounds like gibberish, and is too technical to quickly understand.
-For that reason, I&#8217;m making this blog post to explain my own mental model of these functions.</p>
+For that reason, I’m making this blog post to explain my own mental model of these functions.</p>
 <h2 id="refresher-on-binary-search">Refresher on binary search</h2>
-<p>First, it&#8217;s important to understand how <code>lower_bound</code> and <code>upper_bound</code> work under the hood.</p>
+<p>First, it’s important to understand how <code>lower_bound</code> and <code>upper_bound</code> work under the hood.</p>
 <p>As you know, finding words in a dictionary is relatively fast.
 This is possible because the words are in alphabetical order.
-If the words weren&#8217;t ordered, you&#8217;d have to look through every single word in the dictionary, one by one.
+If the words weren’t ordered, you’d have to look through every single word in the dictionary, one by one.
 That would be an excruciating, and much slower process.
 Because of the ordering, you can rapidly narrow down the word you want.</p>
 <p>Computers can do the same with ordered data: this is called <em>binary search</em>,
 and is what powers <code>lower_bound</code> and <code>upper_bound</code>.
-For example, say our dictionary is 1000 pages, and the computer wants to look for the word &#8220;rabbit&#8221;.
+For example, say our dictionary is 1000 pages, and the computer wants to look for the word “rabbit”.
 These are the steps it takes:</p>
 <ol>
 <li>Start at exactly page 500.</li>
-<li>See the word &#8220;murmur&#8221;, so go forwards to page 750.</li>
-<li>See the word &#8220;sunny&#8221;, so go backwards to page 625.</li>
+<li>See the word “murmur”, so go forwards to page 750.</li>
+<li>See the word “sunny”, so go backwards to page 625.</li>
 <li>And so on.</li>
 </ol>
-<p>This is called &#8220;binary search&#8221; because we halve the region we are looking in every time (we pick either the left half, or the right half.)
+<p>This is called “binary search” because we halve the region we are looking in every time (we pick either the left half, or the right half.)
 For step 1, the computer is halving the range <code>1-1000</code>.
 In step 2, <code>500-1000</code>. Then for step 3, <code>500-750</code>.
 This is like the way humans look at dictionaries, but more structured.</p>
-<p>Anyways, this is not intended to be a full explanation of binary search: refer to <a href="https://youtube.com/watch?v=KXJSjte_OAI">Tom Scott&#8217;s video</a> about it for more information.</p>
+<p>Anyways, this is not intended to be a full explanation of binary search: refer to <a href="https://youtube.com/watch?v=KXJSjte_OAI">Tom Scott’s video</a> about it for more information.</p>
 <h2 id="lower-bound-and-upper-bound">Lower bound and upper bound</h2>
 <p>Back to the real subject of this post: <code>lower_bound</code> and <code>upper_bound</code> in C++.
 What I used to understand of these functions is that they use binary search to find elements in a sorted container.
-However, I didn&#8217;t get what differentiated them.
-Again, if you read solely the documentation about these functions, it&#8217;s not easily comprehensible.</p>
+However, I didn’t get what differentiated them.
+Again, if you read solely the documentation about these functions, it’s not easily comprehensible.</p>
 <p>First of all, say we wish to search for the integer <code>k</code> (k for key) in a sorted vector (array) of integers <code>v</code>.
 We can find the lower and upper bounds with these function calls:</p>
-<pre><code>&#47;&#47; (you could use auto here instead of the verbose type)
-std::vector&#60;int&#62;::iterator lb = std::lower_bound(v.begin(), v.end(), k);
-std::vector&#60;int&#62;::iterator ub = std::upper_bound(v.begin(), v.end(), k);
+<pre><code class="language-cpp"><span></span><span class="c1">// (you could use auto here instead of the verbose type)</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">iterator</span><span class="w"> </span><span class="n">lb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">lower_bound</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">k</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">iterator</span><span class="w"> </span><span class="n">ub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">upper_bound</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span><span class="w"> </span><span class="n">k</span><span class="p">);</span>
 </code></pre>
 <p>Based on the documentation, we know
-the first two arguments specify the region of <code>v</code> we&#8217;re looking in.
-Here, it&#8217;s the entire vector (from the beginning to the end).
+the first two arguments specify the region of <code>v</code> we’re looking in.
+Here, it’s the entire vector (from the beginning to the end).
 Also, put simply, the functions return by default:</p>
 <ul>
-<li><code>lower_bound</code>: the first element <code>e</code> where <code>k &#60;= e</code>;</li>
-<li><code>upper_bound</code>: the first element <code>e</code> where <code>k &#60; e</code>.</li>
+<li><code>lower_bound</code>: the first element <code>e</code> where <code>k &lt;= e</code>;</li>
+<li><code>upper_bound</code>: the first element <code>e</code> where <code>k &lt; e</code>.</li>
 </ul>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> Both functions return <code>v.end()</code> if no valid element is found.
 This iterator points just <strong>after</strong> the last element of <code>v</code>.</p>
 </div>
-<p>This is the technical definition; it doesn&#8217;t mean much by itself.
+<p>This is the technical definition; it doesn’t mean much by itself.
 However, with a concrete example with real numbers, it clicked in my mind.
 For example, let <code>k = 3</code>.
 Here is an example sorted array <code>v</code>, with upper and lower bounds marked:</p>
@@ -99,43 +97,44 @@ Here is an example sorted array <code>v</code>, with upper and lower bounds mark
          ↑
  matching interval
 </code></pre>
-<p>The first <code>3</code> is the lower bound: it&#8217;s the first element bigger or equal to our key.
+<p>The first <code>3</code> is the lower bound: it’s the first element bigger or equal to our key.
 The <code>4</code> is the upper bound, the first element strictly bigger than our key.</p>
-<p>Here, when it&#8217;s laid out visually, it&#8217;s now clear what the lower and upper bounds mean:
-it&#8217;s the <em>bounds of the interval</em> that matches our search key.
+<p>Here, when it’s laid out visually, it’s now clear what the lower and upper bounds mean:
+it’s the <em>bounds of the interval</em> that matches our search key.
 This is mostly useful if the array has duplicate elements.</p>
 <p>Notice how the upper bound is one past the end of the interval,
 just like how <code>v.end()</code> is one past the last element of the vector.
 This is usually how C++ iterators work, and makes some tasks more convenient.
 Take this regular for loop:</p>
-<pre><code>for (int i = 0; i &#60; 10; i++) { ... }
+<pre><code class="language-cpp"><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </code></pre>
 <p>This loop will iterate over the numbers <code>0</code> to <code>9</code>,
 excluding the upper bound <code>10</code>.
 The same logic applies to C++ iterators.
-If we want to iterate over all elements of a vector, we&#8217;d use:</p>
-<pre><code>for (auto it = v.begin(); it != v.end(); it++) { ... }
+If we want to iterate over all elements of a vector, we’d use:</p>
+<pre><code class="language-cpp"><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">();</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </code></pre>
-<p>Here, we use <code>!=</code> instead of <code>&#60;</code> for iterators, but it does practically the same thing.
-When the iterator goes past the end of the vector, it&#8217;ll hit <code>v.end()</code> (which is one past the last element),
+<p>Here, we use <code>!=</code> instead of <code>&lt;</code> for iterators, but it does practically the same thing.
+When the iterator goes past the end of the vector, it’ll hit <code>v.end()</code> (which is one past the last element),
 and as such the loop stops.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
-<p><strong>Note:</strong> Usually, you&#8217;d do <code>for (auto number : v)</code> to iterate over the entire array.</p>
+<p><strong>Note:</strong> Usually, you’d do <code>for (auto number : v)</code> to iterate over the entire array.</p>
 </div>
 <p>So, having the upper bound be right past the end of the interval makes this possible:</p>
-<pre><code>for (auto it = lb; it != ub; it++) {
-    &#47;&#47; *it is like pointer dereference:
-    &#47;&#47; it gets the number pointed to by the iterator
-    std::cout &#60;&#60; *it &#60;&#60; std::endl;
-}
+<pre><code class="language-cpp"><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lb</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">ub</span><span class="p">;</span><span class="w"> </span><span class="n">it</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// *it is like pointer dereference:</span>
+<span class="w">    </span><span class="c1">// it gets the number pointed to by the iterator</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">it</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
 </code></pre>
-<p>Anyways, I&#8217;ll repeat it again: <code>lower_bound</code> and <code>upper_bound</code> represent the <em>interval</em> that matches what you&#8217;re looking for.</p>
+<p>Anyways, I’ll repeat it again: <code>lower_bound</code> and <code>upper_bound</code> represent the <em>interval</em> that matches what you’re looking for.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>So, that is my &#8220;visual&#8221; explanation how lower and upper bound works in C++.
+<p>So, that is my “visual” explanation how lower and upper bound works in C++.
 In hindsight, this seems obvious, but back when I was first told about these functions,
 I could not understand it because of the confusing descriptions.
 Having this intuition for concepts is pretty helpful for truly understanding them:
-you don&#8217;t want to be stuck memorizing things that don&#8217;t make sense.</p>
+you don’t want to be stuck memorizing things that don’t make sense.</p>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

@@ -2,37 +2,35 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Chess engine, pt. 0: Index</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Chess engine, pt. 0: Index</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="chess-engine-pt.-0-index">Chess engine, pt. 0: Index</h1>
 <div class="creation-date">
 2025-03-05
 </div>
-<link rel="next" href="/chess1" />
+<link href="/chess1" rel="next">
 <p>Building chess engines,
 that is, making computers play chess,
 is seemingly a <a href="https://youtube.com/watch?v=DpXy041BIlA">common</a>
@@ -42,8 +40,8 @@ Of course, I had to try it too, so I created my own engine, <a href="https://git
 As it turns out, chess engine development is incredibly addicting (I say this from experience),
 because there is always more room for improvement in your engine.
 Now though, chess-inator can beat most chess players I know personally,
-so I&#8217;m stopping before I spend way too many hours on this project.</p>
-<p>This blog post series is essentially a log of chess-inator&#8217;s development, including
+so I’m stopping before I spend way too many hours on this project.</p>
+<p>This blog post series is essentially a log of chess-inator’s development, including
 important tips and information that I had difficulty finding from other online
 sources.
 Even though the series is mostly about my own engine,
@@ -52,11 +50,11 @@ These posts are intended to focus on practical rather than theoretical aspects;
 you should technically be able to write an engine by following along.</p>
 <p>The target audience of this blog series is
 me from 2024,
-that is a version of myself that doesn&#8217;t know anything about chess engine development.
+that is a version of myself that doesn’t know anything about chess engine development.
 Ideally, this series contains all the essentials to get started with writing an engine
 without any prior experience.
 I assume you, the reader, are proficient with some programming language,<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>
-you&#8217;ve played chess before, and you know the rules of the game (google en passant).
+you’ve played chess before, and you know the rules of the game (google en passant).
 In this series, I use pseudo-Python for code examples, but my real chess engine project uses Rust for engine code.</p>
 <p>Before I begin, here are the mandatory acknowledgements.
 Thanks to</p>
@@ -77,7 +75,7 @@ If you follow along with this post, you will quickly be able to play games again
 <li><a href="/chess2">Part 2: Negamax search</a>: I cover the <em>negamax</em> search algorithm, which is a variation of minmax.
 Once negamax is implemented, the chess engine will play moves more intelligently (i.e. not random moves).</li>
 <li><a href="/chess3">Part 3: Elo, and rigorous SPRT testing</a>: I introduce the Sequential Probability Ratio Test,
-which is a statistical tool that can be used to rigorously test a chess engine&#8217;s performance.
+which is a statistical tool that can be used to rigorously test a chess engine’s performance.
 SPRT is very important in modern chess engine development.</li>
 <li><a href="/chess4">Part 4: α-β pruning and better search</a>: I go over some of the main optimizations to negamax:
 alpha-beta pruning, the transposition table, move ordering, and iterative deepening.</li>
@@ -86,19 +84,19 @@ fix some really annoying bugs in the chess engine.
 These bugs are inherent to how we implement negamax.
 After this part, the engine plays chess at a beginner level, albeit with a quite unnatural (i.e. bad) playstyle.</li>
 <li><a href="/chess6">Part 6: Neural-net evaluation</a>: I explain how neural networks, specifically the NNUE, can be
-used to improve a chess engine&#8217;s performance.
-This post goes over chess-inator&#8217;s NNUE architecture in great detail.</li>
+used to improve a chess engine’s performance.
+This post goes over chess-inator’s NNUE architecture in great detail.</li>
 </ul>
 <p>Some of my favourite posts in this series are <a href="/chess3">part 3 (SPRT)</a> and <a href="/chess6">part 6 (NNUE)</a>.
 SPRT is something you should use as soon as possible when developing a chess engine,
-yet I&#8217;ve never heard of it before starting this project.
+yet I’ve never heard of it before starting this project.
 If I had to recommend one part of this blog series, it would be the part about SPRT.
-It&#8217;s not an exciting subject, but it is essential to making a good chess engine.</p>
+It’s not an exciting subject, but it is essential to making a good chess engine.</p>
 <p>I also had fun writing the NNUE post,
 because I think there is a shortage of resources for beginners.
-In my research, I found lots of general summaries that explain NNUE&#8217;s general concept,
+In my research, I found lots of general summaries that explain NNUE’s general concept,
 and also <a href="https://github.com/official-stockfish/nnue-pytorch/blob/master/docs/nnue.md">deep dives</a>
-about Stockfish&#8217;s complex NNUE architecture.
+about Stockfish’s complex NNUE architecture.
 However, resources for my skill level are rarer.
 The aim in my NNUE post is to explain how a simple (and easy to understand) NNUE architecture works,
 with enough detail for you to follow along with its implementation.</p>
@@ -108,28 +106,26 @@ I hope that some of you find will it useful.
 If you find any mistakes in the posts (such as mixing up an <code>i</code> and a <code>j</code>, or a typo),
 please <a href="/about#contact-information">tell me</a>.
 Feel free to write to me if you have any other comments.</p>
-<p>Now, let&#8217;s begin: <a href="/chess1">Part 1 →</a></p>
+<p>Now, let’s begin: <a href="/chess1">Part 1 →</a></p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note</strong>: The dates given for all the blog posts are not the publication date;
-they&#8217;re the date that I created each document.
+they’re the date that I created each document.
 Part 0 (this page) was written on 2025-07-07, but it has been backdated so that the order of the posts on the home page makes sense.</p>
 </div>
 <div class="footnotes">
 <hr/>
 <ol>
-
 <li id="fn1">
 <p>Ideally, the programming language you use for a chess engine is a performant language like C++, Rust, Java, C#.
 If your language is generally faster, then your engine will be better because it can
-do more calculations in the same amount of time.&#160;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+do more calculations in the same amount of time. <a href="#fnref1" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn2">
-<p>This series is roughly 25k words, which is five times more than the <a href="/lc3">LC-3 article</a>, the previous record holder.&#160;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+<p>This series is roughly 25k words, which is five times more than the <a href="/lc3">LC-3 article</a>, the previous record holder. <a href="#fnref2" rev="footnote">↩</a></p>
 </li>
-
 </ol>
 </div>
+</link></article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

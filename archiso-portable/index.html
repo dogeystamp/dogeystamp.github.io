@@ -2,48 +2,46 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Making custom Arch Linux live ISOs without Arch Linux</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Making custom Arch Linux live ISOs without Arch Linux</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="making-custom-arch-linux-live-isos-without-arch-linux">Making custom Arch Linux live ISOs without Arch Linux</h1>
 <div class="creation-date">
 2023-06-07
 </div>
-<p>If you&#8217;ve ever installed any Linux distro, you probably had to do it using a live install environment.
-Once you flashed the USB drive, you could boot off it and you&#8217;d be greeted with a Linux system.</p>
-<p>I&#8217;ve always found it fascinating that you could pack the entire OS onto a stick and bring it around with you.
+<p>If you’ve ever installed any Linux distro, you probably had to do it using a live install environment.
+Once you flashed the USB drive, you could boot off it and you’d be greeted with a Linux system.</p>
+<p>I’ve always found it fascinating that you could pack the entire OS onto a stick and bring it around with you.
 However, something even more enticing is being able to customize that system.</p>
 <p>This is where archiso comes in handy:
-it&#8217;s a tool that can be used to generate ISOs with Arch Linux on them.
+it’s a tool that can be used to generate ISOs with Arch Linux on them.
 You can flash these ISOs to USB drives to make portable Arch Linux systems.
 archiso is also incredibly flexible, and you can customize it very well.
-In fact, it&#8217;s the tool that Arch&#8217;s maintainers use to generate the official live installation images.</p>
+In fact, it’s the tool that Arch’s maintainers use to generate the official live installation images.</p>
 <p>The one issue I have, though is that you need to be running Arch Linux to run archiso:</p>
 <blockquote>
-<p>&#8220;Currently creating the images is only supported on Arch Linux but may work on other operating systems as well.&#8221;</p>
+<p>“Currently creating the images is only supported on Arch Linux but may work on other operating systems as well.”</p>
 </blockquote>
 <p>As I run another distro on my laptop, I could not use archiso.
 So, in the last few days, I set out to make archiso run on my system.
@@ -55,7 +53,7 @@ This is the bootstrapped root filesystem (root FS).
 Later, archiso takes that folder, compresses it, and puts it in the final ISO file.</p>
 <p>The problem is that pacstrap needs your host system to be Arch Linux so that it can bootstrap a new Arch system.
 In fact, if you look at the <a href="https://github.com/archlinux/arch-install-scripts/blob/master/pacstrap.in">source code</a>,
-you&#8217;ll find that the host system uses its own pacman to install everything to the bootstrapped system:</p>
+you’ll find that the host system uses its own pacman to install everything to the bootstrapped system:</p>
 <pre><code>pacman -r "$newroot" "${pacman_args[@]}"
 </code></pre>
 <p>pacstrap only has to create a few directories, but the rest is done by installing the <code>base</code> metapackage through pacman.
@@ -69,28 +67,29 @@ Cleverly, this script removes the need for arch-chroot on the host system:
 it runs the arch-chroot inside the downloaded Arch filesystem.</p>
 <p>Somewhat annoyingly though, archstrap does not operate exactly the same way pacstrap does:
 I had to patch it to get it working with archiso.
-Also, I patched archiso itself to remove some flags archstrap doesn&#8217;t parse.</p>
+Also, I patched archiso itself to remove some flags archstrap doesn’t parse.</p>
 <h2 id="other-changes">Other changes</h2>
-<p>The other main dependency missing in archiso is pacman, Arch&#8217;s package manager.
-Since we aren&#8217;t running Arch, we of course do not have it on our host system.
+<p>The other main dependency missing in archiso is pacman, Arch’s package manager.
+Since we aren’t running Arch, we of course do not have it on our host system.
 However, the bootstrapped Arch root FS we downloaded earlier does have pacman inside of it.
 Therefore, I replaced all invocations of pacman inside archiso with invocations of the bootstrapped pacman.</p>
 <p>archiso also includes a small script to test your generated ISOs in a QEMU virtual machine.
 I added a check to it that switches some hard-coded paths.
-In Arch, the path is <code>&#47;usr&#47;share&#47;edk2-ovmf&#47;x64</code>,
-but on my system it was at <code>&#47;usr&#47;share&#47;edk2-ovmf</code>.</p>
+In Arch, the path is <code>/usr/share/edk2-ovmf/x64</code>,
+but on my system it was at <code>/usr/share/edk2-ovmf</code>.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>It turns out that modifying open source software isn&#8217;t that difficult.
-Given that archiso&#8217;s maintainers wrote very structured and organized code,
-it&#8217;s surprisingly easy to navigate around the script to patch things.</p>
+<p>It turns out that modifying open source software isn’t that difficult.
+Given that archiso’s maintainers wrote very structured and organized code,
+it’s surprisingly easy to navigate around the script to patch things.</p>
 <p>Of course, I definitely ruined the quality of archiso by doing this:
-there&#8217;s missing features and everything is untested and unlinted.
-Then again, this isn&#8217;t going to be production-grade software;
+there’s missing features and everything is untested and unlinted.
+Then again, this isn’t going to be production-grade software;
 I just wanted to make a custom portable Arch USB while using Gentoo on my PC.</p>
-<p>Anyways, if you want to make your own custom Arch USBs but don&#8217;t have Arch,
+<p>Anyways, if you want to make your own custom Arch USBs but don’t have Arch,
 check out <a href="https://github.com/dogeystamp/archiso-portable">archiso-portable</a> on GitHub.</p>
-<p>As a bonus, here&#8217;s a screenshot of the Arch Linux live environment I made earlier on a Gentoo system:</p>
-<p><img src="/public/img/archiso-portable-desktop.jpg" alt="preview" /></p>
+<p>As a bonus, here’s a screenshot of the Arch Linux live environment I made earlier on a Gentoo system:</p>
+<p><img alt="preview" src="/public/img/archiso-portable-desktop.jpg"/></p>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

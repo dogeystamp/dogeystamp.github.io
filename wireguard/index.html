@@ -2,31 +2,29 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>WireGuard VPN server setup guide for Linux</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>WireGuard VPN server setup guide for Linux</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="wireguard-vpn-server-setup-guide-for-linux">WireGuard VPN server setup guide for Linux</h1>
 <div class="creation-date">
@@ -35,22 +33,22 @@
 <p>Recently, I decided to set up a WireGuard VPN server for personal use.
 I found that existing guides about this subject are all lacking in some way.
 The server setup tutorials I found all go through the commands and configurations needed very throughly,
-but don&#8217;t explain <em>why</em> things work.
-Meanwhile, WireGuard&#8217;s <a href="https://www.wireguard.com/#conceptual-overview"><em>Conceptual Overview</em></a>
+but don’t explain <em>why</em> things work.
+Meanwhile, WireGuard’s <a href="https://www.wireguard.com/#conceptual-overview"><em>Conceptual Overview</em></a>
 focuses on the protocol itself and how it is different from others.</p>
 <p>So, this post is a summary of my mental model of how WireGuard works,
 plus a tutorial for setting up the server.
 I assume that you have some knowledge of networking,
-but aren&#8217;t familiar with WireGuard.
+but aren’t familiar with WireGuard.
 I also assume Linux knowledge.
 This guide should work generally, but I tested it on Arch Linux.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong></p>
-<p>In this post, if you see an <code>&#47;24</code> at the end of an IP address, that&#8217;s <a href="https://en.m.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR notation</a>.
-<code>192.168.0.0&#47;24</code> could be written as &#8220;any address that fits the pattern
-<code>192.168.0.*</code>&#8221;. Because there are 32 bits in an IPv4 address, the <code>&#47;24</code> at
+<p>In this post, if you see an <code>/24</code> at the end of an IP address, that’s <a href="https://en.m.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR notation</a>.
+<code>192.168.0.0/24</code> could be written as “any address that fits the pattern
+<code>192.168.0.*</code>”. Because there are 32 bits in an IPv4 address, the <code>/24</code> at
 the end means that the first 24 bits (the first three bytes <code>192.168.0</code>) are
-fixed, and the remaining 8 bits can be anything. Also, a <code>&#47;32</code> pattern
+fixed, and the remaining 8 bits can be anything. Also, a <code>/32</code> pattern
 matches only one address.</p>
 </div>
 <h2 id="what-is-a-vpn">What is a VPN?</h2>
@@ -58,8 +56,8 @@ matches only one address.</p>
 encrypted tunnel for their Internet connection.
 Mostly, this is useful for changing your IP address.</p>
 <p>However, this is not the full picture of what a VPN is.
-In corporate networks, there are many important services that can&#8217;t be exposed publicly,
-which is why they&#8217;re only available on an internal, private network.
+In corporate networks, there are many important services that can’t be exposed publicly,
+which is why they’re only available on an internal, private network.
 Some off-site users, especially remote workers, need to access the internal network,
 but from the outside Internet.
 This is where a VPN can be useful: users can <em>virtually</em> be on the private network,
@@ -73,20 +71,20 @@ preventing strangers from even seeing the login pages of my services.
 This reduces the attack surface and makes things more secure.</p>
 <h2 id="wireguard-setup">WireGuard setup</h2>
 <p>WireGuard is a relatively recent protocol for implementing VPNs.
-It&#8217;s shiny and new, and also has a slimmer codebase than older, more established protocols.</p>
-<p>Let&#8217;s go through the process of setting up a VPN to access an internal network.
-The setup for tunneling all of a device&#8217;s Internet traffic is similar, and I will explain it too later.
+It’s shiny and new, and also has a slimmer codebase than older, more established protocols.</p>
+<p>Let’s go through the process of setting up a VPN to access an internal network.
+The setup for tunneling all of a device’s Internet traffic is similar, and I will explain it too later.
 We will have a <em>Client</em> device, and a <em>Server</em> device.
-The Server is in the internal network (let&#8217;s say in the <code>192.168.0.0&#47;24</code> subnet),
+The Server is in the internal network (let’s say in the <code>192.168.0.0/24</code> subnet),
 and the Client is outside of it.
 There is also a publicly accessible domain <code>vpn.example.com</code> that resolves to the Server.</p>
-<p>To recap, here is a diagram of what we&#8217;re trying to do:</p>
+<p>To recap, here is a diagram of what we’re trying to do:</p>
 <pre><code> 
    ╭────────────╮
    │ VPN Client │
    ╰─────┬──────╯
          │                  ╭────────────────────────────────────────────────╮
-         │                  │ the private network (192.168.0.0&#47;24)           │
+         │                  │ the private network (192.168.0.0/24)           │
          │                  │      ╭───────────────────╮                     │
  ╭───────┴─────────╮        │      │ VPN Server        │                     │
  │ public internet ├────────┼──────┤ (vpn.example.com) ├────── ⋯ other hosts │
@@ -104,7 +102,7 @@ which is an utility that takes a config file and sets up WireGuard with it.
 In Arch Linux, this comes in the <code>wireguard-tools</code> package:</p>
 <pre><code># pacman -S wireguard-tools
 </code></pre>
-<p><code>wg-quick</code> stores config files under <code>&#47;etc&#47;wireguard&#47;</code>.
+<p><code>wg-quick</code> stores config files under <code>/etc/wireguard/</code>.
 Each config file has the name <code>[name].conf</code>,
 where the file name is used as the <em>interface</em> name.
 These are the same network interfaces as <code>wlan0</code> or <code>eth0</code>;
@@ -114,49 +112,49 @@ WireGuard typically uses names like <code>wg0</code>.</p>
 every device is a <em>peer</em>.
 To authenticate with each other, each peer has a private key,
 and a list of public keys of the peers it talks to.
-This is similar to how SSH&#8217;s <code>authorized_keys</code> works.
+This is similar to how SSH’s <code>authorized_keys</code> works.
 To generate both the private key and the public key at once, use this command:</p>
-<pre><code>$ wg genkey | tee &#47;dev&#47;tty | wg pubkey
-WDax5fhKcKwdeuiYjgi4w&#47;34ig2aZuDjmLHYnWUtfGc=
+<pre><code>$ wg genkey | tee /dev/tty | wg pubkey
+WDax5fhKcKwdeuiYjgi4w/34ig2aZuDjmLHYnWUtfGc=
 pJApgMHuIvMMsApTNXA3MMq+82nQ30XuVbAk9jsBNRs=
 </code></pre>
 <p>The private key will be on the first line, and the public key on the second.
 Keep these keys around, as they will be useful later.</p>
-<p>Let&#8217;s now see the config file for the Server:</p>
-<pre><code># SERVER config
-# &#47;etc&#47;wireguard&#47;wg0.conf
+<p>Let’s now see the config file for the Server:</p>
+<pre><code class="language-ini"><span></span><span class="c1"># SERVER config</span>
+<span class="c1"># /etc/wireguard/wg0.conf</span>
 
-[Interface]
-Address = 10.0.0.1&#47;32
-# REPLACE THIS!
-PrivateKey = [private key]
-ListenPort = 51820
+<span class="k">[Interface]</span>
+<span class="na">Address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10.0.0.1/32</span>
+<span class="c1"># REPLACE THIS!</span>
+<span class="na">PrivateKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[private key]</span>
+<span class="na">ListenPort</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">51820</span>
 
-# make sure to replace eth0 by the appropriate interface
-PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+<span class="c1"># make sure to replace eth0 by the appropriate interface</span>
+<span class="na">PostUp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">iptables -A FORWARD -i %i -j ACCEPT</span><span class="c1">; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+<span class="na">PostDown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">iptables -D FORWARD -i %i -j ACCEPT</span><span class="c1">; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span>
 
-[Peer]
-PublicKey = xZGlY8HIJt+rhGfbDK&#47;T2xq0LQoR3kL6tGGVijaRBDI=
-AllowedIPs = 10.0.0.2&#47;32
+<span class="k">[Peer]</span>
+<span class="na">PublicKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">xZGlY8HIJt+rhGfbDK/T2xq0LQoR3kL6tGGVijaRBDI=</span>
+<span class="na">AllowedIPs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10.0.0.2/32</span>
 </code></pre>
-<p>First, let&#8217;s look at the <code>[Interface]</code> section, which contains information about the Server.
+<p>First, let’s look at the <code>[Interface]</code> section, which contains information about the Server.
 It has the private key, and also the UDP port that WireGuard listens on
 (remember to open this in the firewall).
-The address marked here is the Server&#8217;s address.
-Its subnet is completely different from the LAN the Server is actually on (<code>192.168.0.0&#47;24</code>).
-This is because we&#8217;re creating a brand new private network (<code>10.0.0.0&#47;24</code>) inside the VPN connection,
+The address marked here is the Server’s address.
+Its subnet is completely different from the LAN the Server is actually on (<code>192.168.0.0/24</code>).
+This is because we’re creating a brand new private network (<code>10.0.0.0/24</code>) inside the VPN connection,
 where our Client and Server will coexist.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong>
-<code>10.0.0.0&#47;8</code>, <code>172.16.0.0&#47;12</code> and <code>192.168.0.0&#47;24</code> are all entirely reserved for private subnets, and you will not see them on the open Internet.
+<code>10.0.0.0/8</code>, <code>172.16.0.0/12</code> and <code>192.168.0.0/24</code> are all entirely reserved for private subnets, and you will not see them on the open Internet.
 To avoid collisions, the new VPN subnet should be different from the real LAN subnets for all peers.
-OpenVPN <a href="https://openvpn.net/community-resources/numbering-private-subnets/">recommends</a> obscure subnets like <code>10.66.77.0&#47;24</code>,
+OpenVPN <a href="https://openvpn.net/community-resources/numbering-private-subnets/">recommends</a> obscure subnets like <code>10.66.77.0/24</code>,
 which are equivalent to the middle of nowhere in IP address space.</p>
 </div>
 <p>There is also the <code>PostUp</code> and <code>PostDown</code> fields.
 These are commands run in <code>bash</code> after starting and stopping the VPN Server.
-I&#8217;m not going to go into the details, but I&#8217;ll explain in general what they mean:</p>
+I’m not going to go into the details, but I’ll explain in general what they mean:</p>
 <ul>
 <li><code>iptables -A</code> means to add a firewall rule when starting the VPN, and <code>-D</code> is to delete the rule when the VPN stops.</li>
 <li>The <code>%i</code> variable is part of <code>wg-quick</code>, and it expands to the VPN interface name (e.g. <code>wg0</code>).</li>
@@ -165,80 +163,80 @@ Essentially, just as a device can access the Internet through a router, the Clie
 To do this, the Server will act like a router and perform <a href="https://en.wikipedia.org/wiki/Network_address_translation">NAT</a>.</li>
 <li><code>-o eth0</code> means the internal network is accessed over the <code>eth0</code> interface.</li>
 </ul>
-<p>Meanwhile, in the <code>[Peer]</code> section, we write the Client&#8217;s public key,
+<p>Meanwhile, in the <code>[Peer]</code> section, we write the Client’s public key,
 which allows it to talk to the Server.
 Our Client has an address of <code>10.0.0.2</code>, but
 instead of an <code>Address</code> field, we use <code>AllowedIPs</code>.
 These are the IP addresses that <em>can be routed to and from this peer</em>.
 Here are some examples to clarify what that means:</p>
 <ul>
-<li>Let&#8217;s say the Server wants to send a packet to <code>10.0.0.2</code>.
+<li>Let’s say the Server wants to send a packet to <code>10.0.0.2</code>.
 WireGuard sees that peer <code>xZGlY...</code> (the Client) has this IP in its allowlist,
 so the Server sends the packet to the Client.</li>
 <li>The Server wants to send a packet to <code>archlinux.org (95.217.163.246)</code>.
-This IP is not in the peer&#8217;s allowlist, so it will not route the packet to the Client.</li>
+This IP is not in the peer’s allowlist, so it will not route the packet to the Client.</li>
 <li>The Client sends a packet to the Server, with the source being its IP address <code>10.0.0.2</code>.
 The Server sees that this IP is in the allowlist, so it accepts the packet from the Client.</li>
 <li>The Client, who is now evil, decides to send a packet to the Server but impersonating another IP address: <code>10.0.0.69</code>.
-This IP not being in the Server&#8217;s allowlist, it rejects the packet.</li>
+This IP not being in the Server’s allowlist, it rejects the packet.</li>
 </ul>
-<p>In general, you can see that the <code>AllowedIPs</code> field is what determines where packets can and can&#8217;t go.
+<p>In general, you can see that the <code>AllowedIPs</code> field is what determines where packets can and can’t go.
 By setting <code>AllowedIPs = 10.0.0.2</code>, the server knows that the Client only has control over packets directed to or from that address.
 It is not allowed packets to or from any other IP.
 This concept of pairing the allowlist with public keys to manage packet routing is called <a href="https://www.wireguard.com/#cryptokey-routing"><em>cryptokey routing</em></a> in WireGuard.</p>
 <p>Also, 
-by default, Linux disables IP forwarding. To enable it, edit <code>&#47;etc&#47;sysctl.conf</code> and add&#47;uncomment the line</p>
-<pre><code>net.ipv4.ip_forward = 1
+by default, Linux disables IP forwarding. To enable it, edit <code>/etc/sysctl.conf</code> and add/uncomment the line</p>
+<pre><code class="language-ini"><span></span><span class="na">net.ipv4.ip_forward</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
 </code></pre>
 <p>and run</p>
-<pre><code># sysctl -p
+<pre><code class="language-console"><span></span><span class="gp"># </span>sysctl<span class="w"> </span>-p
 </code></pre>
 <p>to load the new configuration.
 If your VPN server is on the public internet,
 be sure to have sane firewall rules before doing this.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
-<p><strong>Note:</strong> If you use <a href="https://wiki.archlinux.org/title/Uncomplicated_Firewall">UFW</a> as a firewall like me, note that it has its own <code>sysctl.conf</code>, which lives at <code>&#47;etc&#47;ufw&#47;sysctl.conf</code>.
+<p><strong>Note:</strong> If you use <a href="https://wiki.archlinux.org/title/Uncomplicated_Firewall">UFW</a> as a firewall like me, note that it has its own <code>sysctl.conf</code>, which lives at <code>/etc/ufw/sysctl.conf</code>.
 This will override the regular <code>sysctl</code> if you follow the instructions above.
 To prevent it from erasing your changes, uncomment the relevant line:</p>
-<pre><code># &#47;etc&#47;ufw&#47;sysctl.conf
+<pre><code class="language-ini"><span></span><span class="c1"># /etc/ufw/sysctl.conf</span>
 
-# Uncomment this to allow this host to route packets between interfaces
-net&#47;ipv4&#47;ip_forward=1
+<span class="c1"># Uncomment this to allow this host to route packets between interfaces</span>
+<span class="na">net/ipv4/ip_forward</span><span class="o">=</span><span class="s">1</span>
 </code></pre>
 </div>
 <h3 id="client-configuration">Client configuration</h3>
-<p>Let&#8217;s now examine the Client&#8217;s configuration file.
-If the client is running Linux, it will also be in <code>&#47;etc&#47;wireguard&#47;*.conf</code>,
+<p>Let’s now examine the Client’s configuration file.
+If the client is running Linux, it will also be in <code>/etc/wireguard/*.conf</code>,
 However, the <code>wg-quick</code> configuration format can be read by many other clients,
 like the WireGuard Android app.</p>
 <p>Anyways, here is the configuration file:</p>
-<pre><code># CLIENT config
-# wg0.conf
+<pre><code class="language-ini"><span></span><span class="c1"># CLIENT config</span>
+<span class="c1"># wg0.conf</span>
 
-[Interface]
-Address = 10.0.0.2&#47;32
-# REPLACE THIS!
-PrivateKey = [private key]
+<span class="k">[Interface]</span>
+<span class="na">Address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10.0.0.2/32</span>
+<span class="c1"># REPLACE THIS!</span>
+<span class="na">PrivateKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">[private key]</span>
 
-# be careful not to use CIDR notation here
-DNS = 10.0.0.1
+<span class="c1"># be careful not to use CIDR notation here</span>
+<span class="na">DNS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10.0.0.1</span>
 
-[Peer]
-PublicKey = M&#47;HD4qJYi1RlMH&#47;K9xQ12yW6Cu62LuGasyZhfnVsbUE=
+<span class="k">[Peer]</span>
+<span class="na">PublicKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">M/HD4qJYi1RlMH/K9xQ12yW6Cu62LuGasyZhfnVsbUE=</span>
 
-# do not forget the port here
-Endpoint = vpn.example.com:51820
+<span class="c1"># do not forget the port here</span>
+<span class="na">Endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vpn.example.com:51820</span>
 
-AllowedIPs = 192.168.0.0&#47;24
+<span class="na">AllowedIPs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">192.168.0.0/24</span>
 </code></pre>
-<p>You&#8217;ll see this configuration is very similar to the Server&#8217;s,
+<p>You’ll see this configuration is very similar to the Server’s,
 which is natural as WireGuard devices are all peers.
 There are a few differences, though.</p>
 <p>First, there is a <code>DNS</code> field, which can be used to prevent <a href="https://en.m.wikipedia.org/wiki/DNS_leak">DNS leaks</a>.
 This only works if the VPN server provides a DNS server too.
 Otherwise, set it to some other DNS server, or remove the line.</p>
 <p>There is also the <code>Endpoint</code> field.
-This marks the Server&#8217;s public address on the open Internet.
+This marks the Server’s public address on the open Internet.
 The <code>Endpoint</code> field is omitted in the Server configuration,
 as it is implicit:
 the Server will find out the endpoint IP when the Client reaches out to it for the first time.</p>
@@ -247,44 +245,44 @@ the Server will find out the endpoint IP when the Client reaches out to it for t
 If <code>SaveConfig</code> is enabled in the <code>[Interface]</code> section, and either the Server or Client changes IP address
 while connected, <a href="https://www.wireguard.com/#built-in-roaming">roaming</a> allows WireGuard to keep working
 and update <code>Endpoint</code> to the new address in the config file.
-I haven&#8217;t tested this, though.</p>
+I haven’t tested this, though.</p>
 </div>
 <p>Most importantly, we also have the <code>AllowedIPs</code> for the server.
-Here, it&#8217;s an entire subnet, and not just a single address.
+Here, it’s an entire subnet, and not just a single address.
 What this means is that if the Client wants to send a packet to a device on the internal network,
-say <code>192.168.0.4</code>, WireGuard matches the IP to the subnet <code>192.168.0.0&#47;24</code>, takes the packet and routes it through to the server,
+say <code>192.168.0.4</code>, WireGuard matches the IP to the subnet <code>192.168.0.0/24</code>, takes the packet and routes it through to the server,
 which then forwards these packets to the machine at <code>192.168.0.4</code> in the internal network.</p>
-<p>If the machine then replies with a packet, WireGuard sees it is from the <code>192.168.0.0&#47;24</code> subnet, then routes it back to the Client.
+<p>If the machine then replies with a packet, WireGuard sees it is from the <code>192.168.0.0/24</code> subnet, then routes it back to the Client.
 Using the VPN, the Client will be able to communicate with machines in the internal network as if it were there.</p>
 <h2 id="running-the-vpn">Running the VPN</h2>
 <h3 id="wg-quick">wg-quick</h3>
-<p>To start&#47;stop the VPN for both Client and Server (if they run Linux),
+<p>To start/stop the VPN for both Client and Server (if they run Linux),
 you can use</p>
-<pre><code># wg-quick up wg0
-# wg-quick down wg0
+<pre><code class="language-console"><span></span><span class="gp"># </span>wg-quick<span class="w"> </span>up<span class="w"> </span>wg0
+<span class="gp"># </span>wg-quick<span class="w"> </span>down<span class="w"> </span>wg0
 </code></pre>
 <p>where <code>wg0</code> should be the name of your configuration file.
 Alternatively, there is a SystemD service you can use:</p>
-<pre><code># systemctl start wg-quick@wg0
-# systemctl stop wg-quick@wg0
+<pre><code class="language-console"><span></span><span class="gp"># </span>systemctl<span class="w"> </span>start<span class="w"> </span>wg-quick@wg0
+<span class="gp"># </span>systemctl<span class="w"> </span>stop<span class="w"> </span>wg-quick@wg0
 </code></pre>
 <p>or, to have WireGuard start at boot:</p>
-<pre><code># systemctl enable wg-quick@wg0
-# systemctl disable wg-quick@wg0
+<pre><code class="language-console"><span></span><span class="gp"># </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>wg-quick@wg0
+<span class="gp"># </span>systemctl<span class="w"> </span>disable<span class="w"> </span>wg-quick@wg0
 </code></pre>
 <p>To diagnose issues with WireGuard, running <code>wg show</code> can be useful:</p>
-<pre><code># wg show
-interface: wg0
-  public key: [snip]
-  private key: (hidden)
-  listening port: 49595
+<pre><code class="language-console"><span></span><span class="gp"># </span>wg<span class="w"> </span>show
+<span class="go">interface: wg0</span>
+<span class="go">  public key: [snip]</span>
+<span class="go">  private key: (hidden)</span>
+<span class="go">  listening port: 49595</span>
 
-peer: [snip]
-  endpoint: [snip]:51820
-  allowed ips: 0.0.0.0&#47;0
-  latest handshake: 57 seconds ago
-  transfer: 4.83 GiB received, 261.16 MiB sent
-  persistent keepalive: every 25 seconds
+<span class="go">peer: [snip]</span>
+<span class="go">  endpoint: [snip]:51820</span>
+<span class="go">  allowed ips: 0.0.0.0/0</span>
+<span class="go">  latest handshake: 57 seconds ago</span>
+<span class="go">  transfer: 4.83 GiB received, 261.16 MiB sent</span>
+<span class="go">  persistent keepalive: every 25 seconds</span>
 </code></pre>
 <p>This can show that there is no handshake at all between peers,
 and thus that there is no connection.</p>
@@ -292,12 +290,12 @@ and thus that there is no connection.</p>
 <p>There is also the option of using <a href="https://wiki.archlinux.org/title/NetworkManager">NetworkManager</a>,
 which is neat if you already use it to manage your existing network connections.
 To do this, save your configuration file, and then import it through <code>nmcli</code>:</p>
-<pre><code>$ nmcli con import type wireguard file wg0.conf
+<pre><code class="language-console"><span></span><span class="gp">$ </span>nmcli<span class="w"> </span>con<span class="w"> </span>import<span class="w"> </span><span class="nb">type</span><span class="w"> </span>wireguard<span class="w"> </span>file<span class="w"> </span>wg0.conf
 </code></pre>
 <p>Then, you can manage the connection as usual through <code>nmcli</code>:</p>
-<pre><code>$ nmcli con down wg0
-$ nmcli con up wg0
-$ nmcli con edit wg0
+<pre><code class="language-console"><span></span><span class="gp">$ </span>nmcli<span class="w"> </span>con<span class="w"> </span>down<span class="w"> </span>wg0
+<span class="gp">$ </span>nmcli<span class="w"> </span>con<span class="w"> </span>up<span class="w"> </span>wg0
+<span class="gp">$ </span>nmcli<span class="w"> </span>con<span class="w"> </span>edit<span class="w"> </span>wg0
 </code></pre>
 <h3 id="mobile-devices">Mobile devices</h3>
 <p>On mobile devices, WireGuard apps can also use these configuration files:</p>
@@ -307,30 +305,30 @@ $ nmcli con edit wg0
 <li>App Store: <a href="https://apps.apple.com/us/app/wireguard/id1441195209">WireGuard</a></li>
 </ul>
 <p>You can securely transfer the config files in a normal way,
-but I recommend using QR codes because it&#8217;s way simpler.
+but I recommend using QR codes because it’s way simpler.
 Install the <code>qrencode</code> package,
 and do this:</p>
-<pre><code>$ cat wg0.conf | qrencode -t ansiutf8
+<pre><code class="language-console"><span></span><span class="gp">$ </span>cat<span class="w"> </span>wg0.conf<span class="w"> </span><span class="p">|</span><span class="w"> </span>qrencode<span class="w"> </span>-t<span class="w"> </span>ansiutf8
 
-█████████████████████████████████████
-█████████████████████████████████████
-████ ▄▄▄▄▄ █▄▄▄ ▀▀▀▄▀▄█▀██ ▄▄▄▄▄ ████
-████ █   █ ██▄▀ █ ██▀▀▄▄▀█ █   █ ████
-████ █▄▄▄█ ██▀▄ ▄▀▄█▄▄ ▄▀█ █▄▄▄█ ████
-████▄▄▄▄▄▄▄█ ▀▄█ ▀▄▀ █▄█▄█▄▄▄▄▄▄▄████
-████  ▀  ▀▄▀█▄▀█▄▄▄▄█ ▀ ▄▀▄▀▀█▀▀▄████
-████▀█▄ ▀█▄  ▄██▄█ ▄   ▀▀▀▀▄ ▀▄█▀████
-████▄█▄▄█▄▄█▀▄ █▀▄ ▀█▀▄█ █ ▀▀▀▀▀ ████
-████▀ ▀█ █▄▄▄█▀█▀▀  █▄█▄▄▄▄  █ █ ████
-████▀▄▀▀▄▀▄██   ▄██ ▄▀█  ███▀▄▀▀█████
-████  ██▀▄▄█▀▀█▀▄ ▄▄ █▀▄█▀▄▀█ ▀█▄████
-████▄▄▄▄█▄▄█▀ ▀▄▀ █ ▀ ▄█ ▄▄▄  ▄▄█████
-████ ▄▄▄▄▄ ██▀▄ ▀ █ ▄ █  █▄█ ▄█▀█████
-████ █   █ █ ▄ ▄▄ ▀ ▀█▀▄▄▄▄▄▄▄██ ████
-████ █▄▄▄█ █▀   ▄▄█▄▀█▀▄█ █  ▀ ▄ ████
-████▄▄▄▄▄▄▄█▄▄████▄▄▄▄█▄▄▄▄▄█▄███████
-█████████████████████████████████████
-█████████████████████████████████████
+<span class="go">█████████████████████████████████████</span>
+<span class="go">█████████████████████████████████████</span>
+<span class="go">████ ▄▄▄▄▄ █▄▄▄ ▀▀▀▄▀▄█▀██ ▄▄▄▄▄ ████</span>
+<span class="go">████ █   █ ██▄▀ █ ██▀▀▄▄▀█ █   █ ████</span>
+<span class="go">████ █▄▄▄█ ██▀▄ ▄▀▄█▄▄ ▄▀█ █▄▄▄█ ████</span>
+<span class="go">████▄▄▄▄▄▄▄█ ▀▄█ ▀▄▀ █▄█▄█▄▄▄▄▄▄▄████</span>
+<span class="go">████  ▀  ▀▄▀█▄▀█▄▄▄▄█ ▀ ▄▀▄▀▀█▀▀▄████</span>
+<span class="go">████▀█▄ ▀█▄  ▄██▄█ ▄   ▀▀▀▀▄ ▀▄█▀████</span>
+<span class="go">████▄█▄▄█▄▄█▀▄ █▀▄ ▀█▀▄█ █ ▀▀▀▀▀ ████</span>
+<span class="go">████▀ ▀█ █▄▄▄█▀█▀▀  █▄█▄▄▄▄  █ █ ████</span>
+<span class="go">████▀▄▀▀▄▀▄██   ▄██ ▄▀█  ███▀▄▀▀█████</span>
+<span class="go">████  ██▀▄▄█▀▀█▀▄ ▄▄ █▀▄█▀▄▀█ ▀█▄████</span>
+<span class="go">████▄▄▄▄█▄▄█▀ ▀▄▀ █ ▀ ▄█ ▄▄▄  ▄▄█████</span>
+<span class="go">████ ▄▄▄▄▄ ██▀▄ ▀ █ ▄ █  █▄█ ▄█▀█████</span>
+<span class="go">████ █   █ █ ▄ ▄▄ ▀ ▀█▀▄▄▄▄▄▄▄██ ████</span>
+<span class="go">████ █▄▄▄█ █▀   ▄▄█▄▀█▀▄█ █  ▀ ▄ ████</span>
+<span class="go">████▄▄▄▄▄▄▄█▄▄████▄▄▄▄█▄▄▄▄▄█▄███████</span>
+<span class="go">█████████████████████████████████████</span>
+<span class="go">█████████████████████████████████████</span>
 </code></pre>
 <p>and the QR code will display in your terminal.
 On your phone, select the option to add a connection via QR code,
@@ -340,34 +338,34 @@ and it also creates PNG files if you select that format.</p>
 <h2 id="encrypted-internet-tunnel">Encrypted Internet tunnel</h2>
 <p>I mentioned earlier that to the average user, a VPN is an encrypted tunnel they can run their Internet traffic through.
 The topology is</p>
-<pre><code>Client -&#62; VPN Server -&#62; public internet -&#62; website
+<pre><code>Client -&gt; VPN Server -&gt; public internet -&gt; website
 </code></pre>
 <p>which makes it look to the website that the traffic originates from the VPN server.
 This is actually very similar to our internal network setup from before, which boils down to</p>
-<pre><code>Client -&#62; VPN Server -&#62; internal network -&#62; machine
+<pre><code>Client -&gt; VPN Server -&gt; internal network -&gt; machine
 </code></pre>
 <p>To achieve the Internet tunnel topology, we just need to modify the client configuration:</p>
-<pre><code>[Peer]
-PublicKey = M&#47;HD4qJYi1RlMH&#47;K9xQ12yW6Cu62LuGasyZhfnVsbUE=
+<pre><code class="language-diff"><span></span>[Peer]
+PublicKey = M/HD4qJYi1RlMH/K9xQ12yW6Cu62LuGasyZhfnVsbUE=
 Endpoint = vpn.example.com:51820
 
-- AllowedIPs = 192.168.0.0&#47;24
-+ AllowedIPs = 0.0.0.0&#47;0
+<span class="gd">- AllowedIPs = 192.168.0.0/24</span>
+<span class="gi">+ AllowedIPs = 0.0.0.0/0</span>
 </code></pre>
 <p>This <code>[Peer]</code> section refers to the Server.
 We modify <code>AllowedIPs</code> so that it includes all possible IPs
-(<code>0.0.0.0&#47;0</code>),
-rather than just the internal subnet&#8217;s IPs.</p>
+(<code>0.0.0.0/0</code>),
+rather than just the internal subnet’s IPs.</p>
 <p>With this, every time the Client tries to communicate on the Internet,
 for instance it requests <code>archlinux.org (95.217.163.246)</code>,
-WireGuard will match that IP to the <code>0.0.0.0&#47;0</code> (all IPs) mask,
+WireGuard will match that IP to the <code>0.0.0.0/0</code> (all IPs) mask,
 and route the packet to the Server.
 Then, the Server will forward that packet to <code>archlinux.org</code>.</p>
-<p>Thus, we&#8217;ve made a VPN that works just like NordVPN or ProtonVPN, and all the others.</p>
+<p>Thus, we’ve made a VPN that works just like NordVPN or ProtonVPN, and all the others.</p>
 <h2 id="further-reading">Further reading</h2>
 <p>This guide distills my knowledge with the network topologies I use,
 i.e. connecting to an internal network, and connecting to the Internet via WireGuard.
-However, that&#8217;s of course not the only way you can use a VPN.
+However, that’s of course not the only way you can use a VPN.
 Here are some resources that were useful to me:</p>
 <ul>
 <li>man pages <code>wg-quick(8)</code> and <code>wg(8)</code></li>
@@ -376,7 +374,8 @@ Here are some resources that were useful to me:</p>
 </ul>
 <p>Thank you for reading this article!</p>
 <hr/>
-<p>Edit: the &#8220;our internal setup&#8221; diagram has been corrected (2025-03-02)</p>
+<p>Edit: the “our internal setup” diagram has been corrected (2025-03-02)</p>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

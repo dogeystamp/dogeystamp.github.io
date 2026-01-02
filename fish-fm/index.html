@@ -2,51 +2,49 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Using the shell as a file picker for Qutebrowser</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Using the shell as a file picker for Qutebrowser</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="using-the-shell-as-a-file-picker-for-qutebrowser">Using the shell as a file picker for Qutebrowser</h1>
 <div class="creation-date">
 2023-06-28
 </div>
-<p><a href="https://github.com/qutebrowser/qutebrowser">Qutebrowser</a> is pretty great (thanks The-Compiler &#60;3).
-For those who don&#8217;t know about it, it&#8217;s essentially a Vim-like browser:
-there&#8217;s a bunch of cryptic shortcuts, but they maximize your efficiency.
+<p><a href="https://github.com/qutebrowser/qutebrowser">Qutebrowser</a> is pretty great (thanks The-Compiler &lt;3).
+For those who don’t know about it, it’s essentially a Vim-like browser:
+there’s a bunch of cryptic shortcuts, but they maximize your efficiency.
 The best part of Vim, which is replicated in Qutebrowser,
 is the ability to do everything without taking your hands off the keyboard.</p>
 <p>Anyways, an issue I had was that when uploading a file in Qutebrowser is that it calls on a normal GUI file picker.
 This is probably a sane default, but the default file picker does not have Vim shortcuts (absolutely unusable!).
 Now, you <em>could</em> use <a href="https://github.com/ranger/ranger">ranger</a>, or <a href="https://github.com/vifm/vifm">vifm</a>
 in the way described <a href="https://old.reddit.com/r/qutebrowser/comments/r9igqe/need_help_using_ranger_as_file_chooser/">here</a>,
-but that&#8217;s boring.
+but that’s boring.
 Instead, as a masochist power user, I manage all my files exclusively in the shell,
 and I wanted to have that experience in Qutebrowser.
 So, I made a 25-line script <code>fish-fm</code> that does just that.</p>
 <h2 id="demonstration">Demonstration</h2>
-<p>Here&#8217;s an example usage of fish-fm.</p>
+<p>Here’s an example usage of fish-fm.</p>
 <p>First, when a website asks you to upload a file, qutebrowser opens a terminal window with fish-fm.
 Then, you have a full fish shell in which
 you can run <code>sxiv</code>, <code>mpv</code>, or any other command to inspect your files first.
@@ -54,13 +52,13 @@ This also includes all its features like history and autosuggestions.
 Once you figure out what you want to upload, you then run <code>sel [file paths]</code>.
 The great thing about this is that you can use any glob or even xargs with this command.
 As a demo:</p>
-<p><img src="../public/img/fish-fm/term-thumb.jpg" alt="" />
-<img src="../public/img/fish-fm/discord-thumb.jpg" alt="" /></p>
+<p><img alt="" src="../public/img/fish-fm/term-thumb.jpg">
+<img alt="" src="../public/img/fish-fm/discord-thumb.jpg"/></img></p>
 <h3 id="sxiv-selection">sxiv selection</h3>
 <p>Optionally, you can run <code>ssel [directory or file paths]</code>,
 which uses sxiv to view your images.
-Then, you can mark the images (see sxiv&#8217;s man page), and those will be uploaded.</p>
-<p><img src="../public/img/fish-fm/sxiv.jpg" alt="" /></p>
+Then, you can mark the images (see sxiv’s man page), and those will be uploaded.</p>
+<p><img alt="" src="../public/img/fish-fm/sxiv.jpg"/></p>
 <h2 id="installation">Installation</h2>
 <ul>
 <li>Install the dependencies: qutebrowser, fish</li>
@@ -68,18 +66,19 @@ Then, you can mark the images (see sxiv&#8217;s man page), and those will be upl
 <li>Create a qutebrowser <a href="https://github.com/qutebrowser/qutebrowser/blob/master/doc/help/configuring.asciidoc#configuring-qutebrowser-via-configpy">config.py</a>.
 Then, add these lines:</li>
 </ul>
-<pre><code>c.fileselect.handler = "external"
-c.fileselect.multiple_files.command = ["st", "-e", "fish", "-C", "set -x OUTPUT {}; source ~&#47;.local&#47;bin&#47;fish-fm"]
-c.fileselect.single_file.command = ["st", "-e", "fish", "-C", "set -x OUTPUT {}; source ~&#47;.local&#47;bin&#47;fish-fm"]
+<pre><code class="language-python"><span></span><span class="n">c</span><span class="o">.</span><span class="n">fileselect</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="s2">"external"</span>
+<span class="n">c</span><span class="o">.</span><span class="n">fileselect</span><span class="o">.</span><span class="n">multiple_files</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"st"</span><span class="p">,</span> <span class="s2">"-e"</span><span class="p">,</span> <span class="s2">"fish"</span><span class="p">,</span> <span class="s2">"-C"</span><span class="p">,</span> <span class="s2">"set -x OUTPUT </span><span class="si">{}</span><span class="s2">; source ~/.local/bin/fish-fm"</span><span class="p">]</span>
+<span class="n">c</span><span class="o">.</span><span class="n">fileselect</span><span class="o">.</span><span class="n">single_file</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"st"</span><span class="p">,</span> <span class="s2">"-e"</span><span class="p">,</span> <span class="s2">"fish"</span><span class="p">,</span> <span class="s2">"-C"</span><span class="p">,</span> <span class="s2">"set -x OUTPUT </span><span class="si">{}</span><span class="s2">; source ~/.local/bin/fish-fm"</span><span class="p">]</span>
 </code></pre>
 <p>Depending on your terminal, you might have to edit these commands.
 I personally use <code>st</code>; yours may be different.
 The <code>{}</code> here is a placeholder for a temporary file where fish-fm writes its output.
-This is necessary because terminals don&#8217;t forward the stdout of their commands,
-so fish-fm can&#8217;t just print the files selected.</p>
+This is necessary because terminals don’t forward the stdout of their commands,
+so fish-fm can’t just print the files selected.</p>
 <ul>
 <li>Your file picker is now a fish shell.</li>
 </ul>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

@@ -2,31 +2,29 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Note-taking with Typst and Neovim</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Note-taking with Typst and Neovim</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="note-taking-with-typst-and-neovim">Note-taking with Typst and Neovim</h1>
 <div class="creation-date">
@@ -37,7 +35,7 @@
 <strong>This post is outdated!</strong> Please see the <a href="/typst-notes2">updated 2026 version</a>,
 which is a complete rewrite of this article with updated information.</p>
 </div>
-<p>A while back, I saw Gilles Castel&#8217;s <a href="https://castel.dev/post/lecture-notes-1/">series</a>
+<p>A while back, I saw Gilles Castel’s <a href="https://castel.dev/post/lecture-notes-1/">series</a>
 of blog posts about his note-taking setup with LaTeX and Vim.
 I was quite inspired by the idea, and I even tried it for a while,
 but gave up in the end.
@@ -47,83 +45,83 @@ So, these were my goals for a note-taking system:</p>
 <li>Taking notes should be convenient.
 I should be able to to open a new notes page and start writing in a short amount of time.</li>
 <li>The syntax for the notes should be easy to remember.
-If I need to look up syntax for common things, I&#8217;m wasting time.</li>
+If I need to look up syntax for common things, I’m wasting time.</li>
 <li>I should be able to put basic math, figures, etc. in my notes.</li>
 </ul>
 <p>Eventually, I found a typesetting system called <a href="https://github.com/typst/typst">Typst</a>.
 Typst is kind of a mix between LaTeX and other formats like Markdown.
-On one hand, it&#8217;s designed for working with math and other technical subjects, like LaTeX.
+On one hand, it’s designed for working with math and other technical subjects, like LaTeX.
 On the other hand, it has a relatively simple syntax reminiscent of Markdown.
 Compare these two snippets:</p>
 <p>LaTeX:</p>
-<pre><code>Then, starting from 2:
-\begin{enumerate}
-    \item If the current number is composite, we skip to the next number.
-    \item Mark all factors of the current number as composite.
-    \item Move to the next number.
-\end{enumerate}
+<pre><code class="language-tex"><span></span>Then, starting from 2:
+<span class="k">\begin</span><span class="nb">{</span>enumerate<span class="nb">}</span>
+    <span class="k">\item</span> If the current number is composite, we skip to the next number.
+    <span class="k">\item</span> Mark all factors of the current number as composite.
+    <span class="k">\item</span> Move to the next number.
+<span class="k">\end</span><span class="nb">{</span>enumerate<span class="nb">}</span>
 </code></pre>
 <p>Typst:</p>
-<pre><code>Then, starting from 2:
-+ If the current number is composite, we skip to the next number.
-+ Mark all factors of the current number as composite.
-+ Move to the next number.
+<pre><code class="language-typst"><span></span>Then,<span class="w"> </span>starting<span class="w"> </span>from<span class="w"> </span>2:
+<span class="p">+</span><span class="w"> </span>If<span class="w"> </span>the<span class="w"> </span>current<span class="w"> </span>number<span class="w"> </span>is<span class="w"> </span>composite,<span class="w"> </span>we<span class="w"> </span>skip<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>next<span class="w"> </span>number.
+<span class="p">+</span><span class="w"> </span>Mark<span class="w"> </span>all<span class="w"> </span>factors<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>current<span class="w"> </span>number<span class="w"> </span>as<span class="w"> </span>composite.
+<span class="p">+</span><span class="w"> </span>Move<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>next<span class="w"> </span>number.
 </code></pre>
 <p>Because of the above advantages, I decided to start writing things down in Typst.
-In this blog post, I&#8217;ll be documenting my process and tools for Typst note-taking at the time of writing.</p>
+In this blog post, I’ll be documenting my process and tools for Typst note-taking at the time of writing.</p>
 <h2 id="neovim-setup">Neovim setup</h2>
-<p>Currently, I&#8217;m using the <a href="https://github.com/kaarmu/typst.vim">typst.vim</a> plugin to integrate Typst with Neovim.
+<p>Currently, I’m using the <a href="https://github.com/kaarmu/typst.vim">typst.vim</a> plugin to integrate Typst with Neovim.
 It provides basic syntax highlighting, and recognizes <code>.typ</code> files as Typst files.
-The plugin also has a &#8220;watch&#8221; command that compiles your Typst file on change to a PDF.
-However, I haven&#8217;t figured out how to have it display compiler errors, so I have this in my Neovim config:</p>
-<pre><code>function TypstWatch()
-    vsp
-    vertical resize 20
-    exec &#39;terminal &#39; .. &#39;typst watch &#39; .. expand("%:")
-    exec "norm \&#60;c-w&#62;h"
+The plugin also has a “watch” command that compiles your Typst file on change to a PDF.
+However, I haven’t figured out how to have it display compiler errors, so I have this in my Neovim config:</p>
+<pre><code class="language-vim"><span></span><span class="k">function</span> TypstWatch<span class="p">()</span>
+    <span class="k">vsp</span>
+    <span class="k">vertical</span> <span class="k">resize</span> <span class="m">20</span>
+    exec <span class="s1">'terminal '</span> .. <span class="s1">'typst watch '</span> .. expand<span class="p">(</span><span class="s2">"%:"</span><span class="p">)</span>
+    exec <span class="s2">"norm \&lt;c-w&gt;h"</span>
 endfunc
-nnoremap &#60;silent&#62;&#60;leader&#62;fc :call TypstWatch()&#60;cr&#62;
-nnoremap &#60;silent&#62;&#60;leader&#62;fr :silent exec "!zathura --fork " . expand("%:p:r") . ".pdf &#38;"&#60;cr&#62;
+<span class="nb">nnoremap</span> <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;&lt;</span>leader<span class="p">&gt;</span>fc :<span class="k">call</span> TypstWatch<span class="p">()&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
+<span class="nb">nnoremap</span> <span class="p">&lt;</span><span class="k">silent</span><span class="p">&gt;&lt;</span>leader<span class="p">&gt;</span>fr :<span class="k">silent</span> exec <span class="s2">"!zathura --fork "</span> . expand<span class="p">(</span><span class="s2">"%:p:r"</span><span class="p">)</span> . <span class="s2">".pdf &amp;"</span><span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
 </code></pre>
 <p>This sets up a bind to open <code>typst watch</code> in a terminal pane on the right,
 with another bind to open the PDF in Zathura.
 Every time I save the content in my text editor, it updates the PDF seamlessly.
 It looks like this on screen:</p>
-<p><a href="/public/img/typst-notes/nvim.jpg"> <img src="/public/img/typst-notes/nvim-thumb.jpg" alt="" /> </a></p>
+<p><a href="/public/img/typst-notes/nvim.jpg"> <img alt="" src="/public/img/typst-notes/nvim-thumb.jpg"> </img></a></p>
 <h3 id="templates">Templates</h3>
 <p>Users of LaTeX or Typst often use templates in order to configure things like document size, layout, fonts, style, and so on.
 Instead of redefining these settings every time, we can just import them from a file.
-I won&#8217;t go into detail here; read the relvant Typst <a href="https://typst.app/docs/tutorial/making-a-template/">documentation</a> for information.
+I won’t go into detail here; read the relvant Typst <a href="https://typst.app/docs/tutorial/making-a-template/">documentation</a> for information.
 For reference, you can find my own <a href="https://github.com/dogeystamp/typst-templates">templates</a> at GitHub along with instructions for using them.
-The developers of Typst are working on better ways of packaging templates at the moment, so beware that they&#8217;re not the best example of how to write templates.</p>
+The developers of Typst are working on better ways of packaging templates at the moment, so beware that they’re not the best example of how to write templates.</p>
 <p>Anyways, you always need to import the templates for every new document you make,
 and you also need to pass in parameters like the title of the document.
 Typing all this boilerplate manually would be tedious, if done for every document.
 This is where <a href="https://github.com/SirVer/ultisnips">UltiSnips</a> comes in handy.
 UltiSnip provides snippets, which are templates of text that you can rapidly paste in the editor.
-For example, I&#8217;ve set it up so typing <code>today</code> and pressing Tab prints out the current date:</p>
-<p><a href="/public/img/typst-notes/today.gif"> <img src="/public/img/typst-notes/today-thumb.gif" alt="" /> </a></p>
+For example, I’ve set it up so typing <code>today</code> and pressing Tab prints out the current date:</p>
+<p><a href="/public/img/typst-notes/today.gif"> <img alt="" src="/public/img/typst-notes/today-thumb.gif"/> </a></p>
 <p>Snippets also support slots where you can type your own text.
 Every time Tab is pressed again, it moves to the next slot instantly.
 Here, you can see my snippet for new documents in action:</p>
-<p><a href="/public/img/typst-notes/general.gif"> <img src="/public/img/typst-notes/general-thumb.gif" alt="" /> </a></p>
+<p><a href="/public/img/typst-notes/general.gif"> <img alt="" src="/public/img/typst-notes/general-thumb.gif"/> </a></p>
 <p>With this setup for Neovim, I have achieved the goal of being able to start writing new notes rapidly.
 It only takes around twenty seconds to open a new file in the editor, then fill out the template information,
 after which I can start writing.</p>
 <h3 id="version-control">Version control</h3>
 <p>When dealing with any textual content, a good practice is to put it under version control like Git.
-This is the norm for code, but it&#8217;s also viable for LaTeX&#47;Typst content.
+This is the norm for code, but it’s also viable for LaTeX/Typst content.
 The main advantages of this are:</p>
 <ul>
-<li>You&#8217;re sure you won&#8217;t accidentally delete any data,</li>
+<li>You’re sure you won’t accidentally delete any data,</li>
 <li>You can roll back to older versions, and</li>
 <li>You can easily view what changed between versions.</li>
 </ul>
 <p>For that reason, I set up a private GitHub repo for storing all my notes in a single folder.
 Besides that, I also set up the templates as a submodule.
 Like this, I can clone the notes repository and also get my templates set up at the same time.</p>
-<h2 id="math-code">Math &#38; code</h2>
-<p>In the notes I&#8217;m writing, I often have to deal with mathematical expressions and code.
+<h2 id="math-code">Math &amp; code</h2>
+<p>In the notes I’m writing, I often have to deal with mathematical expressions and code.
 You can see <a href="https://castel.dev/post/lecture-notes-1/#latex-snippets">here</a>
 that Castel gets a lot of use out of UltiSnips for rapidly typing math in LaTeX.
 However, in Typst, I find that these snippets are mostly unnecessary,
@@ -132,77 +130,78 @@ since it has cleaner, simpler syntax for math in general.</p>
 <pre><code>\frac{3}{2}
 </code></pre>
 <p>Typst has a much more minimal syntax:</p>
-<pre><code>3&#47;2
+<pre><code>3/2
 </code></pre>
-<p>Typst also has a simpler math &#8220;environment&#8221; syntax.
+<p>Typst also has a simpler math “environment” syntax.
 Anything between dollar signs <code>$"like this"$</code> is inline math.
 To use display math, add any spacing <code>$ "like this" $</code>.
 With <a href="https://github.com/jiangmiao/auto-pairs">auto-pairs</a> for Neovim,
 it only takes a single keystroke to start a math expression,
 and another to end one.
 See it here in action:</p>
-<p><a href="/public/img/typst-notes/math.mp4"> <img src="/public/img/typst-notes/math-thumb.gif" alt="" /> </a></p>
-<p>Another bit of syntax sugar that&#8217;s built-in to Typst is support for code blocks.
+<p><a href="/public/img/typst-notes/math.mp4"> <img alt="" src="/public/img/typst-notes/math-thumb.gif"/> </a></p>
+<p>Another bit of syntax sugar that’s built-in to Typst is support for code blocks.
 Inline code is introduced by single backticks,
 while multi-line code is introduced by triple backticks.
 This is <em>exactly</em> the same syntax as in Markdown, which is much more familiar than <code>\begin{verbatim}</code>.
 It also provides syntax highlighting out of the box, without needing to import lstlisting:</p>
-<p><a href="/public/img/typst-notes/code.mp4"> <img src="/public/img/typst-notes/code-thumb.gif" alt="" /> </a></p>
+<p><a href="/public/img/typst-notes/code.mp4"> <img alt="" src="/public/img/typst-notes/code-thumb.gif"/> </a></p>
 <h2 id="figures">Figures</h2>
 <p>Being able to draw diagrams in the notes is also a necessary feature.
-This part of my setup is mostly unaltered from Castel&#8217;s own method of drawing figures.
+This part of my setup is mostly unaltered from Castel’s own method of drawing figures.
 Read his own <a href="https://castel.dev/post/lecture-notes-2/">blog post</a> regarding drawing figures for the best explanation of how it works.
 To briefly summarize his post, Castel uses Inkscape to draw figures,
 with a shortcut script that accelerates the process.
 He says that he can draw almost as fast as his lecturers draw on the blackboard,
-although I&#8217;m not nearly skilled enough to do the same.
-Here&#8217;s an example from his blog post:</p>
-<p><a href="/public/img/typst-notes/castel-fig.jpg"> <img src="/public/img/typst-notes/castel-fig-thumb.jpg" alt="" /> </a></p>
-<p>Again, read Castel&#8217;s blog post about drawing figures.
+although I’m not nearly skilled enough to do the same.
+Here’s an example from his blog post:</p>
+<p><a href="/public/img/typst-notes/castel-fig.jpg"> <img alt="" src="/public/img/typst-notes/castel-fig-thumb.jpg"/> </a></p>
+<p>Again, read Castel’s blog post about drawing figures.
 Here, I will only explain the modifications I made to his process,
 assuming you already know how it works.</p>
-<p>So, first of all, Castel&#8217;s shortcut manager (<a href="https://github.com/gillescastel/inkscape-shortcut-manager">GitHub</a>)
+<p>So, first of all, Castel’s shortcut manager (<a href="https://github.com/gillescastel/inkscape-shortcut-manager">GitHub</a>)
 is quite useful, and does indeed speed up drawing considerably.
-However, it&#8217;s built to deal with LaTeX only,
+However, it’s built to deal with LaTeX only,
 which is not compatible with my notes.
 Therefore, I patched his scripts so that they hook into Typst rather than latexmk.
 The results of this are available <a href="https://github.com/dogeystamp/inkscape-shortcut-manager">on GitHub</a>.
 Besides that, I also have a snippet for figures in Typst.
-It has slots for inputting the filename&#47;ID of the figure, and also a caption for it.
-Once the snippet is pasted, I can hover over the filename and press <code>&#60;leader&#62;ff</code>,
-which opens that figure in Inkscape, or creates it if it doesn&#8217;t exist.
+It has slots for inputting the filename/ID of the figure, and also a caption for it.
+Once the snippet is pasted, I can hover over the filename and press <code>&lt;leader&gt;ff</code>,
+which opens that figure in Inkscape, or creates it if it doesn’t exist.
 Then, I can draw things, and have it appear in my notes.
-Here&#8217;s a full demo of drawing a figure (click for a non-gif version):</p>
-<p><a href="/public/img/typst-notes/figure.mp4"> <img src="/public/img/typst-notes/figure-thumb.gif" alt="" /> </a></p>
-<p>For now, there&#8217;s the limitation that there is no equivalent of PDF+LaTeX for Typst.
+Here’s a full demo of drawing a figure (click for a non-gif version):</p>
+<p><a href="/public/img/typst-notes/figure.mp4"> <img alt="" src="/public/img/typst-notes/figure-thumb.gif"/> </a></p>
+<p>For now, there’s the limitation that there is no equivalent of PDF+LaTeX for Typst.
 This means that the font for the document is not synced to the font in the figures themselves.</p>
-<h2 id="linkingreferences">Linking&#47;references</h2>
-<p>Often, when I&#8217;m writing notes for a certain topic, I might want to reference another.
+<h2 id="linkingreferences">Linking/references</h2>
+<p>Often, when I’m writing notes for a certain topic, I might want to reference another.
 Now, it is possible to use a relative path link to another PDF,
-but that doesn&#8217;t allow for referencing specific pages or sections.
+but that doesn’t allow for referencing specific pages or sections.
 Castel himself solved this problem with <a href="https://github.com/gillescastel/instant-reference">Instant Reference</a>,
-which creates links with the <code>phd:&#47;&#47;</code> protocol, which is then handled specially by a script.
+which creates links with the <code>phd://</code> protocol, which is then handled specially by a script.
 However, I decided to make my own <a href="https://github.com/dogeystamp/pyinstantref">rewrite</a> of the script in Python, in contrast to the original written in JavaScript.
-I prefer having my packages managed by the system&#8217;s package manager, rather than by <code>npm</code>.
-Python is better in this regard, because Arch Linux packages essential Python packages under <code>extra&#47;python-.*</code>.</p>
+I prefer having my packages managed by the system’s package manager, rather than by <code>npm</code>.
+Python is better in this regard, because Arch Linux packages essential Python packages under <code>extra/python-.*</code>.</p>
 <p>I have a bind set up to instantly copy a link to the currently viewed page in the PDF.
 For example, here I link to my algorithm notes in a document:</p>
-<p><a href="/public/img/typst-notes/reference.mp4"> <img src="/public/img/typst-notes/reference-thumb.gif" alt="" /> </a></p>
-<p>An extra feature I have compared to Castel&#8217;s version is referencing specific sections.
+<p><a href="/public/img/typst-notes/reference.mp4"> <img alt="" src="/public/img/typst-notes/reference-thumb.gif"/> </a></p>
+<p>An extra feature I have compared to Castel’s version is referencing specific sections.
 This is helpful when you modify notes afterwards and a page number points to different content.
 A key bind in my PDF reader triggers a rofi menu where you select one of the sections visible on the current page,
 after which you can paste the link to that section seamlessly in your notes.</p>
 <h1 id="conclusion">Conclusion</h1>
-<p>I&#8217;ve been using the above system for taking notes on competitive programming problems
+<p>I’ve been using the above system for taking notes on competitive programming problems
 and computer science for a few months.
 I think that my goals of having a system for notes that was convenient, easy, and featureful has been accomplished.
-Indeed, I haven&#8217;t had to open up a plain text document for taking notes in quite a while;
+Indeed, I haven’t had to open up a plain text document for taking notes in quite a while;
 everything is in Typst now.</p>
 <p>If you want to see the real configuration files behind all of it, check out my dotfiles <a href="https://github.com/dogeystamp/dots">on GitHub</a>.
-The important files are <code>src&#47;.local&#47;bin&#47;typst-figure</code>, and <code>src&#47;.config&#47;nvim&#47;typst.vim</code>.</p>
+The important files are <code>src/.local/bin/typst-figure</code>, and <code>src/.config/nvim/typst.vim</code>.</p>
 <p>Maybe this post will sway you to check out Typst.
-But if it hasn&#8217;t, look at the example on their <a href="https://github.com/typst/typst">GitHub page</a>.
-Hopefully, one day Typst will get wider usage, because it&#8217;s a great typesetting system.</p>
+But if it hasn’t, look at the example on their <a href="https://github.com/typst/typst">GitHub page</a>.
+Hopefully, one day Typst will get wider usage, because it’s a great typesetting system.</p>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

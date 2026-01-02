@@ -2,38 +2,36 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Chess engine, pt. 6: Neural-net evaluation</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Chess engine, pt. 6: Neural-net evaluation</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="chess-engine-pt.-6-neural-net-evaluation">Chess engine, pt. 6: Neural-net evaluation</h1>
 <div class="creation-date">
 2025-05-28
 </div>
-<link rel="contents" href="/chess0" />
-<link rel="prev" href="/chess5" />
+<link href="/chess0" rel="contents">
+<link href="/chess5" rel="prev">
 <div class="callout markdown-alert markdown-alert-callout">
 <p>This post is part of a series about building a chess-playing engine.</p>
 <p><a href="/chess0">Introduction (0)</a>
@@ -41,12 +39,12 @@
 </div>
 <p>The engine we built in this blog post series is now capable of playing chess,
 and it understands the game decently on a tactical basis.
-However, a common comment from human players was that the engine plays &#8220;weird&#8221;.
+However, a common comment from human players was that the engine plays “weird”.
 This unnatural-ness is a symptom of the engine having no knowledge of chess other than tactics.</p>
-<p>In this post, I&#8217;ll cover some of the main methods, both traditional and modern, used to
+<p>In this post, I’ll cover some of the main methods, both traditional and modern, used to
 give the engine some positional knowledge.
-To do this, I will continue building on our engine&#8217;s evaluation function.
-Right now, it&#8217;s based on material counting,
+To do this, I will continue building on our engine’s evaluation function.
+Right now, it’s based on material counting,
 but by the end of this post, it will be replaced by a neural network.</p>
 <p>First, though, a disclaimer.
 The purpose of this post is slightly different from the rest of the series,
@@ -56,72 +54,72 @@ The point of this post is not to describe best practice,
 but to show how to build a neural network, from the perspective of a beginner in ML.
 If I can do it, you can too!</p>
 <h2 id="material-counting">Material counting</h2>
-<p>Let&#8217;s revisit our engine&#8217;s current evaluation function.
+<p>Let’s revisit our engine’s current evaluation function.
 Primarily, it is based on material counting;
 that is, each piece is assigned a point value, like a pawn is 1 point (or 100 centipawns),
 and the queen is 9 points.
 Then, whichever player (White or Black) has more points has more advantage.</p>
-<p>The main reason material counting is useful is that it&#8217;s really effective at all levels of chess,
+<p>The main reason material counting is useful is that it’s really effective at all levels of chess,
 and is low effort to implement.
 As I mentioned before, even the best chess players in the world would struggle if they had a huge material disadvantage.</p>
 <p>However, there is of course more to chess than counting material.
 Take for example this opening, the Bongcloud Attack:</p>
-<p><img src="../public/img/chess6/bongcloud.gif" alt="A chess position diagram. From the start position, e4, e5, Ke2." /></p>
+<p><img alt="A chess position diagram. From the start position, e4, e5, Ke2." src="../public/img/chess6/bongcloud.gif"/></p>
 <p>If we just counted material, for all we know,
 this position is perfectly equal for both sides.
 In reality, the Bongcloud is so bad for White that it has become a meme.
-Why is it bad? <a href="https://en.m.wikibooks.org/wiki/Chess_Opening_Theory/1._e4/1...e5/2._Ke2">Wikibooks</a> says that this opening &#8220;prevents castling to protect the King, endangers the King, ignores development and the center, and blocks the Queen and Bishop&#8221;.</p>
-<p>Our engine can&#8217;t understand any of that,
+Why is it bad? <a href="https://en.m.wikibooks.org/wiki/Chess_Opening_Theory/1._e4/1...e5/2._Ke2">Wikibooks</a> says that this opening “prevents castling to protect the King, endangers the King, ignores development and the center, and blocks the Queen and Bishop”.</p>
+<p>Our engine can’t understand any of that,
 because it only sees that a side <em>has</em> a given piece,
-and it doesn&#8217;t know <em>where</em> that piece is.</p>
+and it doesn’t know <em>where</em> that piece is.</p>
 <h2 id="piece-square-tables">Piece-square tables</h2>
 <p>To make the engine understand basic positional aspects of chess,
 we can use <strong>piece-square tables</strong>.
-These encode a score not just for having a piece, like &#8220;<em>pawn</em> is 100 centipawns&#8221;,
-but also their position, like &#8220;<em>pawn on a6</em> is 180 centipawns&#8221;.
+These encode a score not just for having a piece, like “<em>pawn</em> is 100 centipawns”,
+but also their position, like “<em>pawn on a6</em> is 180 centipawns”.
 This score includes the inherent material value of the piece (1 point),
 and a bonus for its advanced position on the board (0.8 points).</p>
 <p>Piece-square tables can encode a lot of conventional wisdom about chess.
-For example, &#8220;knights on the rim are dim&#8221;,
+For example, “knights on the rim are dim”,
 that is, knights on the edge of the board,
 and especially the corners,
 are less valuable because their mobility is limited.
 In practice, the piece square table is an array of numbers that represent the score for each square a knight could be on.
-For &#8220;knights on the rim are dim&#8221;, this could be the PST you use:</p>
-<pre><code class="language-python">pst_knight_white = [
-    -70, -20, -20, -20, -20, -20, -20, -70,
-    -20,   0,   0,   0,   0,   0,   0, -20,
-    -20,   0,   0,   0,   0,   0,   0, -20,
-    -20,   0,   0,   0,   0,   0,   0, -20,
-    -20,   0,   0,   0,   0,   0,   0, -20,
-    -20,   0,   0,   0,   0,   0,   0, -20,
-    -20,   0,   0,   0,   0,   0,   0, -20,
-    -70, -20, -20, -20, -20, -20, -20, -70,
-]
+For “knights on the rim are dim”, this could be the PST you use:</p>
+<pre><code class="language-python"><span></span><span class="n">pst_knight_white</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">-</span><span class="mi">70</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">70</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">70</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">70</span><span class="p">,</span>
+<span class="p">]</span>
 </code></pre>
 <p>Each number represents a square, so the PST assigns scores for the entire chessboard.
 This PST specifically would penalize the knights for being on the edge, and doubly so for being in the corners.</p>
-<p>The array is one-dimensional, because engines typically don&#8217;t use row&#47;column notation (a1 is row 0, column 0);
+<p>The array is one-dimensional, because engines typically don’t use row/column notation (a1 is row 0, column 0);
 engines typically use a single number for every square, so a1 is 0, and h8 is 63.
 (Here is a <a href="https://pages.cs.wisc.edu/~psilord/blog/data/chess-pages/rep.html#:~:text=typedef%20uint64_t%20Bitboard%3B-,Chess%20Board%20Mapping,-So%20how%20do">neat visualization</a>
 of which numbers correspond to which squares.)</p>
 <p>Developers will often bake the material values of the pieces into the table.
 In pseudo-Python, it could look like this:</p>
-<pre><code class="language-python">pst_knight_white = [score + 300 for score in pst_knight_white]
+<pre><code class="language-python"><span></span><span class="n">pst_knight_white</span> <span class="o">=</span> <span class="p">[</span><span class="n">score</span> <span class="o">+</span> <span class="mi">300</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">pst_knight_white</span><span class="p">]</span>
 </code></pre>
-<p>In other words, we can directly add the knight&#8217;s 3 point material value into the piece-square table,
+<p>In other words, we can directly add the knight’s 3 point material value into the piece-square table,
 instead of it being a separate score we have to add.</p>
-<p>Also, piece-square tables are usually given from White&#8217;s view of the board.
-To get Black&#8217;s scores for each square, engines commonly do a vertical flip of White&#8217;s scores.
+<p>Also, piece-square tables are usually given from White’s view of the board.
+To get Black’s scores for each square, engines commonly do a vertical flip of White’s scores.
 Using the standard square numbering convention, if a certain square is <code>x</code>, the vertically
-mirrored equivalent square is <code>x ^ 56</code> (the square&#8217;s index bitwise XOR 56).
-Then to generate Black&#8217;s piece-square table, we can use this code:</p>
-<pre><code class="language-python">pst_knight_black = [pst_knight_white[i ^ 56] for i in range(64)]
+mirrored equivalent square is <code>x ^ 56</code> (the square’s index bitwise XOR 56).
+Then to generate Black’s piece-square table, we can use this code:</p>
+<pre><code class="language-python"><span></span><span class="n">pst_knight_black</span> <span class="o">=</span> <span class="p">[</span><span class="n">pst_knight_white</span><span class="p">[</span><span class="n">i</span> <span class="o">^</span> <span class="mi">56</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">64</span><span class="p">)]</span>
 </code></pre>
 <div class="notecard note markdown-alert markdown-alert-note">
-<p><strong>Note:</strong> In this post specifically, <em>scores will be from White&#8217;s perspective</em>,
+<p><strong>Note:</strong> In this post specifically, <em>scores will be from White’s perspective</em>,
 so positive is good for White, and negative is good for Black.
-For negamax, if we want Black&#8217;s perspective, we can negate the score.
+For negamax, if we want Black’s perspective, we can negate the score.
 Typically, NNUE engines do not operate this way; they use perspective networks.</p>
 </div>
 <p>To keep with the sign convention, whenever we evaluate a position with the PST, we add
@@ -129,32 +127,32 @@ scores for White, and subtract scores for Black.</p>
 <p>So far, this is just the knight PST; you should also make a table for all the other pieces.
 For instance, pawns that are close to the end of the board are very valuable because they can promote.</p>
 <p>Then, here is some pseudo-code for how your evaluation function could look like:</p>
-<pre><code class="language-python">def eval(position):
-    score = 0
-    for square in range(64):
-        piece = position.get_piece_on(square)
-        if piece.color == white:
-            score += get_piece_square_value(piece, square)
-        else:
-            score -= get_piece_square_value(piece, square)
-    return score
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval</span><span class="p">(</span><span class="n">position</span><span class="p">):</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">square</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">64</span><span class="p">):</span>
+        <span class="n">piece</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">get_piece_on</span><span class="p">(</span><span class="n">square</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">piece</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">white</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">get_piece_square_value</span><span class="p">(</span><span class="n">piece</span><span class="p">,</span> <span class="n">square</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">score</span> <span class="o">-=</span> <span class="n">get_piece_square_value</span><span class="p">(</span><span class="n">piece</span><span class="p">,</span> <span class="n">square</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">score</span>
 </code></pre>
 <p>Once you have piece-square tables in your engine, your evaluation function can become quite smart,
 depending on what heuristics you can encode in it.</p>
 <h3 id="tapered-evaluation">Tapered evaluation</h3>
 <p>The game of chess is often divided into the opening, midgame and endgame phases.
-In the midgame and endgame phases, the PST is useful for guiding the engine&#8217;s moves.
+In the midgame and endgame phases, the PST is useful for guiding the engine’s moves.
 However, the best strategy for the midgame is probably not the best strategy for the endgame.
 Therefore, engines often have two piece-square tables, one for the midgame and one for the endgame.</p>
 <p>As I mentioned in the last post,
 chess engines commonly determine whether it is the midgame or endgame
 based on how many pieces are still left on the board.
-Often, there will be a &#8220;phase&#8221; number that you calculate that will determine if you are in midgame or endgame.
+Often, there will be a “phase” number that you calculate that will determine if you are in midgame or endgame.
 Based on this number, the engine will interpolate between using the midgame and endgame piece-square tables.</p>
-<p>Interpolating between the tables is important (so I&#8217;ve read).
+<p>Interpolating between the tables is important (so I’ve read).
 If you use a fixed threshold and switch abruptly between the tables,
 the engine might avoid a good capture because it has a better score with the midgame table than the endgame table.
-To smooth out the difference, you &#8220;taper&#8221; the evaluation between midgame and endgame.</p>
+To smooth out the difference, you “taper” the evaluation between midgame and endgame.</p>
 <h3 id="summary">Summary</h3>
 <p>To briefly conclude this section, piece-square tables
 help your engine understand the value of <em>where</em> the pieces are on the board.
@@ -162,11 +160,11 @@ To do this, each piece-square combination is assigned a bonus or penalty.</p>
 <p>PSTs can be quite effective as an evaluation function.
 As of writing, the <a href="https://rofchade.nl/?p=307">PeSTO engine</a>, an engine that operates with <a href="https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function">piece-square tables</a> only,
 is <a href="http://computerchess.org.uk/ccrl/404/cgi/engine_details.cgi?print=Details&amp;each_game=1&amp;eng=PeSTO%202.210%2064-bit%204CPU#PeSTO_2_210_64-bit_4CPU">rated 3125 Elo</a> on CCRL Blitz (for comparison, Stockfish is 3818).
-PeSTO&#8217;s evaluation function is the product of lots of effort and fine-tuning,
+PeSTO’s evaluation function is the product of lots of effort and fine-tuning,
 but it goes to show that PSTs are pretty powerful, despite their relative simplicity.</p>
 <h2 id="neural-network-evaluation">Neural network evaluation</h2>
 <p>One of the main reasons I did this chess engine project was to get experience with training and running neural networks.</p>
-<p>I saw DeepMind&#8217;s work with <a href="https://en.m.wikipedia.org/wiki/AlphaZero">AlphaZero</a>,
+<p>I saw DeepMind’s work with <a href="https://en.m.wikipedia.org/wiki/AlphaZero">AlphaZero</a>,
 a neural-network based chess engine with <em>zero</em> knowledge of chess that learned to play at a superhuman level within a few hours.
 The idea behind AlphaZero is quite elegant;
 by having the network play games against itself,
@@ -176,32 +174,32 @@ it managed to learn chess with no external help or initial knowledge of chess ex
 hand-crafted evaluation (HCE) techniques like piece-square tables were the norm
 in chess engines.
 At the time, engine developers had to be good enough at chess to codify the winning strategies of the game.</p>
-<p>My idea was, if I can&#8217;t play half-decent chess, maybe my computer could learn
+<p>My idea was, if I can’t play half-decent chess, maybe my computer could learn
 about chess by itself like AlphaZero did.
-(I can say in hindsight that my engine was definitely far from AlphaZero&#8217;s success,
+(I can say in hindsight that my engine was definitely far from AlphaZero’s success,
 but it did succeed at learning chess at a higher level than my own understanding of it.)</p>
 <p>Now, since this was my first significant neural network project,
 I made a lot of mistakes doing it.
 Generally, the advice I give here is hopefully decent,
 but in the real project my methods were flawed.
 The purpose of this part is to document what I did and what I did wrong,
-but also to show you that getting into chess neural nets isn&#8217;t super difficult.
+but also to show you that getting into chess neural nets isn’t super difficult.
 Chess-inator is really bad relative to the best engines out there,
-but it&#8217;s much better than anything I thought I could ever make on my own.</p>
+but it’s much better than anything I thought I could ever make on my own.</p>
 <p>Also, before I continue, you should probably have some knowledge of neural networks,
 like what is a neuron and
 activation function,
-or how the typical neural network&#8217;s forward pass works.</p>
+or how the typical neural network’s forward pass works.</p>
 <h3 id="nnue">NNUE</h3>
 <p>Neural networks and machine learning can be a bit scary,
 because they commonly need lots of costly hardware to run.
 AlphaZero was trained using <a href="https://en.wikipedia.org/w/index.php?title=AlphaZero&amp;oldid=1289278179#:~:text=self%2Dplay%20using-,5%2C000%20first%2Dgeneration%20TPUs,-to%20generate%20the">thousands of TPUs</a> specialized for neural nets,
 and many other ML projects require GPUs at inference time.</p>
-<p>With many modern chess engines, though, you don&#8217;t need a GPU to run the neural network anymore.</p>
+<p>With many modern chess engines, though, you don’t need a GPU to run the neural network anymore.</p>
 <p><strong>NNUE</strong>, or Efficiently Updatable Neural Network,
 is a neural network design that is specifically CPU-friendly.
 Unlike deep learning, where there are many layers of neurons,
-I like to call NNUE &#8220;shallow learning&#8221;, because it often uses a very small amount of layers.
+I like to call NNUE “shallow learning”, because it often uses a very small amount of layers.
 Because of this small layer count, and the nature of games like chess,
 this type of network allows for extreme speed optimizations.
 Other neural networks may be more intelligent,
@@ -216,11 +214,11 @@ which makes it seem like NNUE is hard to implement.
 However, basic NNUE designs are actually quite simple,
 but also very effective.</p>
 <h3 id="pst-again">PST, again</h3>
-<p>To ease you into the idea of NNUE, let&#8217;s take the piece-square tables we had earlier,
+<p>To ease you into the idea of NNUE, let’s take the piece-square tables we had earlier,
 and turn them into a neural network.</p>
 <p>Recall that in the piece-square table, each combination of <em>piece</em> and <em>square</em>
 is assigned a score.
-The <em>color</em> of the piece is also important for the score&#8217;s sign.
+The <em>color</em> of the piece is also important for the score’s sign.
 For instance, a White Pawn on a1 could be worth 100 centipawns,
 while a Black Rook on h8 would be worth -500 centipawns.</p>
 <p>There are 6 pieces (rook, knight, bishop, queen, pawn, king), 2 colors (White, Black), and 64 squares on the chessboard.
@@ -228,146 +226,146 @@ These <strong>features</strong> make up 768 inputs to the piece-square table.
 Based on these inputs, the table returns a single value, the score of the position.</p>
 <p>We can therefore represent a piece-square table as a neural network with no activation functions,
 and no biases:</p>
-<p><img src="../public/img/chess6/neural_net.svg" alt="A diagram of a neural network. There is one input layer, connected to one output node." /></p>
+<p><img alt="A diagram of a neural network. There is one input layer, connected to one output node." src="../public/img/chess6/neural_net.svg"/></p>
 <p>Each input is either a 1 or a 0.
-For instance, if the first input is 1, that means &#8220;there is a White pawn on a1&#8221;.
-Otherwise, &#8220;there is not a White pawn on a1&#8221;.<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup></p>
+For instance, if the first input is 1, that means “there is a White pawn on a1”.
+Otherwise, “there is not a White pawn on a1”.<sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup></p>
 <p>These inputs almost fully represent a chess position.
-Notably, castling rights and en-passant aren&#8217;t accounted for.
-However, for our purposes, the evaluation function doesn&#8217;t have to be perfect,
-and our engine&#8217;s search will take care of those elements.
+Notably, castling rights and en-passant aren’t accounted for.
+However, for our purposes, the evaluation function doesn’t have to be perfect,
+and our engine’s search will take care of those elements.
 (I like to think that the evaluation function is the intuition of the chess engine,
 while search is the logical brain,
-so that evaluation doesn&#8217;t have to be 100% accurate in its calculations.)</p>
+so that evaluation doesn’t have to be 100% accurate in its calculations.)</p>
 <p>We then multiply each input by a weight. (In the example diagram above, I picked some arbitrary numbers like 100 and -500,
 which roughly correspond to the material values of the White pawn and Black rook, in centipawns.)
 Then, we take the sum of the products, and the resulting output is the score of the position in centipawns.
-The score is from White&#8217;s perspective; a positive score is good for White, and a negative score is good for Black.</p>
+The score is from White’s perspective; a positive score is good for White, and a negative score is good for Black.</p>
 <p>In other words, we add the values of all White pieces, and subtract the values of all Black pieces.
 But now, instead of explicitly doing that calculation, we use a neural network to do it.</p>
-<p>Here is some pseudo-code for evaluating the neural network&#8217;s output:</p>
-<pre><code class="language-python">WEIGHTS = [100, 100, 100, ..., -500, -550, -500]
+<p>Here is some pseudo-code for evaluating the neural network’s output:</p>
+<pre><code class="language-python"><span></span><span class="n">WEIGHTS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">500</span><span class="p">,</span> <span class="o">-</span><span class="mi">550</span><span class="p">,</span> <span class="o">-</span><span class="mi">500</span><span class="p">]</span>
 
-def forward_pass(inputs):
-    output = 0
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_pass</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
 
-    for i in range(768):
-        output += WEIGHTS[i] * inputs[i]
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">768</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    return output
+    <span class="k">return</span> <span class="n">output</span>
 </code></pre>
 <p>But since the inputs are binary zeroes and ones, this code is equivalent:</p>
-<pre><code class="language-python">def forward_pass(inputs):
-    output = 0
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">forward_pass</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
 
-    for i in range(768):
-        if inputs[i] == 1:
-            output += WEIGHTS[i]
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">768</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    return output
+    <span class="k">return</span> <span class="n">output</span>
 </code></pre>
-<p>Now, we have a &#8220;neural network&#8221; that implements a piece-square table.</p>
+<p>Now, we have a “neural network” that implements a piece-square table.</p>
 <h3 id="incremental-update">Incremental update</h3>
-<p>In this section, I&#8217;m going to continue using the simple PST neural network in the diagram above
+<p>In this section, I’m going to continue using the simple PST neural network in the diagram above
 to explain the core idea behind NNUE.
 Remember that NNUE stands for <em>efficiently updatable</em> neural network.
 What does that mean?</p>
 <p>In the evaluation function code I showed above,
 there is a for loop that iterates over all 768 inputs.
-In the PST, this isn&#8217;t that bad; for computers, a few hundred operations is nothing in terms of time.
+In the PST, this isn’t that bad; for computers, a few hundred operations is nothing in terms of time.
 However, for more complicated neural networks, we start getting nested for loops,
 and in that case doing the same thing 768 times becomes computationally expensive.</p>
 <p>To avoid this all looping and repetition, engines use <strong>incremental updates</strong>.
 The engine always keeps track of the score output of the current position.
 Whenever we make a move on the position,
 we only need to calculate the difference in score between the old and the new position.
-Since individual moves don&#8217;t change the position that much,
+Since individual moves don’t change the position that much,
 this calculation is really simple.</p>
 <p>As an example, suppose our engine is using material counting,
 and we are trying to calculate the score after exd5.</p>
-<p><img src="../public/img/chess6/scandi.svg" alt="Two chess position diagrams. The first is after 1. e4 d5, and the second is after the move 2. exd5." /></p>
+<p><img alt="Two chess position diagrams. The first is after 1. e4 d5, and the second is after the move 2. exd5." src="../public/img/chess6/scandi.svg"/></p>
 <p>If I tell you that the material score of the first position is 0, what is the material score of the second position?
-It&#8217;s a 1 point advantage for White, because
-the only difference between the two positions is that Black&#8217;s pawn was removed.
+It’s a 1 point advantage for White, because
+the only difference between the two positions is that Black’s pawn was removed.
 With material counting, when a piece is removed, its score is removed from the evaluation.
 When a piece is added, its score is added.</p>
 <p>If we apply this same idea to the PST neural network above, whenever an input bit is changed to a 1,
 we add its weight, and whenever a bit is changed to 0, we subtract its weight from the output.</p>
 <p>For instance, if we move the Black rook from h8 to h7 (assuming there is no piece on h7), we turn on <code>Rook, Black, h7</code> (bit 766),
 and we turn off <code>Rook, Black, h8</code> (bit 767):</p>
-<pre><code class="language-python"># this is the score before we move the rook.
-original_score = forward_pass(inputs)
+<pre><code class="language-python"><span></span><span class="c1"># this is the score before we move the rook.</span>
+<span class="n">original_score</span> <span class="o">=</span> <span class="n">forward_pass</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
-# this is the score after moving the rook.
-new_score = original_score + WEIGHTS[766] - WEIGHTS[767]
+<span class="c1"># this is the score after moving the rook.</span>
+<span class="n">new_score</span> <span class="o">=</span> <span class="n">original_score</span> <span class="o">+</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="mi">766</span><span class="p">]</span> <span class="o">-</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="mi">767</span><span class="p">]</span>
 </code></pre>
-<p><img src="../public/img/chess6/neural_net2.svg" alt="
+<p><img alt='
 The same neural network diagram as above, but the penultimate bit (Rook, Black, h7) is highlighted green, and the last bit (Rook, Black, h8) is highlighted red.
-Near the output node, there is a green &quot;+(-550)&quot;, and a red &quot;-(-500)&quot;, and a black &quot;difference: -50&quot;.
-" /></p>
+Near the output node, there is a green "+(-550)", and a red "-(-500)", and a black "difference: -50".
+' src="../public/img/chess6/neural_net2.svg"/></p>
 <p>Similar incremental updates can be done for captures too;
 a capture turns two bits off, and one bit on.</p>
-<p>We also need to implement a way to &#8220;undo&#8221; the score, since we can unmake moves.
+<p>We also need to implement a way to “undo” the score, since we can unmake moves.
 Whenever we unmake moves, we do the inverse operations to restore the original state.
 For example:</p>
-<pre><code>original_score = ...
+<pre><code class="language-python"><span></span><span class="n">original_score</span> <span class="o">=</span> <span class="o">...</span>
 
-# make move (Rh7)
-score += WEIGHTS[766]
-score -= WEIGHTS[767]
+<span class="c1"># make move (Rh7)</span>
+<span class="n">score</span> <span class="o">+=</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="mi">766</span><span class="p">]</span>
+<span class="n">score</span> <span class="o">-=</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="mi">767</span><span class="p">]</span>
 
-# unmake move (Rh7)
-score -= WEIGHTS[766]
-score += WEIGHTS[767]
+<span class="c1"># unmake move (Rh7)</span>
+<span class="n">score</span> <span class="o">-=</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="mi">766</span><span class="p">]</span>
+<span class="n">score</span> <span class="o">+=</span> <span class="n">WEIGHTS</span><span class="p">[</span><span class="mi">767</span><span class="p">]</span>
 
-# score is now back to the original state.
+<span class="c1"># score is now back to the original state.</span>
 </code></pre>
 <p>Now that we have incremental updates,
 we can re-evaluate our PST neural network in only a few operations,
 rather than re-doing 768 operations every time.</p>
-<p>In the engine&#8217;s function for applying a move to a position,
+<p>In the engine’s function for applying a move to a position,
 and undoing a move,
 you can add calls to the incremental update functions.
 Then, whenever you make moves on the board,
 the evaluation updates accordingly;
-whenever you unmake&#47;undo moves, the evaluation returns to its original state.</p>
+whenever you unmake/undo moves, the evaluation returns to its original state.</p>
 <h3 id="nnue-one-hidden-layer">NNUE, one hidden layer</h3>
-<p>Now that we&#8217;ve covered a contrived piece-square table neural network,
+<p>Now that we’ve covered a contrived piece-square table neural network,
 I introduce a basic NNUE design:</p>
-<p><img src="../public/img/chess6/neural_net3.svg" alt="
+<p><img alt='
 A neural network diagram.
-There is one input layer, one hidden layer with 3 nodes (labelled &quot;n = 3&quot;), and one output node.
+There is one input layer, one hidden layer with 3 nodes (labelled "n = 3"), and one output node.
 Layers are fully connected.
-" /></p>
+' src="../public/img/chess6/neural_net3.svg"/></p>
 <p>This neural network takes the same chessboard input as before,
 and outputs a score for it.
 However, the network is now more complex.</p>
 <p>Notably, we introduce a hidden layer of neurons.
 There are also biases on the hidden layer nodes and the output node.
-I chose to have 3 hidden layer nodes in this example, but there&#8217;s usually more than that (i.e. dozens to a few thousand).</p>
-<p>In the hidden layer, I&#8217;m using the <strong>clipped ReLU</strong> (sometimes called CReLU) activation function.
+I chose to have 3 hidden layer nodes in this example, but there’s usually more than that (i.e. dozens to a few thousand).</p>
+<p>In the hidden layer, I’m using the <strong>clipped ReLU</strong> (sometimes called CReLU) activation function.
 The original ReLU (rectified linear unit) is a common activation function defined as <code>ReLU(x) = max(0, x)</code>.
 Clipped ReLU is similar, but it completely clamps the output between 0 and 1.
 We can define the function as <code>CReLU(x) = max(0, min(x, 1))</code>, or equivalently, <code>CReLU(x) = clamp(x, 0, 1)</code>.</p>
 <p>Here is the graph for CReLU (<a href="https://www.desmos.com/calculator/lyxowmvi3r">Desmos</a>):</p>
-<p><img src="../public/img/chess6/crelu_graph.svg" alt="The graph for the clipped ReLU function" /></p>
-<p>CReLU is (from what I&#8217;ve read) not an ideal choice,
-but it&#8217;s simple and easy for beginners to deal with.
-The hidden layer&#8217;s activation function will be very often used compared to the output node&#8217;s activation function,
+<p><img alt="The graph for the clipped ReLU function" src="../public/img/chess6/crelu_graph.svg"/></p>
+<p>CReLU is (from what I’ve read) not an ideal choice,
+but it’s simple and easy for beginners to deal with.
+The hidden layer’s activation function will be very often used compared to the output node’s activation function,
 so we ideally pick a function can be optimized for speed.
-CReLU&#8217;s limited range is good for optimization (we&#8217;ll see later), which is why it is preferred over ReLU.</p>
+CReLU’s limited range is good for optimization (we’ll see later), which is why it is preferred over ReLU.</p>
 <p>One major difference between this neural network and our PST is that the output is no longer a score in centipawns (known as <strong>CP-space</strong>).
-Now, we express the position&#8217;s score as a win probability in <strong>WDL-space</strong>:
+Now, we express the position’s score as a win probability in <strong>WDL-space</strong>:
 a 0.0 is a loss, a 0.5 is a draw, and a 1.0 is a win.
-When I talk about training the network in the next section, you&#8217;ll see that using WDL is more natural than centipawn scores.
+When I talk about training the network in the next section, you’ll see that using WDL is more natural than centipawn scores.
 Centipawns are the traditional unit for scores, though, so we need to find a way to convert between CP-space and WDL-space.
 Engine developers have figured out that a <a href="https://en.m.wikipedia.org/wiki/Sigmoid_function">sigmoid function</a> is pretty good for that task.
 Sigmoid functions look like this:</p>
-<p><img src="../public/img/chess6/sigmoid.svg" alt="The equation for a sigmoid function. sigma(x) = 1/(1 + e^(-x/k))" /></p>
+<p><img alt="The equation for a sigmoid function. sigma(x) = 1/(1 + e^(-x/k))" src="../public/img/chess6/sigmoid.svg"/></p>
 <p>where k is a scaling constant.
 For our purposes of converting between centipawns and WDL, a value of <code>k = 400</code> is commonly used to scale the sigmoid properly.
-Here&#8217;s a graph (<a href="https://www.desmos.com/calculator/xugqjb6vbo">Desmos</a>):</p>
-<p><img src="../public/img/chess6/sigmoid_graph.svg" alt="The graph for the sigmoid function" /></p>
+Here’s a graph (<a href="https://www.desmos.com/calculator/xugqjb6vbo">Desmos</a>):</p>
+<p><img alt="The graph for the sigmoid function" src="../public/img/chess6/sigmoid_graph.svg"/></p>
 <p>On the X-axis, we have centipawns, and on the Y-axis, we have win probability.
 The output of a sigmoid function is between zero and one,
 and its domain is all real numbers.
@@ -375,11 +373,11 @@ This makes it ideal for our purposes of creating a WDL score.
 You can see that for negative centipawn scores, the game is probably a loss (near 0),
 and for high centipawn scores, the game is probably a win (near 1).</p>
 <p>Since we want the neural network to provide us with a WDL-space score,
-the output neuron&#8217;s activation function is also a sigmoid function.
+the output neuron’s activation function is also a sigmoid function.
 However, we use a <code>k = 1</code> curve, not the <code>k = 400</code> centipawn-WDL curve.
-I&#8217;ll explain why we do this later.</p>
+I’ll explain why we do this later.</p>
 <h3 id="training-process">Training process</h3>
-<p>For now, let&#8217;s focus on the way the network is trained.
+<p>For now, let’s focus on the way the network is trained.
 The NNUE is supposed to take a board position, and return an accurate WDL score.
 To accomplish this task, we need to figure out good values for all the weights and biases.
 <a href="https://youtube.com/watch?v=IHZwWFHWa-w">Gradient descent</a> is the tool used to do this.</p>
@@ -388,15 +386,15 @@ gradient descent works backwards to tune the weights so that the network is as a
 <p>The problem is, how do we get these examples?
 One supervised learning approach would be to have Stockfish evaluate a bunch of positions,
 and use those position-score pairs as examples.
-That&#8217;s cheating, though; in a way, we&#8217;re stealing Stockfish&#8217;s existing knowledge of chess.</p>
+That’s cheating, though; in a way, we’re stealing Stockfish’s existing knowledge of chess.</p>
 <p>Instead, the more fun solution is to generate training data ourselves.
 We have the engine play against itself for lots of games, and then extract all the positions from these games.
-We also track the engine&#8217;s evaluation of the positions, and the result of the game.</p>
-<p>Then, for every position, the &#8220;correct&#8221; evaluation is a <a href="https://mattdesl.svbtle.com/linear-interpolation">linear interpolation</a> between
-the engine&#8217;s evaluation, and the real final result (win, draw, loss) of the game.</p>
+We also track the engine’s evaluation of the positions, and the result of the game.</p>
+<p>Then, for every position, the “correct” evaluation is a <a href="https://mattdesl.svbtle.com/linear-interpolation">linear interpolation</a> between
+the engine’s evaluation, and the real final result (win, draw, loss) of the game.</p>
 <ul>
-<li>First, the engine&#8217;s centipawn evaluation for the position is converted to WDL space using the sigmoid curve (<code>k = 400</code>) we saw earlier.</li>
-<li>Then, we convert the game&#8217;s result into WDL, either 1.0, 0.5 or 0.0.</li>
+<li>First, the engine’s centipawn evaluation for the position is converted to WDL space using the sigmoid curve (<code>k = 400</code>) we saw earlier.</li>
+<li>Then, we convert the game’s result into WDL, either 1.0, 0.5 or 0.0.</li>
 </ul>
 <p>Now, we have two scores for the position, both in WDL space (i.e. between 0 and 1), that we mix together.
 This way, the engine learns from the outcomes of its games.
@@ -409,7 +407,7 @@ also get confused.<sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup></p>
 <p>Typically, NNUEs are trained on the order of
 <a href="https://github.com/fairy-stockfish/variant-nnue-pytorch/wiki/Training-data-generation#:~:text=at%20least%20100M%20positions">hundreds of millions of positions</a>.
 According to an Engine Programming Discord member kind enough to answer me, the training games
-can be run with a &#8220;5000 node soft limit&#8221; on the search, for example.
+can be run with a “5000 node soft limit” on the search, for example.
 I assume this means that after an iterative deepening iteration, if the count of game tree nodes visited in negamax
 exceeds 5000, break the loop.
 Also, I assume this node limit helps generate more positions in a small amount of time.</p>
@@ -422,174 +420,174 @@ In the worst case scenario, this is the difference between your training requiri
 or 3GB of RAM to run.
 See this
 <a href="https://lichess.org/@/revoof/blog/adapting-nnue-pytorchs-binary-position-format-for-lichess/cpeeAMeY">blog post</a>
-from a Lichess developer about Stockfish&#8217;s NNUE position format.
+from a Lichess developer about Stockfish’s NNUE position format.
 On average, their format requires 18.7 bytes per position.</p>
 <div id="backref-having-no-training-data"></div>
 <p>At the time I wrote the engine, I had no idea of how any of this worked,
 so I actually trained chess-inator on only a few million positions,
-which is &#8220;<em>drastically</em> little&#8221; for the network I was using.
+which is “<em>drastically</em> little” for the network I was using.
 I believe, as a consequence of this lack of training data,
 my NNUE was severely restricted in its performance.
 Also, I was limited by my terrible position encoding which consumed a large amount of RAM.
-<a href="#appendix-having-no-training-data">At the end of this article,</a> I&#8217;ll talk about these issues more and
+<a href="#appendix-having-no-training-data">At the end of this article,</a> I’ll talk about these issues more and
 mention some of the things I did to cope with these problems.</p>
 <h3 id="an-unoptimized-implementation">An unoptimized implementation</h3>
-<p>Now, here&#8217;s the forward pass of the neural net in pseudo-code,
+<p>Now, here’s the forward pass of the neural net in pseudo-code,
 and I hope it answers any of your questions about how it works:</p>
-<pre><code class="language-python">def crelu(x):
-    return clamp(x, 0, 1)
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">crelu</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">clamp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-def sigmoid(x):
-    # k = 1
-    return 1 &#47; (1 + exp(-x))
+<span class="k">def</span><span class="w"> </span><span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1"># k = 1</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
 
-# hidden layer size
-L1_SIZE = 3
-# number of input bits
-INPUT_SIZE = 768
+<span class="c1"># hidden layer size</span>
+<span class="n">L1_SIZE</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="c1"># number of input bits</span>
+<span class="n">INPUT_SIZE</span> <span class="o">=</span> <span class="mi">768</span>
 
-WEIGHTS_L1 = [
-    [...3 weights],
-    [...3 weights],
-    [...3 weights],
-    ... 768 times total
-]
-BIASES_L1 = [...3 biases]
+<span class="n">WEIGHTS_L1</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">],</span>
+    <span class="o">...</span> <span class="mi">768</span> <span class="n">times</span> <span class="n">total</span>
+<span class="p">]</span>
+<span class="n">BIASES_L1</span> <span class="o">=</span> <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">biases</span><span class="p">]</span>
 
-WEIGHTS_OUTPUT = [...3 weights]
-BIAS_OUTPUT = 1 bias
+<span class="n">WEIGHTS_OUTPUT</span> <span class="o">=</span> <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">]</span>
+<span class="n">BIAS_OUTPUT</span> <span class="o">=</span> <span class="mi">1</span> <span class="n">bias</span>
 
-def forward_pass(inputs):
-    # pre-activation state of the hidden layer
-    hidden = [0, 0, 0]
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_pass</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="c1"># pre-activation state of the hidden layer</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
-    for j in range(L1_SIZE):
-        for i in range(INPUT_SIZE):
-            if inputs[i] == 1:
-                hidden[j] += WEIGHTS_L1[i][j]
-        hidden[j] += BIASES_L1[j]
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">INPUT_SIZE</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">WEIGHTS_L1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">BIASES_L1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
-    # weighted sum of hidden layer&#39;s activations, plus bias
-    output_preactivation = 0
-    for j in range(L1_SIZE):
-        output_preactivation += WEIGHTS_OUTPUT[j] * crelu(hidden[j])
-    output_preactivation += BIAS_OUTPUT
+    <span class="c1"># weighted sum of hidden layer's activations, plus bias</span>
+    <span class="n">output_preactivation</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+        <span class="n">output_preactivation</span> <span class="o">+=</span> <span class="n">WEIGHTS_OUTPUT</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">crelu</span><span class="p">(</span><span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">output_preactivation</span> <span class="o">+=</span> <span class="n">BIAS_OUTPUT</span>
 
-    output = sigmoid(output_preactivation)
-    return output
+    <span class="n">output</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">output_preactivation</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
 </code></pre>
 <p>I wrote this forward pass function here so you can understand exactly how the
 neural network operates without any optimizations.
 Practically, this is exactly how it operates in my Python neural network training code.
-In the following sections though, I&#8217;ll be improving this code until it runs fast.
+In the following sections though, I’ll be improving this code until it runs fast.
 This is necessary in the engine side of things (the Rust side in my engine).</p>
 <h3 id="sigmoid-at-runtime">Sigmoid at runtime</h3>
 <p>The neat thing about the sigmoid activation function we used for the output neuron
-is that we don&#8217;t need it at runtime (i.e. when the engine is playing chess.)
+is that we don’t need it at runtime (i.e. when the engine is playing chess.)
 Because the curve that converts between CP-space and WDL-space is also a sigmoid,
-we&#8217;re actually training the neural network to think in terms of centipawns.
-Here&#8217;s the <code>k = 400</code> curve that converts CP-space to WDL-space, but with clearer variable names.</p>
-<p><img src="../public/img/chess6/sigmoid2.svg" alt="The equation for a sigmoid function. WDL = 1/(1 + e^(-CP/k))" /></p>
+we’re actually training the neural network to think in terms of centipawns.
+Here’s the <code>k = 400</code> curve that converts CP-space to WDL-space, but with clearer variable names.</p>
+<p><img alt="The equation for a sigmoid function. WDL = 1/(1 + e^(-CP/k))" src="../public/img/chess6/sigmoid2.svg"/></p>
 <p>And here is the sigmoid <em>activation function</em> that we actually use in our neural net:</p>
-<p><img src="../public/img/chess6/sigmoid3.svg" alt="The equation for a sigmoid function. sigma(x) = 1/(1 + e^(-x))" /></p>
-<p>where <code>x</code> is the pre-activation of the output neuron, and <code>σ(x)</code> is the neuron&#8217;s output.
-Since we&#8217;re training so that <code>σ(x)</code> is equal to <code>WDL</code>, that implies that</p>
-<p><img src="../public/img/chess6/eq.svg" alt="Math equation. CP/400 = x" /></p>
+<p><img alt="The equation for a sigmoid function. sigma(x) = 1/(1 + e^(-x))" src="../public/img/chess6/sigmoid3.svg"/></p>
+<p>where <code>x</code> is the pre-activation of the output neuron, and <code>σ(x)</code> is the neuron’s output.
+Since we’re training so that <code>σ(x)</code> is equal to <code>WDL</code>, that implies that</p>
+<p><img alt="Math equation. CP/400 = x" src="../public/img/chess6/eq.svg"/></p>
 <p>and therefore,</p>
-<p><img src="../public/img/chess6/eq2.svg" alt="Math equation. CP = 400x" /></p>
-<p>If your eyes glazed over the moment you saw math equations, here&#8217;s the key point of this section:
- <em>we can multiply the neural net output&#8217;s pre-activation by 400,
+<p><img alt="Math equation. CP = 400x" src="../public/img/chess6/eq2.svg"/></p>
+<p>If your eyes glazed over the moment you saw math equations, here’s the key point of this section:
+ <em>we can multiply the neural net output’s pre-activation by 400,
 and interpret that value as being in centipawns,</em>
 rather than using a WDL output.</p>
 <p>Thus, we can change our evaluation function to be like this:</p>
-<pre><code class="language-python">SCALE_K = 400
+<pre><code class="language-python"><span></span><span class="n">SCALE_K</span> <span class="o">=</span> <span class="mi">400</span>
 
-def forward_pass(inputs):
-    for _ in range(L1_SIZE):
-        for _ in range(INPUT_SIZE):
-            ... # see last section; I removed this code for brevity
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_pass</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">INPUT_SIZE</span><span class="p">):</span>
+            <span class="o">...</span> <span class="c1"># see last section; I removed this code for brevity</span>
 
-    output_preactivation = 0
-    for j in range(L1_SIZE):
-        output_preactivation += WEIGHTS_OUTPUT[j] * crelu(hidden[j])
-    output_preactivation += BIAS_OUTPUT
+    <span class="n">output_preactivation</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+        <span class="n">output_preactivation</span> <span class="o">+=</span> <span class="n">WEIGHTS_OUTPUT</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">crelu</span><span class="p">(</span><span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">output_preactivation</span> <span class="o">+=</span> <span class="n">BIAS_OUTPUT</span>
 
-    # HERE: notice how the sigmoid is missing
-    return output_preactivation * SCALE_K
+    <span class="c1"># HERE: notice how the sigmoid is missing</span>
+    <span class="k">return</span> <span class="n">output_preactivation</span> <span class="o">*</span> <span class="n">SCALE_K</span>
 </code></pre>
 <p>and instead of returning a weird 0.0 to 1.0 win probability value from the neural network,
-the evaluation function will return a centipawn score, just the way we&#8217;re used to.
+the evaluation function will return a centipawn score, just the way we’re used to.
 Also, we avoid computing <code>sigmoid</code>, which saves time.</p>
 <h3 id="incremental-update-for-nnue">Incremental update for NNUE</h3>
 <p>Notice that the forward pass has an expensive nested for loop,
 which does <code>768 * L1_SIZE</code> iterations.
-That&#8217;s bad; with a sufficiently big hidden layer, this could become a million iterations.</p>
+That’s bad; with a sufficiently big hidden layer, this could become a million iterations.</p>
 <p>The key observation that defines NNUE is that we can also apply incremental updates to this neural network,
 just like I demonstrated earlier with the PST.
-Each time we need an evaluation, we don&#8217;t have to re-compute the entire forward pass;
+Each time we need an evaluation, we don’t have to re-compute the entire forward pass;
 we only need to calculate the difference caused by a few input bits changing.</p>
 <p>Here is code that turns on or turns off bits in the input layer,
 then incrementally updates the NNUE evaluation:</p>
-<pre><code class="language-python"># hidden layer size
-L1_SIZE = 3
-# number of input bits
-INPUT_SIZE = 768
+<pre><code class="language-python"><span></span><span class="c1"># hidden layer size</span>
+<span class="n">L1_SIZE</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="c1"># number of input bits</span>
+<span class="n">INPUT_SIZE</span> <span class="o">=</span> <span class="mi">768</span>
 
-# sigmoid parameter
-SCALE_K = 400
+<span class="c1"># sigmoid parameter</span>
+<span class="n">SCALE_K</span> <span class="o">=</span> <span class="mi">400</span>
 
-WEIGHTS_L1 = [
-    [...3 weights],
-    [...3 weights],
-    [...3 weights],
-    ... 768 times total
-]
-BIASES_L1 = [...3 biases]
+<span class="n">WEIGHTS_L1</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">],</span>
+    <span class="o">...</span> <span class="mi">768</span> <span class="n">times</span> <span class="n">total</span>
+<span class="p">]</span>
+<span class="n">BIASES_L1</span> <span class="o">=</span> <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">biases</span><span class="p">]</span>
 
-WEIGHTS_OUTPUT = [...3 weights]
-BIAS_OUTPUT = 1 bias
+<span class="n">WEIGHTS_OUTPUT</span> <span class="o">=</span> <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">weights</span><span class="p">]</span>
+<span class="n">BIAS_OUTPUT</span> <span class="o">=</span> <span class="mi">1</span> <span class="n">bias</span>
 
 
-# current hidden layer state (pre-activations)
-hidden = [...3 elements]
+<span class="c1"># current hidden layer state (pre-activations)</span>
+<span class="n">hidden</span> <span class="o">=</span> <span class="p">[</span><span class="o">..</span><span class="mf">.3</span> <span class="n">elements</span><span class="p">]</span>
 
-def bit_set(i, on):
-    """Set bit `i` on or off."""
-    if on:
-        inputs[i] = 1
-        for j in range(L1_SIZE):
-            hidden[j] += WEIGHTS_L1[i][j]
-    else:
-        inputs[i] = 0
-        for j in range(L1_SIZE):
-            hidden[j] -= WEIGHTS_L1[i][j]
+<span class="k">def</span><span class="w"> </span><span class="nf">bit_set</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">on</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Set bit `i` on or off."""</span>
+    <span class="k">if</span> <span class="n">on</span><span class="p">:</span>
+        <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+            <span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">WEIGHTS_L1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+            <span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">WEIGHTS_L1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
 
-def evaluation():
-    """Get NNUE output (centipawns)."""
-    output = 0
-    for j in range(L1_SIZE):
-        output += WEIGHTS_OUTPUT[j] * crelu(hidden[j])
-    output += BIAS_OUTPUT
+<span class="k">def</span><span class="w"> </span><span class="nf">evaluation</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Get NNUE output (centipawns)."""</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="n">WEIGHTS_OUTPUT</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">crelu</span><span class="p">(</span><span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">output</span> <span class="o">+=</span> <span class="n">BIAS_OUTPUT</span>
 
-    output *= SCALE_K
-    return output
+    <span class="n">output</span> <span class="o">*=</span> <span class="n">SCALE_K</span>
+    <span class="k">return</span> <span class="n">output</span>
 
-# example: move rook from h8 to h7
-bit_set(767, False)
-bit_set(766, True)
-score = evaluation()
+<span class="c1"># example: move rook from h8 to h7</span>
+<span class="n">bit_set</span><span class="p">(</span><span class="mi">767</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">bit_set</span><span class="p">(</span><span class="mi">766</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">score</span> <span class="o">=</span> <span class="n">evaluation</span><span class="p">()</span>
 
-# then unmake (undo) the above move
-bit_set(767, True)
-bit_set(766, False)
+<span class="c1"># then unmake (undo) the above move</span>
+<span class="n">bit_set</span><span class="p">(</span><span class="mi">767</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">bit_set</span><span class="p">(</span><span class="mi">766</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </code></pre>
 <p>Each bit-set operation now only requires <code>L1_SIZE</code> operations to update the hidden layer pre-activations.
-Then, once we want the NNUE&#8217;s output, we use another <code>L1_SIZE</code> operations to run the hidden layer&#8217;s activation functions and sum them to get a final score.
+Then, once we want the NNUE’s output, we use another <code>L1_SIZE</code> operations to run the hidden layer’s activation functions and sum them to get a final score.
 This is much better than the earlier <code>768 * L1_SIZE</code> number of operations.</p>
 <p>Commonly, the term <strong>accumulator</strong> is used to describe the hidden layer pre-activations (<code>hidden</code> in the above code).
 The accumulator is the only state that you maintain for the NNUE;
 the output (and any further layers there might be) are computed from the accumulator state.
-Using incremental updates, it&#8217;s highly efficient to update the accumulator,
+Using incremental updates, it’s highly efficient to update the accumulator,
 so adding more hidden layer nodes is cheap.
 The accumulator is the <em>efficiently updatable</em> part of NNUE.
 If we had more layers after the accumulator (some engines do), these
@@ -604,9 +602,9 @@ array elements that are next to each other in memory
 are accessed one after the other.
 Secondly, in <code>bit_set</code>, I use <code>if</code> outside, and the <code>for</code> inside, even if this causes a bit of code duplication.
 This is the commonly advised way to write the loop,
-since this way we avoid repeatedly testing a condition that won&#8217;t change between iterations.</p>
+since this way we avoid repeatedly testing a condition that won’t change between iterations.</p>
 <p>In my original code, I implemented both of these things the wrong way.
-After a long time fiddling in <a href="https://godbolt.org/">Godbolt&#8217;s Compiler Explorer</a> and looking at the generated assembly,
+After a long time fiddling in <a href="https://godbolt.org/">Godbolt’s Compiler Explorer</a> and looking at the generated assembly,
 I figured out what was wrong, fixed the code and the compiler suddenly started generating <a href="https://en.m.wikipedia.org/wiki/Single_instruction,_multiple_data">SIMD</a>
 instructions.
 <strong>SIMD</strong> (single instruction, multiple data), or <strong>vectorized</strong> code
@@ -627,7 +625,7 @@ I often see that other engine developers manually vectorize their code, which is
 <h3 id="quantization">Quantization</h3>
 <p>Other than heavy use of SIMD, the other major optimization in NNUE is quantization.
 Floating point numbers <a href="https://youtube.com/watch?v=5TFDG-y-EHs">are</a> <a href="https://en.m.wikipedia.org/wiki/Fast_inverse_square_root#:~:text=evil%20floating%20point%20bit%20level%20hacking">evil</a>  (*personal opinion),
-so engine developers prefer to use integers rather than floating point numbers to represent the NNUE&#8217;s accumulator state.
+so engine developers prefer to use integers rather than floating point numbers to represent the NNUE’s accumulator state.
 One reason is that integers are faster than floating point.</p>
 <p>The other reason to use integers is to avoid floating point error.
 Infamously, <code>0.1 + 0.2 = 0.30000000000000004</code>.
@@ -638,24 +636,24 @@ Tries another move, evaluates, undoes.
 Each time the engine makes or unmakes a move,
 it is also incrementally updating the evaluation.
 The engine relies on the undo operation to get back to the original, clean, NNUE accumulator state.
-With floating point, the undo will return to a slightly different &#8220;original&#8221; state than before.
+With floating point, the undo will return to a slightly different “original” state than before.
 Eventually, because of errors accumulating, repeated undos will return to an accumulator state that is completely different from the original.</p>
-<p>Here&#8217;s an analogy:
-imagine you&#8217;re using a text editor,
+<p>Here’s an analogy:
+imagine you’re using a text editor,
 and you type:</p>
 <pre><code>Hello World!
 </code></pre>
 <p>Then you undo, and get this:</p>
 <pre><code>Helln
 </code></pre>
-<p>Then you type some other word, like &#8220;Everyone!&#8221;:</p>
+<p>Then you type some other word, like “Everyone!”:</p>
 <pre><code>Helln Everyone!
 </code></pre>
 <p>Then you undo, and repeat this over and over again a thousand times, and you end up with this:</p>
 <pre><code>Hexza
 </code></pre>
 <p>This is of course not the behaviour you want; you would expect the text to still be <code>Hello</code>.
-In this analogy, <code>Hello</code> represents the accumulator&#8217;s original state,
+In this analogy, <code>Hello</code> represents the accumulator’s original state,
 which, while making and unmaking moves repeatedly,
 gets corrupted by floating point errors and becomes <code>Hexza</code>.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
@@ -663,56 +661,56 @@ gets corrupted by floating point errors and becomes <code>Hexza</code>.</p>
 this sort of catastrophic floating point error only happened with
 16-bit (half precision) floats,
 and is not nearly as bad on <code>f32</code> (single) and <code>f64</code> (double) types.
-I&#8217;m sure there&#8217;s still some drift of the accumulator state, though.</p>
+I’m sure there’s still some drift of the accumulator state, though.</p>
 </div>
-<p>This issue <em>can&#8217;t</em> happen if we used integers to represent the accumulator state,
+<p>This issue <em>can’t</em> happen if we used integers to represent the accumulator state,
 because in integers, <code>1 + 2 = 3</code> exactly,
 with no error whatsoever.</p>
 <p>Now, the problem is that
-neural networks don&#8217;t use integers, they use floating point numbers.
-We need to <strong>quantize</strong> the network&#8217;s parameters, i.e. convert the floating point numbers to integers.
+neural networks don’t use integers, they use floating point numbers.
+We need to <strong>quantize</strong> the network’s parameters, i.e. convert the floating point numbers to integers.
 Naively, we could round all the numbers to the nearest integer.
 However, this causes inacceptable error.
-For example, let&#8217;s say one of the weights in our NNUE is <code>0.51</code>.
-If you round <code>0.51</code> to <code>1</code>, that&#8217;s a nearly 96% relative error on the original value.</p>
+For example, let’s say one of the weights in our NNUE is <code>0.51</code>.
+If you round <code>0.51</code> to <code>1</code>, that’s a nearly 96% relative error on the original value.</p>
 <p>To lessen this rounding error, we can scale all the values by some constant.
-For example, let&#8217;s multiply the values by 10.
+For example, let’s multiply the values by 10.
 Then we round <code>5.1</code> to <code>5</code>, which is much better (~2% error) than before.
-Once we&#8217;re done with the calculations, we can divide out the scaling constant to get a real answer.</p>
-<p>Here&#8217;s a simple example with a linear function.
+Once we’re done with the calculations, we can divide out the scaling constant to get a real answer.</p>
+<p>Here’s a simple example with a linear function.
 This is our original function:</p>
-<pre><code class="language-python">def f(x):
-    WEIGHT = 0.33
-    BIAS = 0.51
-    return WEIGHT * x + BIAS
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">WEIGHT</span> <span class="o">=</span> <span class="mf">0.33</span>
+    <span class="n">BIAS</span> <span class="o">=</span> <span class="mf">0.51</span>
+    <span class="k">return</span> <span class="n">WEIGHT</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">BIAS</span>
 </code></pre>
 <p>If we rounded the weight and bias naively, we get this function:</p>
-<pre><code class="language-python">def f_round_naive(x):
-    WEIGHT = 0
-    BIAS = 1
-    return WEIGHT * x + BIAS
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f_round_naive</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">WEIGHT</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">BIAS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">WEIGHT</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">BIAS</span>
 </code></pre>
 <p>and if we apply a scaling constant of 100:</p>
-<pre><code class="language-python">def f_quantized(x):
-    WEIGHT = 33
-    BIAS = 51
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">f_quantized</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">WEIGHT</span> <span class="o">=</span> <span class="mi">33</span>
+    <span class="n">BIAS</span> <span class="o">=</span> <span class="mi">51</span>
 
-    # `&#47;&#47;` is integer division
-    return (WEIGHT * x + BIAS) &#47;&#47; 100
+    <span class="c1"># `//` is integer division</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">WEIGHT</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">BIAS</span><span class="p">)</span> <span class="o">//</span> <span class="mi">100</span>
 </code></pre>
-<p>Now, let&#8217;s compare their outputs for <code>x = 20</code>:</p>
-<pre><code>&#62;&#62;&#62; f(20)
-7.11
+<p>Now, let’s compare their outputs for <code>x = 20</code>:</p>
+<pre><code class="language-python"><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="mf">7.11</span>
 
-&#62;&#62;&#62; f_round_naive(20)
-1
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f_round_naive</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="mi">1</span>
 
-&#62;&#62;&#62; f_quantized(20)
-7
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f_quantized</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="mi">7</span>
 </code></pre>
 <p>You can see that the properly quantized function has almost the right answer,
 and that the naively rounded function is completely wrong.</p>
-<p>Let&#8217;s apply quantization to our basic NNUE network now.
+<p>Let’s apply quantization to our basic NNUE network now.
 We can keep our training process completely the same
 (i.e., with floating points),
 and only quantize the weights after.
@@ -723,9 +721,9 @@ before using the network in the engine.</p>
 <div id="backref-quantization"></div>
 <p>Before quantizing, we scale the neural net parameters:</p>
 <ul>
-<li>Multiply the <em>accumulator&#8217;s</em> weights and biases by <code>SCALE_L1</code>, which is defined to be <code>255</code>.</li>
-<li>Multiply the <em>output&#8217;s weight</em> by <code>SCALE_OUT</code>, which is defined to be <code>64</code>.</li>
-<li>Multiply the <em>output&#8217;s bias</em> by <code>SCALE_OUT * SCALE_L1</code>.</li>
+<li>Multiply the <em>accumulator’s</em> weights and biases by <code>SCALE_L1</code>, which is defined to be <code>255</code>.</li>
+<li>Multiply the <em>output’s weight</em> by <code>SCALE_OUT</code>, which is defined to be <code>64</code>.</li>
+<li>Multiply the <em>output’s bias</em> by <code>SCALE_OUT * SCALE_L1</code>.</li>
 </ul>
 <p>(I just took the values straight from the <a href="https://www.chessprogramming.org/NNUE#Basic_NNUE">Wiki article</a>, which says that these are commonly used.)
 Then, we round the model parameters to the nearest integer.
@@ -758,55 +756,55 @@ there is a risk that you get integer overflows or underflows.
 This is why the clipping in CReLU is important; it has a very specific and known output range,
 which lets you ensure that the integer limits are respected.
 Recall also how the centipawn-WDL sigmoid curve has a parameter <code>K = 400</code>,
-but our output node&#8217;s activation function is a sigmoid with <code>K = 1</code>.
+but our output node’s activation function is a sigmoid with <code>K = 1</code>.
 Our neural network <code>K</code> parameter is smaller so that the neural network is trained to output relatively small values.
-This way, the network&#8217;s weights will be small and won&#8217;t cause overflows.</p>
+This way, the network’s weights will be small and won’t cause overflows.</p>
 <p>For an example of how a good engine works with different data-types in NNUE code,
-see <a href="https://official-stockfish.github.io/docs/nnue-pytorch-wiki/docs/nnue.html#quantization">Stockfish&#8217;s docs</a> about quantization.
+see <a href="https://official-stockfish.github.io/docs/nnue-pytorch-wiki/docs/nnue.html#quantization">Stockfish’s docs</a> about quantization.
 They use a mix of <code>i8</code> and <code>i32</code> depending on the layer of the network,
 in order to push the CPU to the maximum.</p>
 <p>For my engine, optimizing every single instruction is not my priority,
 so I just picked <code>i16</code> for the parameters, and <code>i32</code> for the accumulator.
 (Having <code>i32</code> gives a large margin for avoiding integer overflows.)</p>
-<p>Here&#8217;s an example of pseudo-code for quantized NNUE evaluation.
+<p>Here’s an example of pseudo-code for quantized NNUE evaluation.
 Note that it only contains the inference code for running CReLU and then computing the result at the output node;
 the accumulator nodes are updated with practically the same code as before (but with quantized weights now).</p>
-<pre><code class="language-python"># quantization scales
-L1_SCALE = 255
-OUTPUT_SCALE = 64
+<pre><code class="language-python"><span></span><span class="c1"># quantization scales</span>
+<span class="n">L1_SCALE</span> <span class="o">=</span> <span class="mi">255</span>
+<span class="n">OUTPUT_SCALE</span> <span class="o">=</span> <span class="mi">64</span>
 
-DE_SCALE = L1_SCALE * OUTPUT_SCALE
+<span class="n">DE_SCALE</span> <span class="o">=</span> <span class="n">L1_SCALE</span> <span class="o">*</span> <span class="n">OUTPUT_SCALE</span>
 
-# sigmoid K parameter
-SCALE_K = 400
+<span class="c1"># sigmoid K parameter</span>
+<span class="n">SCALE_K</span> <span class="o">=</span> <span class="mi">400</span>
 
-def crelu(x):
-    return clamp(x, 0, L1_SCALE)
+<span class="k">def</span><span class="w"> </span><span class="nf">crelu</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">clamp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">L1_SCALE</span><span class="p">)</span>
 
-def output(hidden):
-    """Compute the neural network evaluation in centipawns."""
+<span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="n">hidden</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute the neural network evaluation in centipawns."""</span>
 
-    # hidden is the hidden layer&#39;s pre-activation states (i.e. the accumulator).
+    <span class="c1"># hidden is the hidden layer's pre-activation states (i.e. the accumulator).</span>
 
-    out = 0
-    for j in range(L1_SIZE):
-        out += WEIGHTS_OUTPUT[j] * crelu(hidden[j])
-    out += BIAS_OUTPUT
+    <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L1_SIZE</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="n">WEIGHTS_OUTPUT</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">crelu</span><span class="p">(</span><span class="n">hidden</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="n">out</span> <span class="o">+=</span> <span class="n">BIAS_OUTPUT</span>
 
-    out *= SCALE_K
+    <span class="n">out</span> <span class="o">*=</span> <span class="n">SCALE_K</span>
 
-    out &#47;= DE_SCALE
+    <span class="n">out</span> <span class="o">/=</span> <span class="n">DE_SCALE</span>
 
-    return out
+    <span class="k">return</span> <span class="n">out</span>
 </code></pre>
-<p>Recall that the weights themselves aren&#8217;t quantized in the engine code (for my engine, the Rust code),
-they&#8217;re already quantized in the neural network training code (Python for me).
+<p>Recall that the weights themselves aren’t quantized in the engine code (for my engine, the Rust code),
+they’re already quantized in the neural network training code (Python for me).
 In the engine, the main thing we need to do is de-scale the output at the very end (i.e. divide by <code>DE_SCALE</code>).
 The de-scaling is the last step, because integer division loses precision;
 in other words, we round only at the end.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>I&#8217;m done explaining how my engine&#8217;s NNUE works.
-Now, here&#8217;s the fun part: pitting the smarter engine against the old engine, which has material counting evaluation.
+<p>I’m done explaining how my engine’s NNUE works.
+Now, here’s the fun part: pitting the smarter engine against the old engine, which has material counting evaluation.
 When I did this, the NNUE engine crushed the material counting engine,
 with <strong>667 wins, 7 losses, and 32 draws,</strong>
 which represents a few hundred Elo gain.
@@ -814,41 +812,41 @@ Not bad!</p>
 <p>Here is an example game from this tournament.
 Note that this tournament ran at a time control of 8 seconds + 0.08 second increment,
 and an opening book was used for the first few moves.</p>
-<iframe src="https://lichess.org/study/embed/86CNdSfx/0qVu4T3v" frameborder=0></iframe>
-<p>I&#8217;m not good at chess, so I can&#8217;t analyze the game for you.
+<iframe frameborder="0" src="https://lichess.org/study/embed/86CNdSfx/0qVu4T3v"></iframe>
+<p>I’m not good at chess, so I can’t analyze the game for you.
 However, notice how White (the material-counting engine)
 shuffles its rook over and over,
 while Black (NNUE) develops its pieces.
 You can definitely tell that the NNUE has some positional intelligence.</p>
 <p>If you want to see more, I also uploaded two other games from this tournament to the Lichess study,
-which you can access through the &#8220;View on Lichess&#8221; option.</p>
-<p>There are of course still many issues with my engine&#8217;s NNUE in its current state.
+which you can access through the “View on Lichess” option.</p>
+<p>There are of course still many issues with my engine’s NNUE in its current state.
 First of all, its chess strategy is still far from being good.
-One of my smarter human friends who played against it said &#8220;that&#8217;s not how you play chess&#8221;.
-(I personally don&#8217;t understand chess enough to discern this.)
-I think the NNUE&#8217;s inability to play great chess is probably a limitation of its training,
+One of my smarter human friends who played against it said “that’s not how you play chess”.
+(I personally don’t understand chess enough to discern this.)
+I think the NNUE’s inability to play great chess is probably a limitation of its training,
 which I talk about more in this <a href="#appendix-having-no-training-data">appendix</a> to this post.</p>
-<p>However, in general, I&#8217;m quite proud of my chess engine;
+<p>However, in general, I’m quite proud of my chess engine;
 it plays chess at a level way above my own comprehension of the game,
-and I&#8217;m happy with that.</p>
+and I’m happy with that.</p>
 <h3 id="further-reading">Further reading</h3>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong>
-If you&#8217;re trying to follow along writing an NNUE using this blog post, my apologies for the pseudo-code snippets
+If you’re trying to follow along writing an NNUE using this blog post, my apologies for the pseudo-code snippets
 being disorganized; the code serves mostly to illustrate my points rather than to be part of a real engine.
 If you want a full, working, implementation of this architecture (and can read Rust code), please see the <a href="https://github.com/dogeystamp/chess_inator">source code</a>
-for my engine chess-inator, specifically <code>src&#47;nnue.rs</code>, <code>nnue&#47;s3_train_neural_net.py</code> and <code>nnue&#47;s4_weights_to_bin.py</code>.
+for my engine chess-inator, specifically <code>src/nnue.rs</code>, <code>nnue/s3_train_neural_net.py</code> and <code>nnue/s4_weights_to_bin.py</code>.
 Be warned that this code may not reflect how other, better, engines do things.
-Otherwise, the <a href="https://www.chessprogramming.org/NNUE">Chess Programming Wiki&#8217;s page</a> on NNUE
+Otherwise, the <a href="https://www.chessprogramming.org/NNUE">Chess Programming Wiki’s page</a> on NNUE
 is a good source for implementing this architecture.</p>
 </div>
-<p>I&#8217;m sure that if you&#8217;ve read this far through the more than six thousand words of this post,
-you&#8217;re probably interested in neural networks for chess.
+<p>I’m sure that if you’ve read this far through the more than six thousand words of this post,
+you’re probably interested in neural networks for chess.
 So, for you, here are some interesting links to read through,
 written by people more competent than I am:</p>
 <ul>
 <li><p><a href="https://github.com/jw1912/bullet/blob/main/docs/1-basics.md">Bullet docs:</a> Bullet is a machine learning library specifically designed for chess engines. The documentation I linked is specifically for beginners, and starts from a similar level as this blog post.</p></li>
-<li><p><a href="https://www.chessprogramming.org/NNUE">Chess Programming Wiki &#8211; NNUE</a></p></li>
+<li><p><a href="https://www.chessprogramming.org/NNUE">Chess Programming Wiki – NNUE</a></p></li>
 <li><p><strong>Stockfish NNUE.</strong> Earlier, I mentioned that NNUE seems like a difficult topic, because Stockfish and other engines
 have really complex neural networks.
 The neural network I covered in this post is relatively simple, if not trivial;
@@ -857,43 +855,43 @@ The core principles are the same, but advanced networks can learn more informati
 <ul>
 <li><a href="https://official-stockfish.github.io/docs/nnue-pytorch-wiki/docs/nnue.html#quantization">Stockfish NNUE document:</a>
 an amazingly detailled and comprehensive overview of the NNUE used in Stockfish. It may be outdated though.</li>
-<li><a href="https://www.chessprogramming.org/Stockfish_NNUE">Chess Programming Wiki &#8211; Stockfish NNUE</a></li>
+<li><a href="https://www.chessprogramming.org/Stockfish_NNUE">Chess Programming Wiki – Stockfish NNUE</a></li>
 </ul></li>
-<li><p><a href="https://github.com/cosmobobak/viridithas">Viridithas</a>: Viridithas (by cosmobobak) is one of the world&#8217;s best chess engines,
+<li><p><a href="https://github.com/cosmobobak/viridithas">Viridithas</a>: Viridithas (by cosmobobak) is one of the world’s best chess engines,
 and it also happens to be written in decently readable Rust.</p>
 <ul>
-<li><a href="https://cosmo.tardis.ac/files/2024-06-01-nnue.html">Cosmobobak &#8211; NNUE Performance Improvements</a></li>
+<li><a href="https://cosmo.tardis.ac/files/2024-06-01-nnue.html">Cosmobobak – NNUE Performance Improvements</a></li>
 </ul></li>
 <li><p><strong>Leela Chess Zero</strong>. Leela is a powerful chess engine based on a neural network,
 but not the NNUE kind.
 Lc0 takes the opposite approach of having a neural network that is more intelligent,
 but more expensive and time-consuming to compute.</p>
 <ul>
-<li><a href="https://www.chessprogramming.org/Leela_Chess_Zero">Chess Programming Wiki &#8212; Leela Chess Zero</a></li>
+<li><a href="https://www.chessprogramming.org/Leela_Chess_Zero">Chess Programming Wiki — Leela Chess Zero</a></li>
 </ul></li>
 </ul>
 <hr/>
 <h2 id="appendix-crelu-quantization">Appendix: CReLU quantization</h2>
 <p><a href="#backref-quantization">Above</a>, I outlined the procedure for applying quantization on the basic NNUE.
-Recall that during the quantization process, we scale up all the neural network&#8217;s parameters.
+Recall that during the quantization process, we scale up all the neural network’s parameters.
 Then, at the end of inference,
 we scale the result down so that it has the same value as a network without quantization.
 We use scaling because rounding big parameters causes less relative rounding error than with small parameters.</p>
 <p>To scale the parameters correctly, we first follow these steps:</p>
 <ul>
-<li>Multiply the <em>accumulator&#8217;s</em> weights and biases by <code>SCALE_L1</code>, which is defined to be <code>255</code>.</li>
-<li>Multiply the <em>output&#8217;s</em> weight by <code>SCALE_OUT</code>, which is defined to be <code>64</code>.</li>
-<li>Multiply the <em>output&#8217;s</em> bias by <code>SCALE_OUT * SCALE_L1</code>.</li>
+<li>Multiply the <em>accumulator’s</em> weights and biases by <code>SCALE_L1</code>, which is defined to be <code>255</code>.</li>
+<li>Multiply the <em>output’s</em> weight by <code>SCALE_OUT</code>, which is defined to be <code>64</code>.</li>
+<li>Multiply the <em>output’s</em> bias by <code>SCALE_OUT * SCALE_L1</code>.</li>
 </ul>
 <p>Then in the inference code, we make the following adjustments:</p>
 <ul>
 <li>Redefine the CReLU activation function as <code>clamp(x, 0, SCALE_L1)</code>;</li>
-<li>Divide the neural net&#8217;s output node pre-activation by <code>SCALE_L1 * SCALE_OUT</code>.</li>
+<li>Divide the neural net’s output node pre-activation by <code>SCALE_L1 * SCALE_OUT</code>.</li>
 </ul>
-<p>I will now show why this procedure works while preserving the neural network&#8217;s output.</p>
-<p>Let&#8217;s define the original neural network&#8217;s output as a mathematical expression,
+<p>I will now show why this procedure works while preserving the neural network’s output.</p>
+<p>Let’s define the original neural network’s output as a mathematical expression,
 using <code>i</code> to index inputs, and <code>j</code> to index hidden layer nodes:</p>
-<p><img src="../public/img/chess6/eq3.svg" alt="Math equation. z_&quot;out&quot; = b_&quot;out&quot; + sum_(j=1)^(n) [w_(&quot;out&quot;,j) dot &quot;CReLU&quot;(sum_(i=1)^(768) (w_(i j) x_i) + b_(j))]" />
+<p><img alt='Math equation. z_"out" = b_"out" + sum_(j=1)^(n) [w_("out",j) dot "CReLU"(sum_(i=1)^(768) (w_(i j) x_i) + b_(j))]' src="../public/img/chess6/eq3.svg"/>
 where:</p>
 <ul>
 <li><code>z_out</code> is the pre-activation of the output node (<code>output_preactivation</code>);</li>
@@ -901,30 +899,30 @@ where:</p>
 <li><code>w_(out, j)</code> is the weight of the connection between the <code>j</code>-th hidden layer node and the output node (<code>WEIGHTS_OUT[j]</code>);</li>
 <li><code>w_ij</code> is the weight of the connection between the <code>i</code>-th input and <code>j</code>-th hidden layer node (<code>WEIGHTS_L1[i][j]</code>);</li>
 <li><code>x_i</code> is the value of the <code>i</code>-th input;</li>
-<li><code>b_j</code> is the <code>j</code>-th hidden layer node&#8217;s bias.</li>
+<li><code>b_j</code> is the <code>j</code>-th hidden layer node’s bias.</li>
 </ul>
 <p>During the quantization process, we multiply all weights and biases by some constants, <code>SCALE_L1</code> (which I will denote <code>S_L1</code>)
 and <code>SCALE_OUT</code> (denoted <code>S_out</code>).
 We also change the definition of CReLU to <code>clamp(x, 0, SCALE_L1)</code> (instead of clamping from 0 to 1).
-I&#8217;ll denote this new CReLU as <code>CReLU_L1</code>.
+I’ll denote this new CReLU as <code>CReLU_L1</code>.
 This gives us a scaled neural network output,</p>
-<p><img src="../public/img/chess6/eq4.svg" alt="Math equation. z_&quot;scaled&quot; = (S_&quot;L1&quot; S_&quot;out&quot;) b_&quot;out&quot; + sum_(j=1)^(n) [S_&quot;out&quot; w_(&quot;out&quot;,j) dot &quot;CReLU&quot;_&quot;L1&quot; (sum_(i=1)^(768) (S_&quot;L1&quot; w_(i j) x_i) + S_&quot;L1&quot; b_(j))]." /></p>
-<p>Let&#8217;s first focus on the CReLU, which is this part of the expression:
-<img src="../public/img/chess6/eq5.svg" alt="Math equation. &quot;CReLU&quot;_&quot;L1&quot; (sum_(i=1)^(768) (S_&quot;L1&quot; w_(i j) x_i) + S_&quot;L1&quot; b_(j))." /></p>
+<p><img alt='Math equation. z_"scaled" = (S_"L1" S_"out") b_"out" + sum_(j=1)^(n) [S_"out" w_("out",j) dot "CReLU"_"L1" (sum_(i=1)^(768) (S_"L1" w_(i j) x_i) + S_"L1" b_(j))].' src="../public/img/chess6/eq4.svg"/></p>
+<p>Let’s first focus on the CReLU, which is this part of the expression:
+<img alt='Math equation. "CReLU"_"L1" (sum_(i=1)^(768) (S_"L1" w_(i j) x_i) + S_"L1" b_(j)).' src="../public/img/chess6/eq5.svg"/></p>
 <p>If we factor out <code>S_L1</code>, we get
-<img src="../public/img/chess6/eq6.svg" alt="Math equation. &quot;CReLU&quot;_&quot;L1&quot; (S_&quot;L1&quot; [sum_(i=1)^(768) (w_(i j) x_i) + b_(j)])." /></p>
+<img alt='Math equation. "CReLU"_"L1" (S_"L1" [sum_(i=1)^(768) (w_(i j) x_i) + b_(j)]).' src="../public/img/chess6/eq6.svg"/></p>
 <p>As you can see in the graph below,
 we can pull out the scaling constant from the scaled <code>CReLU_L1</code> to get a normal <code>CReLU</code>:
-<img src="../public/img/chess6/eq8.svg" alt="Math equation. S_&quot;L1&quot; dot &quot;CReLU&quot; (sum_(i=1)^(768) (w_(i j) x_i) + b_(j))." /></p>
-<p><img src="../public/img/chess6/crelu_graph_scaled.svg" alt="Graph which compares two lines, CReLU_L1(S_L1 x) and CReLU(x)." /></p>
+<img alt='Math equation. S_"L1" dot "CReLU" (sum_(i=1)^(768) (w_(i j) x_i) + b_(j)).' src="../public/img/chess6/eq8.svg"/></p>
+<p><img alt="Graph which compares two lines, CReLU_L1(S_L1 x) and CReLU(x)." src="../public/img/chess6/crelu_graph_scaled.svg"/></p>
 <p>Now, the scaled output of our neural network is
-<img src="../public/img/chess6/eq7.svg" alt="Math equation. z_&quot;scaled&quot; = (S_&quot;L1&quot; S_&quot;out&quot;) b_&quot;out&quot; + sum_(j=1)^(n) [S_&quot;out&quot; w_(&quot;out&quot;,j) dot S_&quot;L1&quot; dot &quot;CReLU&quot; (sum_(i=1)^(768) (w_(i j) x_i) + b_(j))]," />
+<img alt='Math equation. z_"scaled" = (S_"L1" S_"out") b_"out" + sum_(j=1)^(n) [S_"out" w_("out",j) dot S_"L1" dot "CReLU" (sum_(i=1)^(768) (w_(i j) x_i) + b_(j))],' src="../public/img/chess6/eq7.svg"/>
 which we can factor <code>(S_L1 * S_out)</code> from to get
-<img src="../public/img/chess6/eq9.svg" alt="Math equation. z_&quot;scaled&quot; = (S_&quot;L1&quot; S_&quot;out&quot;) (b_&quot;out&quot; + sum_(j=1)^(n) [w_(&quot;out&quot;,j) dot &quot;CReLU&quot; (sum_(i=1)^(768) (w_(i j) x_i) + b_(j))])." />
+<img alt='Math equation. z_"scaled" = (S_"L1" S_"out") (b_"out" + sum_(j=1)^(n) [w_("out",j) dot "CReLU" (sum_(i=1)^(768) (w_(i j) x_i) + b_(j))]).' src="../public/img/chess6/eq9.svg"/>
 Note that inside the bracket is the original, unscaled output of the neural network:
-<img src="../public/img/chess6/eq10.svg" alt="Math equation. z_&quot;scaled&quot; = (S_&quot;L1&quot; S_&quot;out&quot;) (z_&quot;out&quot;)" />
+<img alt='Math equation. z_"scaled" = (S_"L1" S_"out") (z_"out")' src="../public/img/chess6/eq10.svg"/>
 from which we get
-<img src="../public/img/chess6/eq11.svg" alt="Math equation. z_&quot;scaled&quot;/(S_&quot;L1&quot; S_&quot;out&quot;) = z_&quot;out&quot;." />
+<img alt='Math equation. z_"scaled"/(S_"L1" S_"out") = z_"out".' src="../public/img/chess6/eq11.svg"/>
 To conclude, at inference time, after scaling the weights, biases, and the CReLU function,
 we can recover the unscaled output by dividing the scaled output by <code>SCALE_L1 * SCALE_OUT</code>.
 <a href="#backref-quantization">↩</a></p>
@@ -933,23 +931,23 @@ we can recover the unscaled output by dividing the scaled output by <code>SCALE_
 Most importantly, the NNUE is trained on a few orders of magnitude less data than it should have been trained on.
 Below, I document how that affected my project.
 Note that <strong>nothing in this section reflects best practice:</strong>
-I&#8217;m writing this purely to document what happened during the project.</p>
+I’m writing this purely to document what happened during the project.</p>
 <p>There are two reasons I could not train the NNUE on a sufficiently large dataset;
 first, I was using data from SPRT tests (instead of generating them specifically for NNUE training),
 and also, my training code was not able to handle large datasets.
 As I mentioned in the post, someone in the Engine Programming Discord recommended
 using a 5000 node limit to generate training data.
-In my engine&#8217;s training, there is no such limit,
+In my engine’s training, there is no such limit,
 so searches take longer to finish.
 This already reduces the number of positions that can be generated as training data.
 My training pipeline also heavily limited the datasets I could train on, as I
 I encoded positions in compressed text files as zeroes and ones corresponding to the input features.
 In hindsight, this is one of the most inefficient options there is,
 considering that in chess, most of the inputs are 0 at all times.
-The compression also didn&#8217;t help much because once you load the data in memory,
+The compression also didn’t help much because once you load the data in memory,
 it must be decompressed to allow for random access.
 Aggravating the memory usage problems, the Python library I used to deal with the training data, pandas,
-isn&#8217;t great at dealing with huge datasets.</p>
+isn’t great at dealing with huge datasets.</p>
 <p>When I first implemented NNUE in chess-inator,
 I trained it on roughly a thousand games from my own testing.
 This was, in hindsight, woefully too little training data.
@@ -957,7 +955,7 @@ During games, this network would would make egregious tactical blunders,
 demonstrating a total lack of material knowledge.
 Later models were trained on barely more data, around tens of thousands of games;
 this was not enough of an improvement.</p>
-<p>At the time, I could not fix the neural network&#8217;s tactical blunders,
+<p>At the time, I could not fix the neural network’s tactical blunders,
 so I decided to use a hacky solution.
 I hardcoded the material knowledge in the neural network
 by directly writing piece values into the neurons before training.
@@ -965,46 +963,42 @@ After this modification, the neural network would
 at least match the performance of material counting evaluation.</p>
 <p>Generally, I would say this strategy worked in my situation;
 all of my NNUE models are trained with hardcoded material knowledge,
-and they&#8217;re definitely superior at chess than the non-NNUE evaluation functions.</p>
+and they’re definitely superior at chess than the non-NNUE evaluation functions.</p>
 <p>Still, training with really low amounts of training data has its issues.
-Notably, the engine isn&#8217;t realizing the potential of its current neural network architecture;
+Notably, the engine isn’t realizing the potential of its current neural network architecture;
 lots of performance could still be achieved just by increasing the amount of data.
 Also, there are weird artifacts in the evaluation function:
 sometimes, the score for a specific position will be thousands of centipawns off.</p>
 <p>Unfortunately, this is the point where I left off on chess-inator;
-I never fixed the neural network&#8217;s lack of training data.
+I never fixed the neural network’s lack of training data.
 This was my first real project in machine learning,
 and ultimately I learned that throwing more data at an ML problem is usually a good idea.
 It would be really fun to come back<sup id="fnref4"><a href="#fn4" rel="footnote">4</a></sup> to chess-inator and properly train the neural network
 with lots of data,
 but the reason I stopped working on the project was that chess engine development is highly addicting,
-and I&#8217;m scared of getting sucked back in.
+and I’m scared of getting sucked back in.
 <a href="#backref-having-no-training-data">↩</a></p>
 <div class="footnotes">
 <hr/>
 <ol>
-
 <li id="fn1">
 <p>Because of how chess works, there will never be a White pawn on a1,
 so this bit is useless.
-However, such redundancy helps simplify our code, so it&#8217;s fine to leave it there.&#160;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+However, such redundancy helps simplify our code, so it’s fine to leave it there. <a href="#fnref1" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn2">
 <p>See this <a href="https://arxiv.org/html/2412.17948v1#:~:text=noisy%20or%20tactically%20unstable%20positions%20drastically%20ruins%20the%20training%20of%20the%20neural%20network.">paper</a>
-that mentions this issue.&#160;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+that mentions this issue. <a href="#fnref2" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn3">
-<p>As I understand it, Stockfish no longer uses HalfKP as of today; they use <a href="https://www.chessprogramming.org/Stockfish_NNUE#HalfKA">HalfKA</a>.&#160;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+<p>As I understand it, Stockfish no longer uses HalfKP as of today; they use <a href="https://www.chessprogramming.org/Stockfish_NNUE#HalfKA">HalfKA</a>. <a href="#fnref3" rev="footnote">↩</a></p>
 </li>
-
 <li id="fn4">
-<p>As of writing, it has been a few months since the last commit of chess-inator.&#160;<a href="#fnref4" rev="footnote">&#8617;</a></p>
+<p>As of writing, it has been a few months since the last commit of chess-inator. <a href="#fnref4" rev="footnote">↩</a></p>
 </li>
-
 </ol>
 </div>
+</link></link></article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

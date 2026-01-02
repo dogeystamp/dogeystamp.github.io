@@ -2,39 +2,37 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Box-drawing test</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Box-drawing test</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="box-drawing-test">Box-drawing test</h1>
 <div class="creation-date">
 2024-02-03
 </div>
 <p>In my <a href="/lc3">last blog post</a> about the LC-3 virtual machine, I made a few diagrams with ASCII art.
-I found out recently that I didn&#8217;t have to use <code>+</code> and <code>-</code> and <code>|</code> symbols to make boxes; Unicode has symbols specifically for that.
-So I&#8217;m going to use this blog post as a playground for box-drawing.</p>
+I found out recently that I didn’t have to use <code>+</code> and <code>-</code> and <code>|</code> symbols to make boxes; Unicode has symbols specifically for that.
+So I’m going to use this blog post as a playground for box-drawing.</p>
 <p>The symbols used here are all copied directly from <a href="https://en.m.wikipedia.org/wiki/Box-drawing_character">this Wikipedia article</a>.</p>
 <pre><code>boxdraw kit
 
@@ -56,7 +54,7 @@ arrows
 dotted
 ⋯⋮┄┈┊
 </code></pre>
-<p>To make boxes using the kit, copy-paste one of the &#8220;box&#8221; symbol sets,
+<p>To make boxes using the kit, copy-paste one of the “box” symbol sets,
 put newlines, and then expand the box to fit the text:</p>
 <pre><code>╭─╮││╰─╯
 
@@ -124,6 +122,7 @@ put newlines, and then expand the box to fit the text:</p>
                        ┊
                        ⋮
 </code></pre>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

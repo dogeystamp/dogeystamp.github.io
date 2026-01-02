@@ -2,39 +2,37 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Chess engine, pt. 2: Negamax search</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Chess engine, pt. 2: Negamax search</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="chess-engine-pt.-2-negamax-search">Chess engine, pt. 2: Negamax search</h1>
 <div class="creation-date">
 2025-03-07
 </div>
-<link rel="contents" href="/chess0" />
-<link rel="prev" href="/chess1" />
-<link rel="next" href="/chess3" />
+<link href="/chess0" rel="contents">
+<link href="/chess1" rel="prev">
+<link href="/chess3" rel="next">
 <div class="callout markdown-alert markdown-alert-callout">
 <p>This post is part of a series about building a chess-playing engine.</p>
 <p><a href="/chess0">Introduction (0)</a>
@@ -43,7 +41,7 @@
 </div>
 <p>In the last post, I covered the UCI protocol,
 and move generation.
-Implementing these, it&#8217;s possible to create a chess &#8220;playing&#8221;
+Implementing these, it’s possible to create a chess “playing”
 engine that plays random legal moves.
 Though it does play chess, this engine is very bad,
 and it loses rapidly against players with any skill.</p>
@@ -52,26 +50,26 @@ The classic answer is to use the minmax algorithm,
 but in my engine specifically, I use negamax,
 a common variation of minmax.</p>
 <p>Negamax is the core of many modern chess engines,
-so in this post, I&#8217;ll attempt to explain the algorithm
+so in this post, I’ll attempt to explain the algorithm
 in a way that builds strong intuition
 and understanding for how it works.</p>
 <h2 id="the-negamax-algorithm">The negamax algorithm</h2>
 <p><strong>Negamax</strong> is an algorithm that finds the best move to play in any chess position.
 In other words, it is the brain of the chess engine, and it is what lets it play good chess.</p>
-<p>What is the &#8220;best move&#8221; in chess, though?
-Our engine&#8217;s ultimate goal while playing chess
+<p>What is the “best move” in chess, though?
+Our engine’s ultimate goal while playing chess
 is to win, or failing that, get a draw.</p>
 <h3 id="scoring-outcomes">Scoring outcomes</h3>
-<p>Let&#8217;s now specifically define what the outcomes &#8220;win, lose, draw&#8221; mean.</p>
+<p>Let’s now specifically define what the outcomes “win, lose, draw” mean.</p>
 <ul>
 <li><strong>We lose</strong> when it is our turn and we are are in checkmate.</li>
 <li><strong>We win</strong> when our opponent loses.</li>
 <li>A <strong>draw</strong> is when the fifty-move rule or threefold repetition rule are invoked, or there is a stalemate.</li>
 </ul>
 <p>For our purposes, there are no other outcomes to the chess game.</p>
-<p>Notice how I don&#8217;t mention White or Black at all above.
+<p>Notice how I don’t mention White or Black at all above.
 Usually, chess engine think in terms of <strong>Us versus Them</strong>.
-&#8220;We&#8221; are the player to move, which can be either Black or White.</p>
+“We” are the player to move, which can be either Black or White.</p>
 <p>Also, the outcome of a game depends on your perspective.
 If we win, they lose, and vice versa.
 The specific terminology is that chess is a <strong>zero-sum game</strong>.
@@ -87,11 +85,11 @@ D + D =  0  +  0  = 0
 <p>By doing some algebra on this formula, we find out that</p>
 <pre><code>our score = -(their score).
 </code></pre>
-<p>In other words, we can negate a player&#8217;s score to get the other player&#8217;s score.
-This will be important later, and is the &#8220;nega&#8221; of negamax.</p>
+<p>In other words, we can negate a player’s score to get the other player’s score.
+This will be important later, and is the “nega” of negamax.</p>
 <h3 id="the-game-tree">The game tree</h3>
 <p>We may imagine the game of chess as a tree structure, like this:</p>
-<p><img src="../public/img/chess2/negamax1.svg" alt="A tree diagram representing a chess game." /></p>
+<p><img alt="A tree diagram representing a chess game." src="../public/img/chess2/negamax1.svg"/></p>
 <p>This picture represents all possible games of chess that can be played.
 The nodes (the circles) represent <strong>positions</strong>,
 and the edges (the arrows between circles) represent <strong>moves</strong>, which bring the game
@@ -106,43 +104,43 @@ Notice how there are no <code>1</code> scores,
 since games can only end in either draw, or checkmate (which is a loss for the current player).</p>
 <h3 id="trivial-cases">Trivial cases</h3>
 <p>Recall that the goal of the engine is to find the best move in each position.
-Let&#8217;s now examine some simple situations to see what engine should do in each case.
-From these examples, we&#8217;ll be able to build an algorithm that works generally in all situations.</p>
-<p>First, say we&#8217;re White, and we have to choose between two moves in the diagram below:</p>
+Let’s now examine some simple situations to see what engine should do in each case.
+From these examples, we’ll be able to build an algorithm that works generally in all situations.</p>
+<p>First, say we’re White, and we have to choose between two moves in the diagram below:</p>
 <ul>
 <li>the move on the left, which delivers checkmate (i.e. we win);</li>
 <li>the move on the right, which lets Black checkmate us (i.e. we lose).</li>
 </ul>
-<p>Let&#8217;s call this position <code>A</code>.</p>
-<p><img src="../public/img/chess2/negamax2.svg" alt="A tree diagram representing a chess game." /></p>
-<p>What&#8217;s the best move?
+<p>Let’s call this position <code>A</code>.</p>
+<p><img alt="A tree diagram representing a chess game." src="../public/img/chess2/negamax2.svg"/></p>
+<p>What’s the best move?
 Of course, the move on the left that makes us win, and not the one that makes us lose.
 Then, practically speaking, if we get to position <code>A</code>, that is a guaranteed win for White.</p>
-<p>Next, say we&#8217;re White, and we have two moves to choose from. Both moves let Black checkmate us.
-Let&#8217;s call this position <code>B</code>.</p>
-<p><img src="../public/img/chess2/negamax3.svg" alt="A tree diagram representing a chess game." /></p>
+<p>Next, say we’re White, and we have two moves to choose from. Both moves let Black checkmate us.
+Let’s call this position <code>B</code>.</p>
+<p><img alt="A tree diagram representing a chess game." src="../public/img/chess2/negamax3.svg"/></p>
 <p>In this situation, both moves are the best,
 since they both have the same outcome (i.e. we lose).
 Therefore, if we get to position <code>B</code>, White is guaranteed to lose.</p>
 <h3 id="more-complex-cases">More complex cases</h3>
-<p>So far, the positions we&#8217;ve looked at have been pretty simple.
-Let&#8217;s invent a more complicated position.</p>
-<p>Say we&#8217;re Black, and we have the choice between two moves:</p>
+<p>So far, the positions we’ve looked at have been pretty simple.
+Let’s invent a more complicated position.</p>
+<p>Say we’re Black, and we have the choice between two moves:</p>
 <ul>
 <li>one leads to position <code>A</code> (a guaranteed win for White);</li>
 <li>one leads to position <code>B</code> (a guaranteed loss for White).</li>
 </ul>
-<p>Let&#8217;s call this position <code>C</code>.</p>
-<p><img src="../public/img/chess2/negamax4.svg" alt="A tree diagram representing a chess game." /></p>
+<p>Let’s call this position <code>C</code>.</p>
+<p><img alt="A tree diagram representing a chess game." src="../public/img/chess2/negamax4.svg"/></p>
 <p>Now, what is our best move?
 Earlier, we saw that for White, <code>A</code> is a win, and <code>B</code> is a loss.
-But for Black, it&#8217;s the opposite: <code>A</code> is a loss, and <code>B</code> is a win.
-Because of that, Black&#8217;s best move is the one that goes to <code>B</code>.</p>
+But for Black, it’s the opposite: <code>A</code> is a loss, and <code>B</code> is a win.
+Because of that, Black’s best move is the one that goes to <code>B</code>.</p>
 <p>Therefore, if we get to position <code>C</code>, Black is guaranteed to win.</p>
 <p>Eventually, we have the general case.
 Say we have the position <code>X</code>, where we have to choose between multiple moves,
 and they lead to positions <code>Y1</code>, <code>Y2</code>, and so on.</p>
-<p><img src="../public/img/chess2/negamax5.svg" alt="A tree diagram representing a chess game." /></p>
+<p><img alt="A tree diagram representing a chess game." src="../public/img/chess2/negamax5.svg"/></p>
 <p>What is the best move?
 <strong>The best move is the one that leads to the position with the best outcome for us</strong> (i.e., the best outcome for the player to move).
 For example, if the position <code>Y1</code> is a guaranteed win for us, we pick the move that leads to <code>Y1</code>.
@@ -153,7 +151,7 @@ Using a similar process for determining that position <code>C</code> above was a
 we can build the game tree up to determine the outcome of any position in chess,
 including the <code>Y</code> positions.</p>
 <h3 id="the-actual-algorithm">The actual algorithm</h3>
-<p>Let&#8217;s now build concrete code (in pseudo-Python) for negamax, based on the above method for finding the best move.</p>
+<p>Let’s now build concrete code (in pseudo-Python) for negamax, based on the above method for finding the best move.</p>
 <p>The <code>negamax</code> function can be called on a node,
 and it will return both the best move for us (the player to move),
 and the numerical evaluation (i.e. the guaranteed outcome) for the position.</p>
@@ -162,32 +160,32 @@ is that this algorithm starts from a position, and thinks a few moves ahead,
 while in the examples we started from the end of the game,
 and worked backwards.
 (I think working backwards is easier to understand,
-as it&#8217;s more obvious why the best moves are the best.)</p>
-<pre><code class="language-python">def negamax(position) -&#62; (Move, int):
-    """Return the best move and evaluation of a chess position."""
+as it’s more obvious why the best moves are the best.)</p>
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">negamax</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Move</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the best move and evaluation of a chess position."""</span>
 
-    if position.is_checkmate():
-        return None, -1
-    else if position.is_drawn():
-        return None, 0
+    <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">is_checkmate</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">is_drawn</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span>
 
-    possible_moves = generate_moves(position)
+    <span class="n">possible_moves</span> <span class="o">=</span> <span class="n">generate_moves</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
-    best_score = -infinity
-    best_move = None
+    <span class="n">best_score</span> <span class="o">=</span> <span class="o">-</span><span class="n">infinity</span>
+    <span class="n">best_move</span> <span class="o">=</span> <span class="kc">None</span>
 
-    for each move in possible_moves:
-        # note: in real code, consider using make&#47;unmake instead
-        updated_position = apply_move_to_position(position, move)
+    <span class="k">for</span> <span class="n">each</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">possible_moves</span><span class="p">:</span>
+        <span class="c1"># note: in real code, consider using make/unmake instead</span>
+        <span class="n">updated_position</span> <span class="o">=</span> <span class="n">apply_move_to_position</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">move</span><span class="p">)</span>
 
-        opponent_move, opponent_score = negamax(updated_position)
-        our_score = -opponent_score
+        <span class="n">opponent_move</span><span class="p">,</span> <span class="n">opponent_score</span> <span class="o">=</span> <span class="n">negamax</span><span class="p">(</span><span class="n">updated_position</span><span class="p">)</span>
+        <span class="n">our_score</span> <span class="o">=</span> <span class="o">-</span><span class="n">opponent_score</span>
 
-        if our_score &#62; best_score:
-            best_score = our_score
-            best_move = move
+        <span class="k">if</span> <span class="n">our_score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+            <span class="n">best_score</span> <span class="o">=</span> <span class="n">our_score</span>
+            <span class="n">best_move</span> <span class="o">=</span> <span class="n">move</span>
 
-    return best_move, best_score
+    <span class="k">return</span> <span class="n">best_move</span><span class="p">,</span> <span class="n">best_score</span>
 </code></pre>
 <p>Here are the rough steps of the code:</p>
 <ul>
@@ -198,7 +196,7 @@ as it&#8217;s more obvious why the best moves are the best.)</p>
 <li>The best score is the guaranteed outcome of this position.</li>
 </ul>
 <h3 id="optimal-play">Optimal play</h3>
-<p>With just these lines of code, we&#8217;ve (technically) solved the game of chess.
+<p>With just these lines of code, we’ve (technically) solved the game of chess.
 Why?
 All games of chess are finite because of the fifty-move rule,
 so the function must terminate in finite time.
@@ -213,12 +211,12 @@ and it <em>must</em> tell us that either:</p>
 <p>The consequence of this is that if two geniuses played chess optimally,
 the outcome would be the same every time.
 Therefore, as <a href="http://archive.computerhistory.org/projects/chess/related_materials/text/2-0%20and%202-1.Programming_a_computer_for_playing_chess.shannon/2-0%20and%202-1.Programming_a_computer_for_playing_chess.shannon.062303002.pdf">Claude Shannon wrote</a> in 1949,
-if such &#8220;mental giants&#8221; were to start a game,
+if such “mental giants” were to start a game,
 one of them would immediately resign,
 or they would agree to a draw.</p>
 <p>In this (unfortunately fake) video, grandmaster <a href="https://en.m.wikipedia.org/wiki/Maxime_Vachier-Lagrave">Maxime Vachier-Lagrave</a> shows that in this scenario, the starting position in chess simply becomes a chess puzzle.</p>
-<p><video width="426" height="240" controls>
-  <source src="/public/img/chess2/puzzle.mp4" type="video/mp4">
+<p><video controls="" height="240" width="426">
+<source src="/public/img/chess2/puzzle.mp4" type="video/mp4"/>
 Your browser does not support the video tag.
 </video></p>
 <p>Now, we know that in real life, no human chess player can play optimally.
@@ -226,7 +224,7 @@ In fact, not even chess engines play at the level of our negamax algorithm.
 Theoretically, this code would play perfect chess.
 But practically, it would take forever to run.</p>
 <p>If we use really generous numbers,
-let&#8217;s pretend that in any chess position there are two legal moves,
+let’s pretend that in any chess position there are two legal moves,
 and that there are invariably 80 half-moves in a chess game.
 Also pretend that the above algorithm requires one picosecond
 to analyze one unique game.</p>
@@ -240,13 +238,13 @@ is to limit the depth of recursion.
 That is, instead of examining the entire game tree down to the leaves,
 only examine a few layers of it.</p>
 <p>Once we recurse up to a limit of <code>n</code> times,
-we&#8217;ll stop recursing.
+we’ll stop recursing.
 Then, negamax will <em>guess</em> the outcome (<code>1</code>, <code>0</code>, <code>-1</code>) of a position,
 instead of properly calculating it.
-The disadvantage is that we&#8217;re no longer guaranteed the outcome,
+The disadvantage is that we’re no longer guaranteed the outcome,
 but now our negamax will run in a practical timeframe.</p>
 <p>The <strong>evaluation function</strong> is the part that does this guessing.
-A chess engine&#8217;s evaluation function takes a chess position, and returns a numerical score for it.
+A chess engine’s evaluation function takes a chess position, and returns a numerical score for it.
 Traditionally, this score will be a single number.
 A bigger (positive) number means the position is probably a <code>1</code>,
 while a lower (negative) number means the position is probably <code>-1</code>.</p>
@@ -258,14 +256,14 @@ negamax will find moves leading to positions with higher score, thus positions w
 How do we guess the outcome of a chess game?</p>
 <p>It turns out that most chess players already have a decent sense of how to evaluate a position.
 Take a look at this position. Who do you think will win?</p>
-<p><img src="../public/img/chess2/winning.gif" alt="A chess position diagram. White has an extra queen and knight. The FEN for this position is 1R6/2Q3bk/3rN1p1/3Bp2p/4Pp1P/5P2/6PK/8 b - - 1 76" /></p>
+<p><img alt="A chess position diagram. White has an extra queen and knight. The FEN for this position is 1R6/2Q3bk/3rN1p1/3Bp2p/4Pp1P/5P2/6PK/8 b - - 1 76" src="../public/img/chess2/winning.gif"/></p>
 <p>The answer is that White is winning.
 Why?
 One obvious hint is that White has an extra queen,
 and an extra knight.
 Having more pieces, or <em>material</em>, in chess is a big advantage,
 and will help you win.
-Let&#8217;s quantify this advantage now.
+Let’s quantify this advantage now.
 When learning chess, many players are taught these <a href="https://en.m.wikipedia.org/wiki/Chess_piece_relative_value#Standard_valuations">relative numerical values for each piece</a>:</p>
 <table>
 <thead>
@@ -298,14 +296,14 @@ When learning chess, many players are taught these <a href="https://en.m.wikiped
 </tbody>
 </table>
 <p>This rule of thumb helps players determine whether or not to sacrifice their pieces.
-For instance, you should sacrifice your rook, if it allows you to take the opponent&#8217;s queen.
-This is because the rook is less valuable (<code>5</code>) than the opponent&#8217;s queen (<code>9</code>),
+For instance, you should sacrifice your rook, if it allows you to take the opponent’s queen.
+This is because the rook is less valuable (<code>5</code>) than the opponent’s queen (<code>9</code>),
 so in the exchange, you would gain <code>9 - 5 = 4</code> points of material.</p>
 <p>Most of the time, counting the material value in a chess position is a really decent indicator of who will win,
 regardless of what level of chess you are at.
 Even the best players are less likely to win if they are at a material disadvantage.
-Thus, let&#8217;s define our evaluation function based on material value:</p>
-<pre><code>eval(position) = (sum of our piece values) - (sum of opponent&#39;s piece values)
+Thus, let’s define our evaluation function based on material value:</p>
+<pre><code>eval(position) = (sum of our piece values) - (sum of opponent's piece values)
 </code></pre>
 <p>On the board in the picture above,
 this would be</p>
@@ -318,18 +316,18 @@ Black material value:
 Difference:
 12 - 24 = -12 (score for Black)
 </code></pre>
-<p>Since it&#8217;s Black&#8217;s turn, we calculate that Black has a 12 point disadvantage.</p>
-<p>Instead of using &#8220;material points&#8221; as our unit though,
+<p>Since it’s Black’s turn, we calculate that Black has a 12 point disadvantage.</p>
+<p>Instead of using “material points” as our unit though,
 the traditional unit is the <strong>centipawn</strong>.
 As seen above, pieces are defined in terms of the value of a pawn (set to <code>1</code>).
-Our scores can be more precise if we set the pawn&#8217;s value to <code>100</code> centipawns instead.
+Our scores can be more precise if we set the pawn’s value to <code>100</code> centipawns instead.
 A knight is <code>300</code> centipawns, a rook <code>500</code> centipawns, and so on.
 In the above example, Black thus has a <code>-1200</code> centipawn score.</p>
-<p>Note that usually, chess websites and programs will always <em>display</em> scores from White&#8217;s perspective,
+<p>Note that usually, chess websites and programs will always <em>display</em> scores from White’s perspective,
 i.e. positive for White, negative for Black.
 So, on a Lichess analysis board, you would have a positive score here.
-But in negamax, and engine development generally, we usually deal with scores that are positive for &#8220;us&#8221; (the side to move),
-and negative for &#8220;them&#8221; (the opponent).</p>
+But in negamax, and engine development generally, we usually deal with scores that are positive for “us” (the side to move),
+and negative for “them” (the opponent).</p>
 <p>Regardless, this is the centipawn scale that engine evaluations and eval bars operate with.
 Typically, scores will be displayed as pawns.
 For instance, a <code>-1200</code> centipawn score for Black will be displayed as <code>+12.0</code>.</p>
@@ -346,14 +344,14 @@ For the opposite player that is about to get mated,
 this score is negative, so <code>mate -1</code>.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> other engines, chess websites, and the UCI protocol sometimes use full moves for mate scores.
-I think it&#8217;s slightly easier to code with half-moves instead, so that is what I used in my project.
+I think it’s slightly easier to code with half-moves instead, so that is what I used in my project.
 Divide by two to get a full move count.</p>
 </div>
 <p>For example, in this position, the score is <code>mate 1</code>, since
 White can win with <em>Qh7#</em>:</p>
-<p><img src="../public/img/chess2/winning2.gif" alt="A chess position diagram. White can do checkmate in one move. The FEN for this position is 8/1RQ5/4Bbpk/4p2p/4Pp1P/5P2/6PK/8 w - - 3 79" /></p>
-<p>Let&#8217;s also define, as a base case, that the score for a position in checkmate is <code>Mate(0)</code>.
-That is, if the player to move is in check and has no legal moves, that position&#8217;s score is <code>Mate(0)</code>.
+<p><img alt="A chess position diagram. White can do checkmate in one move. The FEN for this position is 8/1RQ5/4Bbpk/4p2p/4Pp1P/5P2/6PK/8 w - - 3 79" src="../public/img/chess2/winning2.gif"/></p>
+<p>Let’s also define, as a base case, that the score for a position in checkmate is <code>Mate(0)</code>.
+That is, if the player to move is in check and has no legal moves, that position’s score is <code>Mate(0)</code>.
 If a player is about to be checkmated in one move (two half moves), that is instead <code>Mate(-2)</code>.</p>
 <p>Quantitatively, we can imagine mate scores as big numbers.
 This is because checkmate is literally a game-winning advantage,
@@ -362,10 +360,10 @@ so it is much more important than any material advantage.</p>
 <pre><code>Mate(1) = 1000000
 Mate(-1) = -1000000.
 </code></pre>
-<p>Let&#8217;s also make it so that mate in more half-moves is a worse score.
+<p>Let’s also make it so that mate in more half-moves is a worse score.
 If all mate scores are the same,
 the engine might start procrastinating the checkmate.
-It&#8217;ll always think &#8220;well this move lets me checkmate in 2 moves anyways, why should I do checkmate in 1?&#8221;,
+It’ll always think “well this move lets me checkmate in 2 moves anyways, why should I do checkmate in 1?”,
 and then before you know it the engine starts shuffling pieces back and forth and draws by repetition.
 To avoid that, we could assign the values like this:</p>
 <pre><code>Mate(2) = 999999
@@ -380,70 +378,70 @@ and so on...
 <li>always prioritize avoiding checkmate or delivering checkmate over material advantage;</li>
 <li>make moves that get closer and closer to winning.</li>
 </ul>
-<p>Now, let&#8217;s redefine our evaluation function, this time in pseudocode:</p>
-<pre><code>def eval(position):
-    if position.is_checkmate():
-        return Mate(0)
-    else if position.is_stalemate():
-        return 0
-    else:
-        return position.our_material_value() - position.their_material_value()
+<p>Now, let’s redefine our evaluation function, this time in pseudocode:</p>
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval</span><span class="p">(</span><span class="n">position</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">is_checkmate</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Mate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">is_stalemate</span><span class="p">():</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">position</span><span class="o">.</span><span class="n">our_material_value</span><span class="p">()</span> <span class="o">-</span> <span class="n">position</span><span class="o">.</span><span class="n">their_material_value</span><span class="p">()</span>
 </code></pre>
-<p>We also need to write logic to increment the &#8220;mate in n&#8221; counter in the negamax algorithm.
+<p>We also need to write logic to increment the “mate in n” counter in the negamax algorithm.
 At every level of recursion, the <code>Mate(0)</code> will become a <code>Mate(1)</code>, then <code>Mate(-2)</code>, <code>Mate(3)</code> and so on.
-I&#8217;ll do this in the next section, with the final pseudocode for negamax in this post.</p>
+I’ll do this in the next section, with the final pseudocode for negamax in this post.</p>
 <h3 id="heuristic-negamax-pseudocode">Heuristic negamax pseudocode</h3>
-<p>Let&#8217;s now rewrite our negamax algorithm to work with heuristic evaluation scores,
+<p>Let’s now rewrite our negamax algorithm to work with heuristic evaluation scores,
 instead of game-theoretical scores.</p>
-<pre><code class="language-python">def eval(position) -&#62; Score:
-    """Evaluate a position."""
-    if position.is_checkmate():
-        return Mate(0)
-    else if position.is_stalemate():
-        return 0
-    else:
-        return position.our_material_value() - position.their_material_value()
+<pre><code class="language-python"><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eval</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Score</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Evaluate a position."""</span>
+    <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">is_checkmate</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Mate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">is_stalemate</span><span class="p">():</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">position</span><span class="o">.</span><span class="n">our_material_value</span><span class="p">()</span> <span class="o">-</span> <span class="n">position</span><span class="o">.</span><span class="n">their_material_value</span><span class="p">()</span>
 
 
-def negate_score(score) -&#62; Score:
-    """Negate score, and for checkmate scores, increment mate in `n` counter."""
-    if score is Mate(n):
-        if n &#62; 0:
-            return Mate(-(n + 1))
-        else:
-            return Mate(-n + 1)
-    else:
-        return -score
+<span class="k">def</span><span class="w"> </span><span class="nf">negate_score</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Score</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Negate score, and for checkmate scores, increment mate in `n` counter."""</span>
+    <span class="k">if</span> <span class="n">score</span> <span class="ow">is</span> <span class="n">Mate</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Mate</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Mate</span><span class="p">(</span><span class="o">-</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">score</span>
 
 
-def negamax(position, depth: int) -&#62; (Move, int):
-    """
-    Return the best move and evaluation of a chess position.
+<span class="k">def</span><span class="w"> </span><span class="nf">negamax</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">Move</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Return the best move and evaluation of a chess position.</span>
 
-    Will only think `depth` half-moves ahead.
-    """
+<span class="sd">    Will only think `depth` half-moves ahead.</span>
+<span class="sd">    """</span>
 
-    if depth == 0:
-        return None, eval(position)
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">eval</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
-    possible_moves = generate_moves(position)
+    <span class="n">possible_moves</span> <span class="o">=</span> <span class="n">generate_moves</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
-    if possible_moves.is_empty():
-        return None, eval(position)
+    <span class="k">if</span> <span class="n">possible_moves</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">eval</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
-    best_score = -infinity
-    best_move = None
+    <span class="n">best_score</span> <span class="o">=</span> <span class="o">-</span><span class="n">infinity</span>
+    <span class="n">best_move</span> <span class="o">=</span> <span class="kc">None</span>
 
-    for each move in possible_moves:
-        updated_position = apply_move_to_position(position, move)
-        opponent_move, opponent_score = negamax(updated_position, depth - 1)
-        our_score = negate_score(opponent_score)
+    <span class="k">for</span> <span class="n">each</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">possible_moves</span><span class="p">:</span>
+        <span class="n">updated_position</span> <span class="o">=</span> <span class="n">apply_move_to_position</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">move</span><span class="p">)</span>
+        <span class="n">opponent_move</span><span class="p">,</span> <span class="n">opponent_score</span> <span class="o">=</span> <span class="n">negamax</span><span class="p">(</span><span class="n">updated_position</span><span class="p">,</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">our_score</span> <span class="o">=</span> <span class="n">negate_score</span><span class="p">(</span><span class="n">opponent_score</span><span class="p">)</span>
 
-        if our_score &#62; best_score:
-            best_score = our_score
-            best_move = move
+        <span class="k">if</span> <span class="n">our_score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+            <span class="n">best_score</span> <span class="o">=</span> <span class="n">our_score</span>
+            <span class="n">best_move</span> <span class="o">=</span> <span class="n">move</span>
 
-    return best_move, best_score
+    <span class="k">return</span> <span class="n">best_move</span><span class="p">,</span> <span class="n">best_score</span>
 </code></pre>
 <p>When calling <code>negamax</code> initially,
 you should set some depth limit like <code>4</code>.
@@ -451,12 +449,12 @@ This is not a lot,
 but remember that negamax takes exponentially more time
 for every extra depth level searched.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>Now, here&#8217;s a game between last part&#8217;s version
+<p>Now, here’s a game between last part’s version
 (the one that plays the first move generated, without thinking)
 and a version using the negamax algorithm from
 this post.
 White is the negamax, and Black is the random move.</p>
-<p><img src="../public/img/chess2/game.gif" alt="Animated GIF of the chess game." /></p>
+<p><img alt="Animated GIF of the chess game." src="../public/img/chess2/game.gif"/></p>
 <p>As you can see, negamax successfully captures a pawn,
 then delivers checkmate.
 Embarassingly,
@@ -464,13 +462,13 @@ even though this version only looks 5 half moves ahead,
 and it has literally zero knowledge of chess other than the rules
 and the value of material,
 it can reliably beat me.</p>
-<p>In this post, we&#8217;ve thus constructed a chess engine that
+<p>In this post, we’ve thus constructed a chess engine that
 can convincingly play chess.
-In the grand scheme of things, it&#8217;s not that good;
+In the grand scheme of things, it’s not that good;
 any competent chess player would easily defeat this engine.</p>
-<p>There&#8217;s lots of room for improvement right now.
+<p>There’s lots of room for improvement right now.
 However, in the next part, before I explain some of the main optimizations for negamax,
-I&#8217;ll go over the testing methodology used
+I’ll go over the testing methodology used
 to ensure that improvements actually improve the engine.
 This may seem boring,
 but if you are actually writing a chess engine,
@@ -478,6 +476,7 @@ testing rigorously is a really essential good habit.</p>
 <p><a href="/chess3">Next part →</a></p>
 <hr/>
 <p>(Credit to Lichess for the chessboard diagrams.)</p>
+</link></link></link></article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>

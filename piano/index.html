@@ -2,31 +2,29 @@
 
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/svg" href="/public/favicon.svg">
-	<title>Reviving a digital piano with new brains</title>
-	<link href="https://www.dogeystamp.com/atom.xml" type="application/atom+xml" rel="alternate" title="Atom feed for blog posts" />
-    <meta name="description" content="DogeyStamp's personal website">
-    <meta name="author" content="DogeyStamp">
-	
-	<link rel="stylesheet" href="/public/css/font/inter.css">
-	<link rel="stylesheet" href="/public/css/style.css">
-</head>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="/public/favicon.svg" rel="shortcut icon" type="image/svg"/>
+<title>Reviving a digital piano with new brains</title>
+<link href="https://www.dogeystamp.com/atom.xml" rel="alternate" title="Atom feed for blog posts" type="application/atom+xml">
+<meta content="DogeyStamp's personal website" name="description"/>
+<meta content="DogeyStamp" name="author"/>
+<link href="/public/css/font/inter.css" rel="stylesheet"/>
+<link href="/public/css/style.css" rel="stylesheet"/>
+<link href="/public/css/pygments.css" rel="stylesheet"/>
+</link></head>
 <div class="header">
-	<div class="dogeystamp">
-		<img src="/public/img/logo.svg" class="logo">
-		<b>DogeyStamp</b>
-	</div>
-	<nav>
-		<a href="/index.html">Home</a>
-		<a href="/about">About</a>
-		<a href="/projects">Projects</a>
-		<a href="https://github.com/dogeystamp">GitHub</a>
-	</nav>
+<div class="dogeystamp">
+<img class="logo" src="/public/img/logo.svg"/>
+<b>DogeyStamp</b>
 </div>
-
+<nav>
+<a href="/index.html">Home</a>
+<a href="/about">About</a>
+<a href="/projects">Projects</a>
+<a href="https://github.com/dogeystamp">GitHub</a>
+</nav>
+</div>
 <article>
 <h1 id="reviving-a-digital-piano-with-new-brains">Reviving a digital piano with new brains</h1>
 <div class="creation-date">
@@ -44,8 +42,8 @@ I had just learned the basics of electronics, and this definitely seemed like a 
 <p>That was a few months ago.
 Recently, I finished implementing this project, which I named geode-piano.
 Here is a quick demo of it (excuse the poor microphone quality):</p>
-<p><video width="640" height="360" controls>
-  <source src="/public/img/piano/demo.mp4" type="video/mp4">
+<p><video controls="" height="360" width="640">
+<source src="/public/img/piano/demo.mp4" type="video/mp4"/>
 Your browser does not support the video tag.
 </video></p>
 <p>This project is powered by a single <a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi Pico</a>, which runs firmware written in Rust.
@@ -55,11 +53,11 @@ Source code and build instructions are available on the <a href="https://github.
 <p>First, before even designing anything, I did a bit of research on what was going on inside a digital piano.
 This helps understand how feasible the project is and how complicated it will be.</p>
 <p>As it turns out, digital pianos are, electrically, pretty simple.
-The switches that detect key-presses aren&#8217;t that different from a regular push-button:
+The switches that detect key-presses aren’t that different from a regular push-button:
 when pressed, they let power through, which we can detect.</p>
-<p>However, there&#8217;s 88 keys on a typical piano,
-and that&#8217;s a lot of switches to deal with.
-The microcontroller (processor chip) inside the piano usually can&#8217;t handle that many inputs.</p>
+<p>However, there’s 88 keys on a typical piano,
+and that’s a lot of switches to deal with.
+The microcontroller (processor chip) inside the piano usually can’t handle that many inputs.</p>
 <p>This can be solved with a <a href="https://en.m.wikipedia.org/wiki/Keyboard_matrix_circuit"><em>key matrix</em></a>, a specific wiring design.
 Essentially, a key matrix helps cram all those key switches onto a microcontroller with way less input pins.
 For example, look at this key matrix:</p>
@@ -99,19 +97,19 @@ allowing key-presses to be detected.
 On my piano, we have 176 key-switches (for reasons which I will explain later), which can be scanned using only 40 pins thanks to the matrix.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> This diagram and explanation are both simplified, so <a href="http://www.openmusiclabs.com/learning/digital/input-matrix-scanning/">click here</a> for a more detailled explanation.
-In practice, diodes are used to ensure power doesn&#8217;t flow the wrong way.</p>
+In practice, diodes are used to ensure power doesn’t flow the wrong way.</p>
 </div>
-<p>So that&#8217;s how a digital piano works, theoretically.
+<p>So that’s how a digital piano works, theoretically.
 What does that look like, under the hood?
 As it turns out, the matrix is accessible through ribbon cables (or <a href="https://en.m.wikipedia.org/wiki/Flexible_flat_cable"><em>flat flexible cable</em></a>, or FFC).</p>
-<p><img src="/public/img/piano/ffc-test.jpg" alt="A flat flexible cable with alligator clips on the contacts." /></p>
+<p><img alt="A flat flexible cable with alligator clips on the contacts." src="/public/img/piano/ffc-test.jpg"/></p>
 <p>The metallic contacts on these cables correspond to the columns and rows of the key matrix.
-Usually, you&#8217;ll find one or multiple ribbon cables with one end plugged into the main board of the digital piano,
+Usually, you’ll find one or multiple ribbon cables with one end plugged into the main board of the digital piano,
 and the other ends leading inside the piano key mechanism.</p>
 <h2 id="project-architecture">Project architecture</h2>
 <p>geode-piano works by disconnecting the ribbon cables from the original circuit board,
 then reconnecting them into my own circuit.
-Effectively, I&#8217;m taking over the piano key circuitry.</p>
+Effectively, I’m taking over the piano key circuitry.</p>
 <p>Designing this, I tried to make things as easy as possible for me.
 Therefore, this project only exposes the piano as a MIDI controller.
 This means that we will only be transmitting data about what note was pressed when.
@@ -132,7 +130,7 @@ Meanwhile, on a computer, we can make use of existing software to synthesize the
         │  3.3mm or usb or whatever
         │
 ╭───────┴───────────╮
-│ speaker&#47;headphone │
+│ speaker/headphone │
 ╰───────────────────╯
 </code></pre>
 <p>This is in contrast to actually generating the sound in my circuit and also playing it through a speaker,
@@ -143,7 +141,7 @@ so reinventing this wheel would be unwise.</p>
 <h2 id="hardware">Hardware</h2>
 <p>Now, physically, what does that <code>[geode-piano]</code> box in the architecture diagram above look like?
 The answer is that it looks like a mess.</p>
-<p><img src="/public/img/piano/doodad2.jpg" alt="My circuit, on a breadboard with many jumper wires" /></p>
+<p><img alt="My circuit, on a breadboard with many jumper wires" src="/public/img/piano/doodad2.jpg"/></p>
 <h3 id="microcontroller">Microcontroller</h3>
 <p>First of all, the heart of geode-piano is the Raspberry Pi Pico microcontroller,
 which is the green chip in the image above.
@@ -161,7 +159,7 @@ as it caused crosstalk.
 In tests, it showed up as ghost signals being detected with no visible source.
 Twisting some wires together and attempting to space them out fixed this issue.</p>
 <p>As an aside, I originally bought the wrong size of socket due to carelessness.
-I put up a ruler to the contacts and eyeballed the pin pitch (distance between each contacts&#8217; centers),
+I put up a ruler to the contacts and eyeballed the pin pitch (distance between each contacts’ centers),
 and decided it was 1.0mm.
 This was a big mistake on my part, as I found out later that it was 1.25mm.</p>
 <p>After this, I discovered that the socket specsheets had measurements of the distance between the first and last contacts,
@@ -174,26 +172,26 @@ Each has 16 GPIO pins, and they communicate over <a href="https://en.m.wikipedia
 which requires only 2 pins on that end.
 For these 14 extra pins we get, we sacrifice a bit of convenience and efficiency.</p>
 <p>One of the features of these chips is their capacity for both input and output.
-This is important because I don&#8217;t actually know which contact on the ribbon cable corresponds to which row and column.
+This is important because I don’t actually know which contact on the ribbon cable corresponds to which row and column.
 Instead of reverse-engineering the circuitry with a multimeter,
-I made a <a href="https://github.com/dogeystamp/geode-piano/blob/main/src/bin/pin_scanner.rs">scanner</a> that will try every row&#47;column combination possible for each key until it finds a valid one.
+I made a <a href="https://github.com/dogeystamp/geode-piano/blob/main/src/bin/pin_scanner.rs">scanner</a> that will try every row/column combination possible for each key until it finds a valid one.
 With this information, we can reconstruct the key matrix pinout.</p>
 <div class="notecard note markdown-alert markdown-alert-note">
 <p><strong>Note:</strong> A few important tips I would tell past me about this chip:</p>
 <ul>
 <li>You need <a href="https://www.joshmcguigan.com/blog/internal-pull-up-resistor-i2c/">pull-up resistors</a>
-for I²C. I won&#8217;t go into detail about it because the linked blog post sums up my experience with this.</li>
+for I²C. I won’t go into detail about it because the linked blog post sums up my experience with this.</li>
 <li>Multiple I²C peripherals can live on the same bus.</li>
 <li>Plug the <code>RESET</code> pin into the positive power rail. I was stuck for an entire afternoon because no documentation said this clearly.
-In the datasheet, &#8220;must be externally biased&#8221; means &#8220;do not leave this pin floating under any circumstances&#8221;.
+In the datasheet, “must be externally biased” means “do not leave this pin floating under any circumstances”.
 Also, the overbar on the pin name in the datasheet means that pulling the pin low will cause a reset.</li>
 <li>MCP23017 chips are known to have weird behaviour on pins GPA7 and GPB7. (Look at the most recent <a href="https://ww1.microchip.com/downloads/aemDocuments/documents/APID/ProductDocuments/DataSheets/MCP23017-Data-Sheet-DS20001952.pdf">datasheet</a>,
 not the old one!)</li>
 </ul>
 </div>
 <h2 id="firmware">Firmware</h2>
-<p>If you&#8217;ve used microcontrollers before,
-you probably know that they&#8217;re programmed using C++, C, or MicroPython,
+<p>If you’ve used microcontrollers before,
+you probably know that they’re programmed using C++, C, or MicroPython,
 or some similar language.
 The Raspberry Pi Pico is no different,
 as the most common ways to write firmware for it are the <a href="https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html">Pico C SDK</a>,
@@ -212,26 +210,26 @@ Even in a <code>no_std</code> embedded environment, you have a full package mana
 The <a href="https://docs.rs/mcp23017/latest/mcp23017/">MCP23017 library</a>, for example,
 let me develop that part of the code faster.
 Also, <a href="https://rust-analyzer.github.io/">rust-analyzer</a> works perfectly well, and
-gives the most detailled and helpful messages out of all language servers I&#8217;ve used before.</p>
+gives the most detailled and helpful messages out of all language servers I’ve used before.</p>
 <p>Specifically for this project, I used the <a href="https://embassy.dev/">embassy-rs</a> framework.
 This library makes embedded development in Rust really easy.
 It offers drivers for a bunch of useful features,
 like <a href="https://docs.embassy.dev/embassy-usb/git/default/index.html">USB MIDI</a>,
 <a href="https://docs.embassy.dev/embassy-usb-logger/git/default/index.html">USB logger output</a>,
 I²C and many others.
-Embassy also works using async&#47;await,
+Embassy also works using async/await,
 which makes multitasking simple and elegant.
-I&#8217;m not a Rust expert, though, so consult their website for more information about this.</p>
+I’m not a Rust expert, though, so consult their website for more information about this.</p>
 <p>Even though Rust is great, it does have an infamously steep learning curve.
 As you might know, Rust is memory-safe by using a strict <a href="https://doc.rust-lang.org/1.8.0/book/references-and-borrowing.html">borrow checker</a>.
 If you follow its rules, you can eliminate many types of memory bugs.
-In this project, though, I spent many hours fighting Rust&#8217;s borrow checker.
+In this project, though, I spent many hours fighting Rust’s borrow checker.
 What I learned from this experience is that, when possible,
-you should follow Rust&#8217;s idiomatic ways of solving problems.
+you should follow Rust’s idiomatic ways of solving problems.
 This means that you should avoid long-lived references,
 and keep lifetimes short.
-Essentially, don&#8217;t overcomplicate the program logic.</p>
-<p>Anyways, the source code for geode-piano&#8217;s firmware is available on the <a href="https://github.com/dogeystamp/geode-piano">project repository</a>.</p>
+Essentially, don’t overcomplicate the program logic.</p>
+<p>Anyways, the source code for geode-piano’s firmware is available on the <a href="https://github.com/dogeystamp/geode-piano">project repository</a>.</p>
 <h2 id="other-features">Other features</h2>
 <p>That was the general overview of the project.
 These are a few miscellaneous details that I could not fit well elsewhere.</p>
@@ -245,7 +243,7 @@ there is no information about intensity.</p>
 <p>To measure the intensity of key-presses, some engineer decided that instead of every key having one switch,
 they should have two switches.
 These switches are placed so that they trip one after the other during a keypress.
-By measuring the time between the switches&#8217; activations, the digital piano can estimate the intensity of a press.
+By measuring the time between the switches’ activations, the digital piano can estimate the intensity of a press.
 A fast press is a hard press, and a slow press is a soft press.
 This system works well, and is present in most digital pianos.</p>
 <p>geode-piano does have velocity detection too,
@@ -262,7 +260,7 @@ However, connecting the pedal to the microcontroller is more difficult.
 Typically, the pedals are connected to the piano via a <a href="https://en.m.wikipedia.org/wiki/Phone_connector_(audio)">TRS jack</a> (not dissimilar to a headphone jack).
 However, I had no socket component for this type of plug.
 Therefore, I made the most cursed part of the circuit:</p>
-<p><img src="/public/img/piano/jack.jpg" alt="TRS jack wrapped in wires" /></p>
+<p><img alt="TRS jack wrapped in wires" src="/public/img/piano/jack.jpg"/></p>
 <p>The brown wire is stripped on the part where it wraps around the plug,
 and the yellow and pink parts are stripped paperclips.
 This may seem like a fire hazard, but the wire connected to an input pin,
@@ -273,14 +271,15 @@ Another win for terrible wiring.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>This project was pretty fun to do.
 Before starting it, I thought that it was pretty ambitious for my skill level;
-at the time, I&#8217;d only played with wiring LEDs and buttons up to my microcontroller.
+at the time, I’d only played with wiring LEDs and buttons up to my microcontroller.
 Who knew that I could implement the circuitry for an entire digital piano?</p>
 <p>I did learn a lot about electronics through this project,
 as well as a bit of Rust.
-I don&#8217;t remember where I heard it anymore,
+I don’t remember where I heard it anymore,
 but I agree with the notion that you should try projects like this that are just barely within your capacities to accomplish.
 This kind of hands-on learning is one of the better ways to develop problem-solving skills.</p>
 <p>Anyways, I now have a working piano again!</p>
+</article></html>
 <footer role="contentinfo">
     <span class="backtotop"><a href="#">Back to top</a></span><br><br>
     <small>
