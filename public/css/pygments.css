@@ -1,0 +1,37 @@
+/* pygmentize -S default -f html > public/css/pygments.css */
+code {}
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.hll { background-color: #ffffcc }
+.c, .ch, .cm, .cpf, .c1, .cs, .sd { color: #7c7c7c; font-style: italic; font-weight: bold } /* Comment */
+.err { border: 1px solid #F00 } /* Error */
+.k, .kc, .kd, .kn, .kp, .kr, .ow { color: #747474 } /* Keyword */
+.o {} /* Operator */
+.cp { color: #9C6500 } /* Comment.Preproc */
+.gd { color: #A00000 } /* Generic.Deleted */
+.ge { font-style: italic } /* Generic.Emph */
+.ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.gr { color: #cc4444 } /* Generic.Error */
+.gh { color: #808080; font-weight: bold } /* Generic.Heading */
+.gi { color: #008400 } /* Generic.Inserted */
+.go { color: #717171 } /* Generic.Output */
+.gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.gs { font-weight: bold } /* Generic.Strong */
+.gu { color: #999999; font-weight: bold } /* Generic.Subheading */
+.gt { color: #04D } /* Generic.Traceback */
+.kt, .nc, .nb, .bp { font-weight: bold } /* Keyword.Type */
+.s, .sa, .sb, .dl, .s2, .sh, .sx, .s1, .m, .mb, .mf, .mh, .mi, .mo { color: #868686; font-weight: bold } /* Literal.String */
+.na { } /* Name.Attribute */
+.no, .ni, .ne, .nn, .nt, .vm { color: #868686; font-weight: bold } /* Name.Constant */
+.nd, .nf, .nl, .fm { font-weight: bold } /* Name.Decorator */
+.nv {} /* Name.Variable */
+.w { color: #BBB } /* Text.Whitespace */
+.sc, .se, .si, .ss { color: #212121; font-weight: bold } /* Literal.String.Char */
+.sx { color: #008000 } /* Literal.String.Other */
+.sr {} /* Literal.String.Regex */
+.vc {} /* Name.Variable.Class */
+.vg {} /* Name.Variable.Global */
+.vi {} /* Name.Variable.Instance */
+.il {} /* Literal.Number.Integer.Long */
