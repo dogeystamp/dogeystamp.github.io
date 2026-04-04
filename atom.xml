@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title>DogeyStamp</title>
 	<link href="https://www.dogeystamp.com/atom.xml" rel="self" />
-	<updated>2026-01-18T23:19:13Z</updated>
+	<updated>2026-04-04T17:37:37Z</updated>
 	<author>
 		<name>dogeystamp</name>
 	</author>
@@ -2342,6 +2342,167 @@ so fish-fm can&amp;#8217;t just print the files selected.&lt;/p&gt;
 		<id>https://www.dogeystamp.com/fish-fm</id>
 		<updated>2023-06-28T10:00:00Z</updated>
 		<published>2023-06-28T10:00:00Z</published>
+	</entry>
+	<entry>
+		<title>Getting into crochet</title>
+		<content type="html">&lt;h1 id=&quot;getting-into-crochet&quot;&gt;Getting into crochet&lt;/h1&gt;
+&lt;div class=&quot;creation-date&quot;&gt;
+2026-04-01
+&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;../public/img/crochet/ribbon.jpg&quot; alt=&quot;A crochet ribbon&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;As of today, we&amp;#8217;re completely rebranding dogeystamp.com as an arts and crafts website!&lt;/p&gt;
+&lt;p&gt;A few months ago, I remembered that joke about how senior software engineers invariably
+retire to tend to crops and a chicken farm,
+or to do woodworking.
+I wanted be ahead of the curve, so I too decided to get a hobby that involved tangible things:
+I learned &lt;a href=&quot;https://en.wikipedia.org/wiki/Crochet&quot;&gt;crochet&lt;/a&gt;,
+which a way of making things (like that ribbon in the picture above) using yarn.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m not skilled or anything, so as the title suggests, this article mostly describes the beginner experience,
+and what I wish I&amp;#8217;d known earlier.
+If you had to retain one thing from reading this, I would say that crochet is quite fun and accessible,
+as long as you have patience.
+Notably, I won&amp;#8217;t actually explain &lt;em&gt;how to&lt;/em&gt; crochet; many people have made much better online resources for that.&lt;/p&gt;
+&lt;h2 id=&quot;materials&quot;&gt;Materials&lt;/h2&gt;
+&lt;p&gt;You only really need two things to crochet, the yarn and a crochet hook,&lt;sup id=&quot;fnref1&quot;&gt;&lt;a href=&quot;#fn1&quot; rel=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;
+and at the end you&amp;#8217;ll need scissors to cut away the yarn you haven&amp;#8217;t used.
+Usually, people have scissors already, so yarn and the hook are the only thing you need to get.
+Hooks and yarn both come in different sizes, and you do want the sizes to match.
+There is some margin of error on the sizes, though, so a small mismatch is fine.&lt;/p&gt;
+&lt;p&gt;I have actually never personally bought a hook or yarn as of writing, because
+some very generous people I know gifted me hooks and yarn.&lt;sup id=&quot;fnref2&quot;&gt;&lt;a href=&quot;#fn2&quot; rel=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;
+It&amp;#8217;s probably not hard to buy yarn and a hook of matching sizes, but if you really want to be safe,
+they sell kits for beginners that should work fine out of the box.&lt;/p&gt;
+&lt;h2 id=&quot;getting-started&quot;&gt;Getting started&lt;/h2&gt;
+&lt;p&gt;Crochet in particular
+is nice (compared to something like knitting)
+at the beginner stage, because every single stitch you make can be effortlessly undone
+by unravelling the yarn.&lt;/p&gt;
+&lt;p&gt;So to figure out how to crochet, I repeatedly made then unmade
+yarn squares, following tutorials online.
+(Pretty much any tutorial for complete beginners seems to be about making these swatches.)
+Here&amp;#8217;s a work-in-progress picture of one of my first squares:
+&lt;img src=&quot;../public/img/crochet/guh.jpg&quot; alt=&quot;A square crochet swatch&quot; /&gt;
+It turns out that the techniques for making squares
+are actually sufficient for creating many interesting items.
+In fact, all of the creations pictured in this article
+are entirely composed of rectangles stitched together in different ways.&lt;/p&gt;
+&lt;p&gt;The process for making a square swatch starts with making a &lt;em&gt;chain&lt;/em&gt;
+of yarn,
+then repeatedly building rows of &lt;em&gt;single crochet&lt;/em&gt; stitches on top of that foundation,
+as if laying bricks to build a wall.&lt;sup id=&quot;fnref3&quot;&gt;&lt;a href=&quot;#fn3&quot; rel=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Most of the difficulty in learning crochet
+comes from figuring out which hole to insert the hook into.
+On every row,
+there will be V-shapes,
+which you are supposed to pass the hook through to create stitches.
+I&amp;#8217;d follow tutorials step by step,
+and end up confused because I couldn&amp;#8217;t recognize
+the shapes from the tutorial when looking at the yarn in my hands.
+For me, it helped to fiddle and twist the row
+until the V-shapes were clearly visible,
+after which everything looked exactly like the tutorials.&lt;/p&gt;
+&lt;p&gt;Other than figuring out how to put the hook in the right hole, an
+important aspect of crochet is making your stitches nice and regular.
+There are two things that helped me with this.
+First, I learned that the &lt;em&gt;thickest part&lt;/em&gt; of the hook is a measurement tool;
+by always wrapping your yarn around the thickest part when making stitches,
+your stitches will have a regular size.
+If you wrap yarn around a thinner part, the holes you make will be too tight to pass the hook through.
+Second, I watched &lt;a href=&quot;https://youtube.com/watch?v=-n_iZFkye8o&quot;&gt;this video&lt;/a&gt;
+about the &amp;#8220;golden loop,&amp;#8221; which contributed to making my stitches more consistent.
+The video itself is much better at explaining than I am,
+so please watch that for further information.&lt;/p&gt;
+&lt;h2 id=&quot;making-things&quot;&gt;Making things&lt;/h2&gt;
+&lt;p&gt;After becoming half-decent at making square swatches, I was able to make more interesting things.&lt;/p&gt;
+&lt;h3 id=&quot;ribbons&quot;&gt;Ribbons&lt;/h3&gt;
+&lt;p&gt;I followed &lt;a href=&quot;https://youtube.com/watch?v=GaTBLmiAFq0&quot;&gt;this tutorial&lt;/a&gt; for making a bow tie &amp;#47; ribbon
+just like the one pictured at the top of this page.&lt;/p&gt;
+&lt;p&gt;The ribbon is actually composed of two rectangles; one is for the main body part,
+and one for the two dangly bits below. The tutorial tells you the sizes (number
+of chains and number of rows) to make both rectangles, and once you make them,
+you attach them together by threading yarn through the stitches.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../public/img/crochet/ribbon3.jpg&quot; alt=&quot;Two parts of a crochet ribbon.&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Ribbons were fun, since they don&amp;#8217;t take a lot of time or material to make,
+are prettier than square swatches,
+and use the single crochet technique used for the beginner squares.
+The method I used for &amp;#8220;sewing&amp;#8221; together the rectangles was also pretty much just single crochet stitches,&lt;sup id=&quot;fnref4&quot;&gt;&lt;a href=&quot;#fn4&quot; rel=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt;
+so once you figure out how to make a square, a ribbon isn&amp;#8217;t much of a big step up.&lt;/p&gt;
+&lt;h3 id=&quot;beanie&quot;&gt;Beanie&lt;/h3&gt;
+&lt;p&gt;Once I made a few ribbons, I got bored and started looking for a new project.
+Taking some inspiration from the friend that helped me get into crochet, I made a beanie with cutesy ears,&lt;sup id=&quot;fnref5&quot;&gt;&lt;a href=&quot;#fn5&quot; rel=&quot;footnote&quot;&gt;5&lt;/a&gt;&lt;/sup&gt;
+following &lt;a href=&quot;https://vivcrochets.com/cat-ear-beanie/&quot;&gt;this tutorial&lt;/a&gt;.
+Here&amp;#8217;s me wearing the beanie:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../public/img/crochet/beanie.jpg&quot; alt=&quot;A crochet beanie with dog ears, worn by a cartoon face&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;(It&amp;#8217;s hard to demonstrate a beanie without showing my face.)
+Despite the seemingly curved ears, the beanie is formed from a single rectangle;
+when worn, it naturally folds in a way that gives ears.&lt;sup id=&quot;fnref6&quot;&gt;&lt;a href=&quot;#fn6&quot; rel=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt;
+Thus, making a beanie is really not that different from the square swatches I started off with.
+However, with this project, I did encounter some challenges.&lt;/p&gt;
+&lt;p&gt;First, the beanie does not just use single crochet stiches; it uses &lt;em&gt;half-double crochet&lt;/em&gt; stitches, and &lt;em&gt;slip stitches&lt;/em&gt;.
+This sounds quite daunting, but these stitches are actually quite similar to single crochet.
+For me, learning the new stitches took much less time than figuring out single crochet for the first time,
+because most of the muscle memory was the same.&lt;/p&gt;
+&lt;p&gt;Second, getting the dimensions of the beanie right was challenging.
+Making the beanie, I had to pick its width and length so that it could fit on my head.
+After two weeks of crocheting,
+I realized that I was running out of yarn,
+and, even worse than that, my beanie was comically tall.
+Unfortunately, I had picked completely incorrect dimensions,
+so I had to unravel everything and start over again.
+Thankfully, the second time crocheting the beanie, I was much faster because I got better at crochet.&lt;/p&gt;
+&lt;p&gt;Another thing to watch out for in terms of dimensions
+is that putting your crochet work in the washing machine might shrink it.
+Apparently &lt;a href=&quot;https://sarahmaker.com/block-crochet/&quot;&gt;blocking&lt;/a&gt;
+helps with shrinkage; I don&amp;#8217;t know much about blocking though.&lt;/p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Learning crochet was fun; it&amp;#8217;s easy to get into, and very forgiving of mistakes.
+Best of all, I get to keep the tangible fruits of my labor,
+and put cool photographs of them in this article.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s much much more to crochet than what I&amp;#8217;ve outlined here;
+notably, &lt;a href=&quot;https://en.wikipedia.org/wiki/Amigurumi&quot;&gt;amigurumi&lt;/a&gt; techniques let you make things that aren&amp;#8217;t just rectangles.
+Hopefully though, this is enough to convey how getting into crochet is really accessible.&lt;/p&gt;
+&lt;p&gt;That concludes my thoughts on crochet.
+Happy April Fool&amp;#8217;s Day!&lt;sup id=&quot;fnref7&quot;&gt;&lt;a href=&quot;#fn7&quot; rel=&quot;footnote&quot;&gt;7&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class=&quot;footnotes&quot;&gt;
+&lt;hr/&gt;
+&lt;ol&gt;
+
+&lt;li id=&quot;fn1&quot;&gt;
+&lt;p&gt;&amp;#8220;Crochet hook&amp;#8221; means &amp;#8220;hook hook&amp;#8221; but it is what it is.&amp;#160;&lt;a href=&quot;#fnref1&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn2&quot;&gt;
+&lt;p&gt;On the off-chance you are reading this, thanks a lot for the materials and your guidance :)&amp;#160;&lt;a href=&quot;#fnref2&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn3&quot;&gt;
+&lt;p&gt;For a niche 3D modeling metaphor for crochet, see &lt;a href=&quot;https://youtube.com/watch?v=xtlDND7NVp8&quot;&gt;this CodeParade video&lt;/a&gt;.&amp;#160;&lt;a href=&quot;#fnref3&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn4&quot;&gt;
+&lt;p&gt;Often, tutorials recommend that you use a proper sewing needle to sew together different pieces.
+So far, I have gotten away with just stitching pieces together.&amp;#160;&lt;a href=&quot;#fnref4&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn5&quot;&gt;
+&lt;p&gt;Everyone says these are cat ears, but I assure you these are shiba ears because I&amp;#8217;m &lt;em&gt;doge&lt;/em&gt;ystamp.&amp;#160;&lt;a href=&quot;#fnref5&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn6&quot;&gt;
+&lt;p&gt;The normal not-eared beanie is not a rectangle, and is arguably harder to make.&amp;#160;&lt;a href=&quot;#fnref6&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id=&quot;fn7&quot;&gt;
+&lt;p&gt;To the astute readers who noticed that I posted this a few days late and backdated it to April 1st:
+shush you didn&amp;#8217;t notice anything.&amp;#160;&lt;a href=&quot;#fnref7&quot; rev=&quot;footnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;</content>
+		<link href="https://www.dogeystamp.com/crochet"/>
+		<id>https://www.dogeystamp.com/crochet</id>
+		<updated>2026-04-01T10:00:00Z</updated>
+		<published>2026-04-01T10:00:00Z</published>
 	</entry>
 	<entry>
 		<title>Lower bound, upper bound in C++, visually explained</title>
@@ -5372,7 +5533,7 @@ but remember that these aren&amp;#8217;t actually part of UCI.&lt;/p&gt;
 &amp;#60;&amp;#60;&amp;#60; quit
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let&amp;#8217;s break this down.&lt;/p&gt;
-&lt;h3 id=&quot;section&quot;&gt;&lt;code&gt;uci&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;uci&quot;&gt;&lt;code&gt;uci&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;First, right after the engine is started,
 the GUI sends a &lt;code&gt;uci&lt;/code&gt;.
 This command means &lt;em&gt;&amp;#8220;let&amp;#8217;s talk using UCI&amp;#8221;&lt;/em&gt;.
@@ -5382,15 +5543,15 @@ others exist, like the &lt;a href=&quot;https://www.chessprogramming.org/Chess_E
 Between &lt;code&gt;uci&lt;/code&gt; and &lt;code&gt;uciok&lt;/code&gt;, the engine may also send the &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;option&lt;/code&gt; messages,
 which specify metadata about the engine, like its name, or the settings you can tweak.
 Typically, in the GUI, options will be displayed as buttons, or sliders, or checkboxes, depending on the &lt;code&gt;type&lt;/code&gt;.&lt;/p&gt;
-&lt;h3 id=&quot;section-1&quot;&gt;&lt;code&gt;isready&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;isready&quot;&gt;&lt;code&gt;isready&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Then, there&amp;#8217;s an &lt;code&gt;isready&lt;/code&gt; from the GUI, following by a &lt;code&gt;readyok&lt;/code&gt; from the engine.
 This command is sort of an &amp;#8220;are you still alive?&amp;#8221; check from the GUI.
 If the chess engine is busy with initialization, it should send &lt;code&gt;readyok&lt;/code&gt; after finishing up,
 i.e. when it is ready to play.&lt;/p&gt;
-&lt;h3 id=&quot;section-2&quot;&gt;&lt;code&gt;ucinewgame&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;ucinewgame&quot;&gt;&lt;code&gt;ucinewgame&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Next, the &lt;code&gt;ucinewgame&lt;/code&gt; from the GUI tells the engine to reset its state.
 This makes it possible to play multiple games without completely rebooting the engine every time.&lt;/p&gt;
-&lt;h3 id=&quot;section-3&quot;&gt;&lt;code&gt;position&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;position&quot;&gt;&lt;code&gt;position&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Now for the actual game.
 In this example, we could assume White is a human player making moves on a chessboard GUI,
 while the engine plays Black.
@@ -5412,7 +5573,7 @@ for instance &lt;code&gt;e1g1&lt;/code&gt; is kingside castling, while &lt;code&
 &lt;/ul&gt;
 &lt;p&gt;Long algebraic notation is easier for programs to deal with,
 since it&amp;#8217;s more explicit about what piece is moving.&lt;/p&gt;
-&lt;h3 id=&quot;section-4&quot;&gt;&lt;code&gt;go&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;go&quot;&gt;&lt;code&gt;go&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;The &lt;code&gt;go&lt;/code&gt; command is the most important one in UCI.
 It tells the engine to start searching the for the best move in the current position (e.g. after White played &lt;em&gt;e4&lt;/em&gt;, the engine thinks of Black&amp;#8217;s best response).&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;#60;&amp;#60;&amp;#60; go wtime 59780 winc 0 btime 60000 binc 0
@@ -5437,13 +5598,13 @@ There are fields other than &lt;code&gt;score&lt;/code&gt; (see the &lt;a href=&
 Ideally, you would print multiple &lt;code&gt;info&lt;/code&gt; lines while the engine thinks
 in order to get a sense of the engine&amp;#8217;s thought process,
 but this is not necessary.&lt;/p&gt;
-&lt;h3 id=&quot;section-5&quot;&gt;&lt;code&gt;quit&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;quit&quot;&gt;&lt;code&gt;quit&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;The &lt;code&gt;quit&lt;/code&gt; command is self-explanatory;
 it tells your engine to terminate the program.
 (In C&amp;#47;C++ for example, this would be returning from &lt;code&gt;main&lt;/code&gt;.)
 This is not to be confused with &lt;code&gt;stop&lt;/code&gt;,
 that only stops an individual search.&lt;/p&gt;
-&lt;h3 id=&quot;section-6&quot;&gt;&lt;code&gt;position fen&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;position-fen&quot;&gt;&lt;code&gt;position fen&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;This command is not in the example, because I don&amp;#8217;t think it&amp;#8217;s strictly necessary for a functioning chess engine.
 However, it&amp;#8217;s very useful, so I&amp;#8217;m including it in this list.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;position fen&lt;/code&gt; takes a &lt;em&gt;Forsyth-Edwards Notation&lt;/em&gt;, or &lt;strong&gt;FEN&lt;/strong&gt; code,
@@ -5474,7 +5635,7 @@ This is because FEN is not actually able to fully represent a chess position.
 Due to the &lt;a href=&quot;https://en.m.wikipedia.org/wiki/Threefold_repetition&quot;&gt;threefold repetition&lt;/a&gt; rule,
 you also need the board history to accurately evaluate a position.
 This is why a series of moves from the start position, which does encode the full history, is used instead.&lt;/p&gt;
-&lt;h3 id=&quot;section-7&quot;&gt;&lt;code&gt;stop&lt;/code&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;stop&quot;&gt;&lt;code&gt;stop&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Another command you should technically handle is
 &lt;code&gt;stop&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;While the engine is thinking, if it receives a &lt;code&gt;stop&lt;/code&gt; command,

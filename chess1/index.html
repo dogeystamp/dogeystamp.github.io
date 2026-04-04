@@ -110,7 +110,7 @@ but remember that these aren’t actually part of UCI.</p>
 &lt;&lt;&lt; quit
 </code></pre>
 <p>Let’s break this down.</p>
-<h3 id="section"><code>uci</code></h3>
+<h3 id="uci"><code>uci</code></h3>
 <p>First, right after the engine is started,
 the GUI sends a <code>uci</code>.
 This command means <em>“let’s talk using UCI”</em>.
@@ -120,15 +120,15 @@ others exist, like the <a href="https://www.chessprogramming.org/Chess_Engine_Co
 Between <code>uci</code> and <code>uciok</code>, the engine may also send the <code>id</code> and <code>option</code> messages,
 which specify metadata about the engine, like its name, or the settings you can tweak.
 Typically, in the GUI, options will be displayed as buttons, or sliders, or checkboxes, depending on the <code>type</code>.</p>
-<h3 id="section-1"><code>isready</code></h3>
+<h3 id="isready"><code>isready</code></h3>
 <p>Then, there’s an <code>isready</code> from the GUI, following by a <code>readyok</code> from the engine.
 This command is sort of an “are you still alive?” check from the GUI.
 If the chess engine is busy with initialization, it should send <code>readyok</code> after finishing up,
 i.e. when it is ready to play.</p>
-<h3 id="section-2"><code>ucinewgame</code></h3>
+<h3 id="ucinewgame"><code>ucinewgame</code></h3>
 <p>Next, the <code>ucinewgame</code> from the GUI tells the engine to reset its state.
 This makes it possible to play multiple games without completely rebooting the engine every time.</p>
-<h3 id="section-3"><code>position</code></h3>
+<h3 id="position"><code>position</code></h3>
 <p>Now for the actual game.
 In this example, we could assume White is a human player making moves on a chessboard GUI,
 while the engine plays Black.
@@ -150,7 +150,7 @@ for instance <code>e1g1</code> is kingside castling, while <code>e1c1</code> is 
 </ul>
 <p>Long algebraic notation is easier for programs to deal with,
 since it’s more explicit about what piece is moving.</p>
-<h3 id="section-4"><code>go</code></h3>
+<h3 id="go"><code>go</code></h3>
 <p>The <code>go</code> command is the most important one in UCI.
 It tells the engine to start searching the for the best move in the current position (e.g. after White played <em>e4</em>, the engine thinks of Black’s best response).</p>
 <pre><code>&lt;&lt;&lt; go wtime 59780 winc 0 btime 60000 binc 0
@@ -175,13 +175,13 @@ There are fields other than <code>score</code> (see the <a href="https://backsca
 Ideally, you would print multiple <code>info</code> lines while the engine thinks
 in order to get a sense of the engine’s thought process,
 but this is not necessary.</p>
-<h3 id="section-5"><code>quit</code></h3>
+<h3 id="quit"><code>quit</code></h3>
 <p>The <code>quit</code> command is self-explanatory;
 it tells your engine to terminate the program.
 (In C/C++ for example, this would be returning from <code>main</code>.)
 This is not to be confused with <code>stop</code>,
 that only stops an individual search.</p>
-<h3 id="section-6"><code>position fen</code></h3>
+<h3 id="position-fen"><code>position fen</code></h3>
 <p>This command is not in the example, because I don’t think it’s strictly necessary for a functioning chess engine.
 However, it’s very useful, so I’m including it in this list.</p>
 <p><code>position fen</code> takes a <em>Forsyth-Edwards Notation</em>, or <strong>FEN</strong> code,
@@ -212,7 +212,7 @@ This is because FEN is not actually able to fully represent a chess position.
 Due to the <a href="https://en.m.wikipedia.org/wiki/Threefold_repetition">threefold repetition</a> rule,
 you also need the board history to accurately evaluate a position.
 This is why a series of moves from the start position, which does encode the full history, is used instead.</p>
-<h3 id="section-7"><code>stop</code></h3>
+<h3 id="stop"><code>stop</code></h3>
 <p>Another command you should technically handle is
 <code>stop</code>.</p>
 <p>While the engine is thinking, if it receives a <code>stop</code> command,
